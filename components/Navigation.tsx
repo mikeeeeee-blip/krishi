@@ -386,7 +386,7 @@ export default function Navigation() {
                   }}
                 >
                   <button 
-                    ref={(el) => (buttonRefs.current[category.name] = el)}
+                    ref={(el) => { buttonRefs.current[category.name] = el; }}
                     type="button"
                     className={`px-3 md:px-4 py-2 md:py-2.5 transition-colors flex items-center gap-1 whitespace-nowrap text-sm md:text-base font-medium h-full ${
                       isHovered ? 'bg-[#15803d]' : 'hover:bg-[#15803d]'

@@ -1,0 +1,327 @@
+'use client';
+
+import { useState } from 'react';
+import { useParams } from 'next/navigation';
+import Image from 'next/image';
+import Link from 'next/link';
+import { Star, ShoppingCart, ChevronRight, CheckCircle, Truck, Package } from 'lucide-react';
+import TopBar from '@/components/TopBar';
+import Header from '@/components/Header';
+import Navigation from '@/components/Navigation';
+import Footer from '@/components/Footer';
+import { productData } from '@/data/products';
+
+export default function ProductDetailPage() {
+  const params = useParams();
+  const productId = params?.id as string;
+  const product = productData[productId as keyof typeof productData];
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [selectedVariant, setSelectedVariant] = useState(0);
+
+  if (!product) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-xl text-gray-600">Product not found</p>
+      </div>
+    );
+  }
+
+  const selectedVariantData = product.variants[selectedVariant];
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <TopBar />
+      <Header />
+      <Navigation />
+      
+      {/* Breadcrumbs */}
+      <div className="bg-white border-b border-gray-200 py-3">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center gap-2 text-sm text-gray-600">
+            <Link href="/" className="hover:text-green-600">Home</Link>
+            <ChevronRight size={16} />
+            <span>{product.technicalDetails.category}</span>
+            <ChevronRight size={16} />
+            <span>{product.technicalDetails.subCategory}</span>
+            <ChevronRight size={16} />
+            <span className="text-gray-900 font-medium">Product Details</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="container mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+          {/* Left Side - Product Images */}
+          <div>
+            {/* Main Image */}
+            <div className="relative aspect-square bg-white rounded-lg border border-gray-200 mb-4 overflow-hidden">
+              {/* Discount Badge */}
+              <div className="absolute top-4 left-4 z-10">
+                <span className="bg-red-500 text-white text-sm font-bold px-3 py-1.5 rounded">
+                  {product.discountPercent}% OFF
+                </span>
+              </div>
+
+              <Image
+                src={product.images[selectedImageIndex]}
+                alt={product.name}
+                fill
+                className="object-contain p-4"
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                priority
+              />
+
+              {/* Image Counter */}
+              <div className="absolute bottom-4 right-4 bg-black/50 text-white text-xs px-2 py-1 rounded">
+                {selectedImageIndex + 1}/{product.images.length}
+              </div>
+            </div>
+
+            {/* Thumbnail Images */}
+            <div className="grid grid-cols-6 gap-2">
+              {product.images.map((img, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setSelectedImageIndex(idx)}
+                  className={`relative aspect-square rounded border-2 overflow-hidden transition-all ${
+                    selectedImageIndex === idx
+                      ? 'border-green-600 ring-2 ring-green-200'
+                      : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                >
+                  <Image
+                    src={img}
+                    alt={`${product.name} view ${idx + 1}`}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 1024px) 16vw, 8vw"
+                  />
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Right Side - Product Info */}
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
+              {product.name}
+            </h1>
+
+            <p className="text-gray-600 mb-4">Brand: {product.brand}</p>
+
+            {/* Rating */}
+            <div className="flex items-center gap-2 mb-4">
+              <div className="flex items-center">
+                <Star size={20} className="fill-yellow-400 text-yellow-400" />
+                <span className="ml-1 font-semibold">{product.rating}</span>
+              </div>
+              <span className="text-gray-600">({product.reviews} reviews)</span>
+            </div>
+
+            {/* Price */}
+            <div className="mb-6">
+              <div className="flex items-baseline gap-3 mb-2">
+                <span className="text-3xl font-bold text-gray-900">
+                  ₹{selectedVariantData.price}
+                </span>
+                <span className="text-xl text-gray-500 line-through">
+                  ₹{product.originalPrice}
+                </span>
+              </div>
+              <p className="text-green-600 font-semibold mb-1">
+                You save ₹{product.discount} ({product.discountPercent}% off)
+              </p>
+              <p className="text-gray-600">Free Delivery</p>
+            </div>
+
+            {/* Variant Selection */}
+            <div className="mb-6">
+              <h3 className="text-lg font-semibold mb-3">Select Variant</h3>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 max-h-64 overflow-y-auto p-2 border border-gray-200 rounded">
+                {product.variants.map((variant, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setSelectedVariant(idx)}
+                    className={`p-3 border-2 rounded text-left transition-all ${
+                      selectedVariant === idx
+                        ? 'border-green-600 bg-green-50'
+                        : 'border-gray-200 hover:border-gray-300'
+                    } ${!variant.inStock ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    disabled={!variant.inStock}
+                  >
+                    <div className="font-semibold text-sm">{variant.name}</div>
+                    <div className="text-xs text-gray-600 mt-1">{variant.quantity}</div>
+                    <div className="text-sm font-bold mt-1">₹{variant.price}</div>
+                    {variant.isBestSeller && (
+                      <span className="inline-block mt-1 bg-red-500 text-white text-xs px-2 py-0.5 rounded">
+                        BEST SELLER
+                      </span>
+                    )}
+                    {!variant.inStock && (
+                      <span className="inline-block mt-1 bg-red-500 text-white text-xs px-2 py-0.5 rounded">
+                        SOLD OUT
+                      </span>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex gap-4 mb-6">
+              <button className="flex-1 bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2">
+                <ShoppingCart size={20} />
+                ADD TO CART
+              </button>
+              <button className="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors">
+                BUY NOW
+              </button>
+            </div>
+
+            {/* Payment & Delivery Info */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+              <div className="text-center">
+                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                  <CheckCircle size={24} className="text-green-600" />
+                </div>
+                <p className="text-xs text-gray-700">Pay On Delivery Or Online Payment</p>
+              </div>
+              <div className="text-center">
+                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                  <CheckCircle size={24} className="text-blue-600" />
+                </div>
+                <p className="text-xs text-gray-700">48 hours returnable</p>
+              </div>
+              <div className="text-center">
+                <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                  <Truck size={24} className="text-purple-600" />
+                </div>
+                <p className="text-xs text-gray-700">AgriBegri Delivery</p>
+              </div>
+              <div className="text-center">
+                <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                  <Package size={24} className="text-orange-600" />
+                </div>
+                <p className="text-xs text-gray-700">Shipping Through Courier</p>
+              </div>
+            </div>
+
+            {/* Additional Info */}
+            <div className="bg-gray-50 p-4 rounded-lg space-y-2 text-sm text-gray-700 mb-6">
+              <p>• Inclusive of all taxes</p>
+              <p>• Pay online and get ₹30 Cash Discount</p>
+              <p>• Pay 10% advance and get ₹15 Cash Discount</p>
+              <p>
+                • Please call us on{' '}
+                <a href={`tel:${product.phoneNumber}`} className="text-green-600 underline font-semibold">
+                  {product.phoneNumber}
+                </a>{' '}
+                for bulk quantity order
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Product Description */}
+        <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+          <h2 className="text-2xl font-bold mb-4">Product Description</h2>
+          <div className="text-gray-700 space-y-4">
+            <p>{product.description}</p>
+            
+            <div>
+              <h3 className="text-lg font-semibold mb-2">Technical Composition:</h3>
+              <p>{product.technicalComposition}</p>
+            </div>
+
+            <div>
+              <h3 className="text-lg font-semibold mb-3">Key Features and Benefits:</h3>
+              <ul className="space-y-3">
+                {product.keyFeatures.map((feature, idx) => (
+                  <li key={idx}>
+                    <span className="font-semibold">{feature.title}:</span> {feature.description}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="text-lg font-semibold mb-3">Dosage:</h3>
+              <ul className="space-y-2 list-disc list-inside">
+                <li><span className="font-semibold">For Spraying:</span> {product.dosage.spraying}</li>
+                <li><span className="font-semibold">For Sugarcane:</span> {product.dosage.sugarcane}</li>
+                <li><span className="font-semibold">For Soil Application Dose:</span> {product.dosage.soilApplication}</li>
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="text-lg font-semibold mb-2">Suitable Crops:</h3>
+              <p>{product.suitableCrops}</p>
+            </div>
+
+            <div>
+              <h3 className="text-lg font-semibold mb-3">Safety Tips</h3>
+              <ul className="space-y-2 list-disc list-inside">
+                {product.safetyTips.map((tip, idx) => (
+                  <li key={idx}>{tip}</li>
+                ))}
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="text-lg font-semibold mb-2">Note:</h3>
+              <p>{product.note}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Product Images Grid */}
+        <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+          <h2 className="text-2xl font-bold mb-4">Product Images</h2>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            {product.images.map((img, idx) => (
+              <div key={idx} className="relative aspect-square rounded-lg overflow-hidden border border-gray-200">
+                <Image
+                  src={img}
+                  alt={`${product.name} - Image ${idx + 1}`}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 50vw, 33vw"
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Technical Details */}
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <h2 className="text-2xl font-bold mb-4">Technical Details</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <span className="font-semibold">Brand:</span> {product.technicalDetails.brand}
+            </div>
+            <div>
+              <span className="font-semibold">Product Code:</span> {product.technicalDetails.productCode}
+            </div>
+            <div>
+              <span className="font-semibold">Country of Origin:</span> {product.technicalDetails.countryOfOrigin}
+            </div>
+            <div>
+              <span className="font-semibold">Category:</span> {product.technicalDetails.category}
+            </div>
+            <div>
+              <span className="font-semibold">Sub Category:</span> {product.technicalDetails.subCategory}
+            </div>
+            <div>
+              <span className="font-semibold">Pickup address:</span> {product.technicalDetails.pickupAddress}
+            </div>
+            <div className="md:col-span-2">
+              <span className="font-semibold">Address of origin:</span> {product.technicalDetails.addressOfOrigin}
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <Footer />
+    </div>
+  );
+}

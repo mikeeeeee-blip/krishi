@@ -1,0 +1,83 @@
+export const productData = {
+  '1': {
+    id: '1',
+    name: 'HUBEL - Humic Acid 98% Potassium Humate, Suitable for All Crops, Enhances Root Mass, Brix Level, and Plant Growth',
+    brand: 'Noble Crop Science',
+    rating: 4.68,
+    reviews: 467,
+    originalPrice: 670,
+    currentPrice: 261,
+    discount: 409,
+    discountPercent: 61,
+    images: [
+      'https://agribegri.com/_next/image?url=https%3A%2F%2Fdujjhct8zer0r.cloudfront.net%2Fmedia%2Fprod_image%2F3748729181735026400.webp&w=1080&q=75',
+      'https://agribegri.com/_next/image?url=https%3A%2F%2Fdujjhct8zer0r.cloudfront.net%2Fmedia%2Fprod_image%2Fb019300ec1dcd5f9fb609b000e8b603c-12-24-24-14-43-03.webp&w=1080&q=75',
+      'https://agribegri.com/_next/image?url=https%3A%2F%2Fdujjhct8zer0r.cloudfront.net%2Fmedia%2Fprod_image%2F9d3d19c670017070466917205f9ec8dd-12-24-24-14-43-10.webp&w=1080&q=75',
+      'https://agribegri.com/_next/image?url=https%3A%2F%2Fdujjhct8zer0r.cloudfront.net%2Fmedia%2Fprod_image%2Ff89d63a2c7f1503789f023d53cfe1973-12-24-24-14-43-17.webp&w=1080&q=75',
+      'https://agribegri.com/_next/image?url=https%3A%2F%2Fdujjhct8zer0r.cloudfront.net%2Fmedia%2Fprod_image%2Fca353da675ce19a23340abd5691ba112-12-24-24-14-43-27.webp&w=1080&q=75',
+      'https://agribegri.com/_next/image?url=https%3A%2F%2Fdujjhct8zer0r.cloudfront.net%2Fmedia%2Fprod_image%2F6ab7ebe2b24d6cd2dd5fe1850b15ca3b-12-27-24-09-42-35.webp&w=1080&q=75',
+    ],
+    variants: [
+      { name: '300 gm', quantity: '300 Gm x 1 Qty', price: 261, inStock: true, isBestSeller: true },
+      { name: '600 gm', quantity: '300 Gm x 2 Qty', price: 387, inStock: true, isBestSeller: true },
+      { name: '900 gm', quantity: '300 Gm x 3 Qty', price: 530, inStock: true, isBestSeller: true },
+      { name: '900 gm', quantity: '900 Gm x 1 Qty', price: 490, inStock: true },
+      { name: '1500 gm', quantity: '300 Gm x 5 Qty', price: 695, inStock: true },
+      { name: '2700 gm', quantity: '900 Gm x 3 Qty', price: 1050, inStock: true },
+      { name: '3 kg', quantity: '300 Gm x 10 Qty', price: 1254, inStock: true },
+      { name: '4500 gm', quantity: '900 Gm x 5 Qty', price: 1645, inStock: true },
+    ],
+    description: "HUBEL Humic Acid 98% is Farmer's First Choice for soil and crop health. It is a combination of Super Potassium Humate and Fulvic Acid. It has excellent nutrients and composting benefits, so mix it with vermicompost or microbial compost. It consists of naturally occurring organic substances, primarily composed of potassium humate, fulvic acid, and humic acid.",
+    technicalComposition: 'Super Potassium Humate 98% (Humic Acid+ Fulvic Acid+ K2O)',
+    keyFeatures: [
+      {
+        title: 'Enhance Soil Structure',
+        description: 'Hubel enhances soil decomposition and organic matter formation.',
+      },
+      {
+        title: 'Better Nutrient Uptake',
+        description: 'It transmutes nutritional components and speeds up decomposition while improving plant quality.',
+      },
+      {
+        title: 'Boosts Root Growth',
+        description: 'It increases root mass, increases Brix levels, stimulates plant vigor in plants, and offers better vegetative growth.',
+      },
+      {
+        title: 'Improved Resistance',
+        description: 'Hubel humic acid fertilizer enhances soil water-holding capacity, and potassium humate helps increase drought resistance.',
+      },
+      {
+        title: 'Improved Seed Germination',
+        description: 'Hubel humic acid helps improve seed germination rates and seedling vigor by creating a favorable environment.',
+      },
+    ],
+    dosage: {
+      spraying: 'Mix 15 to 25 gm of potassium humate per 15-litre spray volume',
+      sugarcane: 'Mix 1 kg of potassium humate per 100 to 150 kg of chemical fertilizer',
+      soilApplication: 'Mix 8 to 12 kg of potassium humate per acre of plant',
+    },
+    suitableCrops: 'HUBEL- Humic Acid 98% is ideal for all crops, including Sugarcane, Cereals, Pulses, Oil Seeds, Fibrous Plants, Vegetables, Fruits, Flowers, Spices, Cash Crops, Plantation and medicinal Crops, and Kitchen Gardening.',
+    safetyTips: [
+      'It is non-toxic, yet you should wear protective clothing.',
+      'Do not mix the product with your bare hands.',
+      'Use a separate tool to make the formulation.',
+      'Wash your hands and clothes after the application.',
+      'Store it in a cool, dry, and safe place.',
+    ],
+    note: 'HUBEL Humic Acid is intended for agricultural use only.',
+    technicalDetails: {
+      brand: 'Noble Crop Science',
+      productCode: '359',
+      countryOfOrigin: 'India',
+      category: 'Fertilizers',
+      subCategory: 'Organic Fertilizers',
+      pickupAddress: 'Rajkot, GUJARAT, 360005',
+      addressOfOrigin: 'No. 308, Haridarshan Arcade, Near Balaji Hall 150 Feet Ring Road, Rajkot, Gujarat 360004',
+    },
+    phoneNumber: '9016760339',
+    pricePerUnit: '(₹87.00 /100 gm)',
+    freeDelivery: true,
+    isBestSeller: true,
+  },
+} as const;
+
