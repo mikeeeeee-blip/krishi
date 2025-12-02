@@ -41,7 +41,7 @@ nav {
   overflow-y: hidden !important;
   overflow-x: visible !important;
   max-height: 48px !important;
-  height: auto !important;
+  height: 48px !important;
 }
 
 nav > div {
@@ -58,8 +58,17 @@ nav > div > div {
   position: relative !important;
   max-height: 48px !important;
   height: 48px !important;
+  min-height: 48px !important;
   display: flex !important;
   align-items: center !important;
+}
+
+nav button {
+  max-height: 48px !important;
+  height: 48px !important;
+  line-height: 1 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
 }
 
 /* Ensure all dropdown menus are visible */

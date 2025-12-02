@@ -344,19 +344,20 @@ export default function Navigation() {
 
   return (
     <>
-      <nav className="bg-[#16a34a] text-white shadow-md relative w-full" style={{ zIndex: 1000, overflow: 'hidden', maxHeight: '48px', height: '48px' }}>
-        <div className="w-full" style={{ position: 'relative', overflow: 'hidden', maxHeight: '48px', height: '48px' }}>
+      <nav className="bg-[#16a34a] text-white shadow-md relative w-full" style={{ zIndex: 1000, overflow: 'hidden', height: '48px', maxHeight: '48px' }}>
+        <div className="w-full h-full" style={{ position: 'relative', overflow: 'hidden', height: '48px', maxHeight: '48px' }}>
           <div 
             ref={navScrollRef}
-            className="flex items-center gap-1 md:gap-2 px-3 md:px-4 scrollbar-hide"
+            className="flex items-center gap-1 md:gap-2 px-3 md:px-4 scrollbar-hide h-full"
             style={{ 
               overflowX: 'auto',
               overflowY: 'hidden',
               position: 'relative',
               WebkitOverflowScrolling: 'touch',
               flexWrap: 'nowrap',
-              minHeight: '48px',
+              height: '48px',
               maxHeight: '48px',
+              minHeight: '48px',
             }}
           >
             {categories.map((category) => {
@@ -388,10 +389,10 @@ export default function Navigation() {
                   <button 
                     ref={(el) => { buttonRefs.current[category.name] = el; }}
                     type="button"
-                    className={`px-3 md:px-4 py-2 md:py-2.5 transition-colors flex items-center gap-1 whitespace-nowrap text-sm md:text-base font-medium h-full ${
+                    className={`px-3 md:px-4 py-0 transition-colors flex items-center gap-1 whitespace-nowrap text-sm md:text-base font-medium ${
                       isHovered ? 'bg-[#15803d]' : 'hover:bg-[#15803d]'
                     }`}
-                    style={{ height: '100%' }}
+                    style={{ height: '48px', lineHeight: '48px', display: 'flex', alignItems: 'center' }}
                   >
                     <span>{category.name}</span>
                     {hasItems && (
