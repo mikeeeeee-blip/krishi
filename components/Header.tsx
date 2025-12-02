@@ -7,14 +7,17 @@ export default function Header() {
   const [cartCount] = useState(2);
 
   return (
-    <header className="bg-white shadow-sm border-b border-gray-100 relative z-30">
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between py-3 md:py-4 gap-3 md:gap-4">
+    <header className="bg-white shadow-sm border-b border-gray-100 relative z-30 w-full">
+      <div className="w-full px-4 md:px-6">
+        <div className="flex items-center justify-between py-4 md:py-5 gap-4 md:gap-6">
           {/* Logo */}
           <div className="flex items-center gap-2 flex-shrink-0">
-            <div className="text-xl md:text-2xl font-bold text-green-600 flex items-center gap-1.5">
-              <span className="text-2xl md:text-3xl">🌿</span>
-              <span>AgriBegri</span>
+            <div className="text-xl md:text-2xl font-bold flex items-center">
+              <span className="text-green-600">Agri</span>
+              <span className="text-[#2563eb] relative">
+                <span className="absolute -top-1 left-0 text-green-600 text-lg md:text-xl">🌿</span>
+                <span className="relative z-10">Begri</span>
+              </span>
             </div>
           </div>
 
@@ -31,29 +34,29 @@ export default function Header() {
               <Search size={18} />
             </button>
             <button className="bg-[#16a34a] text-white px-3 md:px-4 py-2.5 rounded-md hover:bg-[#15803d] flex items-center gap-1.5 text-xs md:text-sm whitespace-nowrap hidden lg:flex transition-colors font-medium">
-              <span className="text-sm">🌿</span>
+              <Search size={16} />
               <span>Search by Technical Name</span>
             </button>
           </div>
 
           {/* User Actions */}
-          <div className="flex items-center gap-3 md:gap-4 flex-shrink-0">
-            <button className="flex items-center gap-1.5 md:gap-2 text-gray-700 hover:text-green-600 transition-colors text-sm">
-              <Truck size={18} className="md:w-5 md:h-5" />
-              <span className="hidden md:inline whitespace-nowrap">Track Order</span>
+          <div className="flex items-center gap-4 md:gap-5 flex-shrink-0">
+            <button className="flex flex-col items-center gap-0.5 text-gray-700 hover:text-green-600 transition-colors text-xs md:text-sm px-2 py-1">
+              <Truck size={20} className="md:w-6 md:h-6" />
+              <span className="whitespace-nowrap font-medium">Track Order</span>
             </button>
-            <button className="relative flex items-center gap-1.5 md:gap-2 text-gray-700 hover:text-green-600 transition-colors text-sm">
-              <ShoppingCart size={18} className="md:w-5 md:h-5" />
-              <span className="hidden md:inline whitespace-nowrap">Cart</span>
+            <button className="relative flex flex-col items-center gap-0.5 text-gray-700 hover:text-green-600 transition-colors text-xs md:text-sm px-2 py-1">
+              <ShoppingCart size={20} className="md:w-6 md:h-6" />
+              <span className="whitespace-nowrap font-medium">Cart</span>
               {cartCount > 0 && (
-                <span className="absolute -top-1.5 -right-1.5 md:-top-2 md:-right-2 bg-red-500 text-white text-xs rounded-full w-4 h-4 md:w-5 md:h-5 flex items-center justify-center font-semibold">
+                <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-semibold">
                   {cartCount}
                 </span>
               )}
             </button>
-            <button className="flex items-center gap-1.5 md:gap-2 text-gray-700 hover:text-green-600 transition-colors text-sm">
-              <User size={18} className="md:w-5 md:h-5" />
-              <span className="hidden md:inline whitespace-nowrap">Login</span>
+            <button className="flex flex-col items-center gap-0.5 text-gray-700 hover:text-green-600 transition-colors text-xs md:text-sm px-2 py-1">
+              <User size={20} className="md:w-6 md:h-6" />
+              <span className="whitespace-nowrap font-medium">Login</span>
             </button>
           </div>
         </div>

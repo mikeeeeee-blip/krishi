@@ -38,23 +38,35 @@ body {
 
 /* Ensure dropdowns are visible - critical fixes */
 nav {
-  overflow: visible !important;
+  overflow-y: hidden !important;
+  overflow-x: visible !important;
+  max-height: 48px !important;
+  height: auto !important;
 }
 
 nav > div {
-  overflow: visible !important;
+  overflow-y: hidden !important;
+  overflow-x: visible !important;
   position: relative !important;
+  max-height: 48px !important;
+  height: 48px !important;
 }
 
 nav > div > div {
-  overflow-y: visible !important;
+  overflow-y: hidden !important;
   overflow-x: auto;
   position: relative !important;
+  max-height: 48px !important;
+  height: 48px !important;
+  display: flex !important;
+  align-items: center !important;
 }
 
 /* Ensure all dropdown menus are visible */
 nav [style*="z-index: 99999"],
 nav [style*="zIndex: 99999"],
+nav [style*="z-index: 999999"],
+nav [style*="zIndex: 999999"],
 nav [style*="z-index: 10000"],
 nav [style*="zIndex: 10000"],
 nav [style*="z-index: 9999"],
@@ -69,7 +81,19 @@ nav [style*="zIndex: 9999"] {
 /* Force dropdown visibility */
 nav .bg-white {
   position: absolute !important;
-  z-index: 99999 !important;
+  z-index: 999999 !important;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+/* Prevent parent containers from clipping dropdowns */
+body, html {
+  overflow-x: hidden;
+}
+
+body > div {
+  overflow-x: hidden;
 }
 
 /* Prevent any clipping */
