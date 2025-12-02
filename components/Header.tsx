@@ -1,10 +1,12 @@
 'use client';
 
 import { Search, ShoppingCart, User, Truck } from 'lucide-react';
-import { useState } from 'react';
+import Link from 'next/link';
+import { useCart } from '@/contexts/CartContext';
 
 export default function Header() {
-  const [cartCount] = useState(2);
+  const { getTotalItems } = useCart();
+  const cartCount = getTotalItems();
 
   return (
     <header className="bg-white shadow-sm border-b border-gray-100 relative z-30 w-full">
@@ -45,7 +47,7 @@ export default function Header() {
               <Truck size={20} className="md:w-6 md:h-6" />
               <span className="whitespace-nowrap font-medium">Track Order</span>
             </button>
-            <button className="relative flex flex-col items-center gap-0.5 text-gray-700 hover:text-green-600 transition-colors text-xs md:text-sm px-2 py-1">
+            <Link href="/cart" className="relative flex flex-col items-center gap-0.5 text-gray-700 hover:text-green-600 transition-colors text-xs md:text-sm px-2 py-1">
               <ShoppingCart size={20} className="md:w-6 md:h-6" />
               <span className="whitespace-nowrap font-medium">Cart</span>
               {cartCount > 0 && (
@@ -53,7 +55,7 @@ export default function Header() {
                   {cartCount}
                 </span>
               )}
-            </button>
+            </Link>
             <button className="flex flex-col items-center gap-0.5 text-gray-700 hover:text-green-600 transition-colors text-xs md:text-sm px-2 py-1">
               <User size={20} className="md:w-6 md:h-6" />
               <span className="whitespace-nowrap font-medium">Login</span>

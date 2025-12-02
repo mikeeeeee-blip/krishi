@@ -1,8 +1,11 @@
 'use client';
 
+import { useState } from 'react';
 import { Heart } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useCart } from '@/contexts/CartContext';
+import Toast from './Toast';
 
 interface ProductVariant {
   name: string;
@@ -33,7 +36,25 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
+  const { addToCart } = useCart();
+  const [showToast, setShowToast] = useState(false);
   const selectedVariant = product.variants[0];
+
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    addToCart({
+      productId: product.id,
+      name: product.name,
+      brand: product.brand,
+      image: product.images[0],
+      variant: selectedVariant.name,
+      quantity: selectedVariant.quantity,
+      price: selectedVariant.price,
+      originalPrice: product.originalPrice,
+    });
+    setShowToast(true);
+  };
 
   return (
     <Link href={`/products/${product.id}`} className="block">
@@ -93,16 +114,19 @@ export default function ProductCard({ product }: ProductCardProps) {
 
           {/* Add to Cart Button */}
           <button
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-            }}
+            onClick={handleAddToCart}
             className="w-full bg-green-600 hover:bg-green-700 text-white text-sm font-semibold py-2 px-3 rounded transition-colors mt-auto"
           >
             Add to Cart
           </button>
         </div>
       </div>
+      
+      <Toast
+        message="Item added to cart!"
+        isVisible={showToast}
+        onClose={() => setShowToast(false)}
+      />
     </Link>
   );
 }

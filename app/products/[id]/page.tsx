@@ -10,13 +10,19 @@ import Header from '@/components/Header';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import { productData } from '@/data/products';
+import { useCart } from '@/contexts/CartContext';
+import { useRouter } from 'next/navigation';
+import Toast from '@/components/Toast';
 
 export default function ProductDetailPage() {
   const params = useParams();
+  const router = useRouter();
+  const { addToCart } = useCart();
   const productId = params?.id as string;
   const product = productData[productId as keyof typeof productData];
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [selectedVariant, setSelectedVariant] = useState(0);
+  const [showToast, setShowToast] = useState(false);
 
   if (!product) {
     return (
@@ -28,8 +34,27 @@ export default function ProductDetailPage() {
 
   const selectedVariantData = product.variants[selectedVariant];
 
+  const handleAddToCart = () => {
+    addToCart({
+      productId: product.id,
+      name: product.name,
+      brand: product.brand,
+      image: product.images[0],
+      variant: selectedVariantData.name,
+      quantity: selectedVariantData.quantity,
+      price: selectedVariantData.price,
+      originalPrice: product.originalPrice,
+    });
+    setShowToast(true);
+  };
+
+  const handleBuyNow = () => {
+    handleAddToCart();
+    router.push('/cart');
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 text-black">
       <TopBar />
       <Header />
       <Navigation />
@@ -152,7 +177,7 @@ export default function ProductDetailPage() {
                     <div className="font-semibold text-sm">{variant.name}</div>
                     <div className="text-xs text-gray-600 mt-1">{variant.quantity}</div>
                     <div className="text-sm font-bold mt-1">₹{variant.price}</div>
-                    {variant.isBestSeller && (
+                    {'isBestSeller' in variant && variant.isBestSeller && (
                       <span className="inline-block mt-1 bg-red-500 text-white text-xs px-2 py-0.5 rounded">
                         BEST SELLER
                       </span>
@@ -169,11 +194,17 @@ export default function ProductDetailPage() {
 
             {/* Action Buttons */}
             <div className="flex gap-4 mb-6">
-              <button className="flex-1 bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2">
+              <button 
+                onClick={handleAddToCart}
+                className="flex-1 bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2"
+              >
                 <ShoppingCart size={20} />
                 ADD TO CART
               </button>
-              <button className="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors">
+              <button 
+                onClick={handleBuyNow}
+                className="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+              >
                 BUY NOW
               </button>
             </div>
@@ -245,13 +276,66 @@ export default function ProductDetailPage() {
             </div>
 
             <div>
-              <h3 className="text-lg font-semibold mb-3">Dosage:</h3>
-              <ul className="space-y-2 list-disc list-inside">
-                <li><span className="font-semibold">For Spraying:</span> {product.dosage.spraying}</li>
-                <li><span className="font-semibold">For Sugarcane:</span> {product.dosage.sugarcane}</li>
-                <li><span className="font-semibold">For Soil Application Dose:</span> {product.dosage.soilApplication}</li>
-              </ul>
+              <h3 className="text-lg font-semibold mb-3">Dosage and Application Method:</h3>
+              {'spraying' in product.dosage ? (
+                <ul className="space-y-2 list-disc list-inside">
+                  <li><span className="font-semibold">For Spraying:</span> {product.dosage.spraying}</li>
+                  {'sugarcane' in product.dosage && (
+                    <li><span className="font-semibold">For Sugarcane:</span> {product.dosage.sugarcane}</li>
+                  )}
+                  {'soilApplication' in product.dosage && (
+                    <li><span className="font-semibold">For Soil Application Dose:</span> {product.dosage.soilApplication}</li>
+                  )}
+                </ul>
+              ) : (
+                <div className="space-y-3">
+                  <div>
+                    <h4 className="font-semibold mb-2">For Foliar Application in Trees:</h4>
+                    <ul className="space-y-2 list-disc list-inside ml-4">
+                      {'trees7to15' in product.dosage && (
+                        <li>{product.dosage.trees7to15}</li>
+                      )}
+                      {'trees16to25' in product.dosage && (
+                        <li>{product.dosage.trees16to25}</li>
+                      )}
+                      {'treesOver25' in product.dosage && (
+                        <li>{product.dosage.treesOver25}</li>
+                      )}
+                    </ul>
+                  </div>
+                  {'foliarApplication' in product.dosage && (
+                    <div>
+                      <h4 className="font-semibold mb-2">For Foliar Application in Other Vegetables and Crops:</h4>
+                      <p>{product.dosage.foliarApplication}</p>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
+
+            {'recommendedDosageTable' in product && product.recommendedDosageTable && (
+              <div>
+                <h3 className="text-lg font-semibold mb-3">Recommended Dosage Table:</h3>
+                <div className="overflow-x-auto">
+                  <table className="min-w-full border border-gray-300 rounded-lg">
+                    <thead className="bg-gray-100">
+                      <tr>
+                        <th className="border border-gray-300 px-4 py-2 text-left font-semibold">Suitable Crops</th>
+                        <th className="border border-gray-300 px-4 py-2 text-left font-semibold">Dosage (per 15 liters of water)</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {product.recommendedDosageTable.map((row, idx) => (
+                        <tr key={idx} className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                          <td className="border border-gray-300 px-4 py-2">{row.crop}</td>
+                          <td className="border border-gray-300 px-4 py-2">{row.dosage}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
 
             <div>
               <h3 className="text-lg font-semibold mb-2">Suitable Crops:</h3>
@@ -322,6 +406,12 @@ export default function ProductDetailPage() {
       </div>
       
       <Footer />
+      
+      <Toast
+        message="Item added to cart!"
+        isVisible={showToast}
+        onClose={() => setShowToast(false)}
+      />
     </div>
   );
 }
