@@ -287,30 +287,29 @@ export default function ProductDetailPage() {
                     <li><span className="font-semibold">For Soil Application Dose:</span> {product.dosage.soilApplication}</li>
                   )}
                 </ul>
-              ) : (
+              ) : 'foliarApplicationTrees' in product.dosage && Array.isArray(product.dosage.foliarApplicationTrees) ? (
                 <div className="space-y-3">
                   <div>
                     <h4 className="font-semibold mb-2">For Foliar Application in Trees:</h4>
                     <ul className="space-y-2 list-disc list-inside ml-4">
-                      {'trees7to15' in product.dosage && (
-                        <li>{product.dosage.trees7to15}</li>
-                      )}
-                      {'trees16to25' in product.dosage && (
-                        <li>{product.dosage.trees16to25}</li>
-                      )}
-                      {'treesOver25' in product.dosage && (
-                        <li>{product.dosage.treesOver25}</li>
-                      )}
+                      {product.dosage.foliarApplicationTrees.map((item: string, idx: number) => (
+                        <li key={idx}>{item}</li>
+                      ))}
                     </ul>
                   </div>
-                  {'foliarApplication' in product.dosage && (
+                  {'foliarApplicationOther' in product.dosage && typeof product.dosage.foliarApplicationOther === 'string' && (
                     <div>
                       <h4 className="font-semibold mb-2">For Foliar Application in Other Vegetables and Crops:</h4>
-                      <p>{product.dosage.foliarApplication}</p>
+                      <p>{product.dosage.foliarApplicationOther}</p>
                     </div>
                   )}
                 </div>
-              )}
+              ) : 'foliarApplication' in product.dosage && typeof product.dosage.foliarApplication === 'string' ? (
+                <div>
+                  <h4 className="font-semibold mb-2">For Foliar Application:</h4>
+                  <p>{product.dosage.foliarApplication}</p>
+                </div>
+              ) : null}
             </div>
 
             {'recommendedDosageTable' in product && product.recommendedDosageTable && (
@@ -320,20 +319,64 @@ export default function ProductDetailPage() {
                   <table className="min-w-full border border-gray-300 rounded-lg">
                     <thead className="bg-gray-100">
                       <tr>
-                        <th className="border border-gray-300 px-4 py-2 text-left font-semibold">Suitable Crops</th>
-                        <th className="border border-gray-300 px-4 py-2 text-left font-semibold">Dosage (per 15 liters of water)</th>
+                        {product.recommendedDosageTable[0] && 'applicationTiming' in product.recommendedDosageTable[0] ? (
+                          <>
+                            <th className="border border-gray-300 px-4 py-2 text-left font-semibold">Crop Name</th>
+                            <th className="border border-gray-300 px-4 py-2 text-left font-semibold">Application Timing</th>
+                            <th className="border border-gray-300 px-4 py-2 text-left font-semibold">Dosage per Acre</th>
+                          </>
+                        ) : product.recommendedDosageTable[0] && 'pests' in product.recommendedDosageTable[0] ? (
+                          <>
+                            <th className="border border-gray-300 px-4 py-2 text-left font-semibold">Suitable Crop</th>
+                            <th className="border border-gray-300 px-4 py-2 text-left font-semibold">Target Pests (General)</th>
+                            <th className="border border-gray-300 px-4 py-2 text-left font-semibold">Dosage</th>
+                          </>
+                        ) : (
+                          <>
+                            <th className="border border-gray-300 px-4 py-2 text-left font-semibold">Suitable Crops</th>
+                            <th className="border border-gray-300 px-4 py-2 text-left font-semibold">Dosage (per 15 liters of water)</th>
+                          </>
+                        )}
                       </tr>
                     </thead>
                     <tbody>
                       {product.recommendedDosageTable.map((row, idx) => (
                         <tr key={idx} className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
                           <td className="border border-gray-300 px-4 py-2">{row.crop}</td>
-                          <td className="border border-gray-300 px-4 py-2">{row.dosage}</td>
+                          {'applicationTiming' in row && (
+                            <>
+                              <td className="border border-gray-300 px-4 py-2">{row.applicationTiming}</td>
+                              <td className="border border-gray-300 px-4 py-2">{row.dosage}</td>
+                            </>
+                          )}
+                          {'pests' in row && (
+                            <>
+                              <td className="border border-gray-300 px-4 py-2">{row.pests}</td>
+                              <td className="border border-gray-300 px-4 py-2">{row.dosage}</td>
+                            </>
+                          )}
+                          {!('applicationTiming' in row) && !('pests' in row) && (
+                            <td className="border border-gray-300 px-4 py-2">{row.dosage}</td>
+                          )}
                         </tr>
                       ))}
                     </tbody>
                   </table>
                 </div>
+              </div>
+            )}
+
+            {'uses' in product && product.uses && (
+              <div>
+                <h3 className="text-lg font-semibold mb-2">Uses:</h3>
+                <p>{product.uses}</p>
+              </div>
+            )}
+
+            {'targetPests' in product && product.targetPests && (
+              <div>
+                <h3 className="text-lg font-semibold mb-2">Target Pests:</h3>
+                <p>{product.targetPests}</p>
               </div>
             )}
 
