@@ -1,14 +1,20 @@
+import TopBar from "@/components/TopBar";
+import Header from "@/components/Header";
+import Navigation from "@/components/Navigation";
+import Carousel from "@/components/Carousel";
+import BestSellers from "@/components/BestSellers";
+import WhatsAppButton from "@/components/WhatsAppButton";
 import Footer from "@/components/Footer";
 
 export default function Home() {
   return (
     <div className="min-h-screen">
-      <main className="min-h-[60vh] flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <h1 className="text-4xl font-bold text-gray-800 mb-4">AgriBegri</h1>
-          <p className="text-gray-600">Your trusted agricultural marketplace</p>
-        </div>
-      </main>
+      <TopBar />
+      <Header />
+      <Navigation />
+      <Carousel />
+      <BestSellers />
+      <WhatsAppButton />
       <Footer />
     </div>
   );
