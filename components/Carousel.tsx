@@ -37,7 +37,7 @@ export default function Carousel() {
   };
 
   return (
-    <div className="relative w-full h-[450px] md:h-[550px] lg:h-[600px] overflow-hidden bg-gradient-to-b from-yellow-50 via-yellow-50 to-green-50">
+    <div className="relative w-full h-[450px] md:h-[550px] lg:h-[600px] overflow-hidden bg-gradient-to-b from-yellow-50 via-yellow-50 to-green-50" style={{ zIndex: 1 }}>
       {/* Carousel Images */}
       <div className="relative w-full h-full">
         {banners.map((banner, index) => (

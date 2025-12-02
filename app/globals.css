@@ -35,3 +35,44 @@ body {
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
 }
+
+/* Ensure dropdowns are visible - critical fixes */
+nav {
+  overflow: visible !important;
+}
+
+nav > div {
+  overflow: visible !important;
+  position: relative !important;
+}
+
+nav > div > div {
+  overflow-y: visible !important;
+  overflow-x: auto;
+  position: relative !important;
+}
+
+/* Ensure all dropdown menus are visible */
+nav [style*="z-index: 99999"],
+nav [style*="zIndex: 99999"],
+nav [style*="z-index: 10000"],
+nav [style*="zIndex: 10000"],
+nav [style*="z-index: 9999"],
+nav [style*="zIndex: 9999"] {
+  position: absolute !important;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+/* Force dropdown visibility */
+nav .bg-white {
+  position: absolute !important;
+  z-index: 99999 !important;
+}
+
+/* Prevent any clipping */
+* {
+  box-sizing: border-box;
+}

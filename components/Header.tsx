@@ -7,7 +7,7 @@ export default function Header() {
   const [cartCount] = useState(2);
 
   return (
-    <header className="bg-white shadow-sm border-b border-gray-100">
+    <header className="bg-white shadow-sm border-b border-gray-100 relative z-30">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between py-3 md:py-4 gap-3 md:gap-4">
           {/* Logo */}
