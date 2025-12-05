@@ -1,6 +1,6 @@
 'use client';
 
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, Phone } from 'lucide-react';
 import { useState } from 'react';
 
 export default function TopBar() {
@@ -8,26 +8,35 @@ export default function TopBar() {
 
   return (
     <div className="bg-[#2563eb] text-white text-sm w-full">
-      <div className="w-full px-4 md:px-6">
-        <div className="flex items-center justify-between py-2.5 md:py-3">
-          <div className="flex items-center gap-4 md:gap-6">
-            <span className="whitespace-nowrap font-medium text-xs md:text-sm">Extra Discount On Online Payment</span>
-            <span className="whitespace-nowrap font-medium text-xs md:text-sm hidden sm:inline">Partial Payment Extra Discount</span>
+      <div className="w-full px-2 sm:px-3 md:px-4 lg:px-6">
+        <div className="flex items-center justify-between py-2 sm:py-2.5 md:py-3 gap-2">
+          <div className="flex items-center gap-2 sm:gap-3 md:gap-4 lg:gap-6 overflow-x-auto scrollbar-hide flex-1 min-w-0">
+            <a href="tel:7065060162" className="flex items-center gap-1 sm:gap-1.5 hover:opacity-80 transition-opacity font-medium text-[10px] xs:text-xs sm:text-sm whitespace-nowrap flex-shrink-0">
+              <Phone size={12} className="sm:w-3.5 sm:h-3.5" />
+              <span className="hidden xs:inline">Missed call: </span>
+              <span>7065060162</span>
+            </a>
+            <a href="tel:7428208822" className="flex items-center gap-1 sm:gap-1.5 hover:opacity-80 transition-opacity font-medium text-[10px] xs:text-xs sm:text-sm hidden sm:inline whitespace-nowrap flex-shrink-0">
+              <span>Help: 7428208822</span>
+            </a>
+            <span className="whitespace-nowrap font-medium text-[10px] xs:text-xs sm:text-sm hidden md:inline flex-shrink-0">Order: 7065060162 | Help: 7428208822</span>
           </div>
-          <div className="flex items-center gap-3 md:gap-5">
+          <div className="flex items-center gap-1.5 sm:gap-2 md:gap-3 lg:gap-5 flex-shrink-0">
             <div className="relative">
               <button
                 onClick={() => setShowLanguageDropdown(!showLanguageDropdown)}
-                className="flex items-center gap-1 hover:opacity-80 transition-opacity font-medium text-xs md:text-sm"
+                className="flex items-center gap-0.5 sm:gap-1 hover:opacity-80 transition-opacity font-medium text-[10px] xs:text-xs sm:text-sm px-1 sm:px-0"
               >
                 <span>EN</span>
-                <ChevronDown size={14} className={`transition-transform ${showLanguageDropdown ? 'rotate-180' : ''}`} />
+                <ChevronDown size={10} className={`sm:w-3.5 sm:h-3.5 transition-transform ${showLanguageDropdown ? 'rotate-180' : ''}`} />
               </button>
             </div>
-            <a href="#" className="hover:underline whitespace-nowrap text-xs md:text-sm font-medium">Sell with us</a>
-            <a href="#" className="hover:underline whitespace-nowrap text-xs md:text-sm font-medium">Seller Login</a>
-            <a href="#" className="hover:underline whitespace-nowrap text-xs md:text-sm font-medium hidden sm:inline">Be a Partner</a>
-            <a href="#" className="hover:underline whitespace-nowrap text-xs md:text-sm font-medium hidden md:inline">Ask Agro Experts</a>
+            <a href="#" className="hover:underline whitespace-nowrap text-[10px] xs:text-xs sm:text-sm font-medium hidden sm:inline">Sell</a>
+            <a href="#" className="hover:underline whitespace-nowrap text-[10px] xs:text-xs sm:text-sm font-medium hidden md:inline">Login</a>
+            <a href="#" className="hover:underline whitespace-nowrap text-[10px] xs:text-xs sm:text-sm font-medium hidden lg:inline">Partner</a>
+            <a href="#" className="hover:underline whitespace-nowrap text-[10px] xs:text-xs sm:text-sm font-medium hidden xl:inline">Experts</a>
+            <a href="#" className="hover:underline whitespace-nowrap text-[10px] xs:text-xs sm:text-sm font-medium hidden xl:inline">Track</a>
+            <a href="#" className="hover:underline whitespace-nowrap text-[10px] xs:text-xs sm:text-sm font-medium hidden xl:inline">APP</a>
           </div>
         </div>
       </div>

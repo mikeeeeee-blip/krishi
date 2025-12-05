@@ -37,7 +37,7 @@ export default function Carousel() {
   };
 
   return (
-    <div className="relative w-full h-[450px] md:h-[550px] lg:h-[600px] overflow-hidden bg-gradient-to-b from-yellow-50 via-yellow-50 to-green-50" style={{ zIndex: 1 }}>
+    <div className="relative w-full h-[200px] xs:h-[250px] sm:h-[300px] md:h-[400px] lg:h-[500px] xl:h-[600px] overflow-hidden bg-gradient-to-b from-yellow-50 via-yellow-50 to-green-50" style={{ zIndex: 1 }}>
       {/* Carousel Images */}
       <div className="relative w-full h-full">
         {banners.map((banner, index) => (
@@ -51,7 +51,7 @@ export default function Carousel() {
               src={banner}
               alt={`Banner ${index + 1}`}
               fill
-              className="object-contain md:object-cover"
+              className="object-contain sm:object-cover"
               priority={index === 0}
               sizes="100vw"
             />
@@ -62,29 +62,29 @@ export default function Carousel() {
       {/* Navigation Arrows */}
       <button
         onClick={goToPrevious}
-        className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white rounded-full p-2 shadow-lg transition-all z-10"
+        className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white rounded-full p-1.5 sm:p-2 shadow-lg transition-all z-10"
         aria-label="Previous slide"
       >
-        <ChevronLeft size={24} className="text-gray-800" />
+        <ChevronLeft size={18} className="sm:w-6 sm:h-6 text-gray-800" />
       </button>
       <button
         onClick={goToNext}
-        className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white rounded-full p-2 shadow-lg transition-all z-10"
+        className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white rounded-full p-1.5 sm:p-2 shadow-lg transition-all z-10"
         aria-label="Next slide"
       >
-        <ChevronRight size={24} className="text-gray-800" />
+        <ChevronRight size={18} className="sm:w-6 sm:h-6 text-gray-800" />
       </button>
 
       {/* Indicators */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+      <div className="absolute bottom-3 sm:bottom-4 md:bottom-6 left-1/2 -translate-x-1/2 flex gap-1.5 sm:gap-2 z-10">
         {banners.map((_, index) => (
           <button
             key={index}
             onClick={() => goToSlide(index)}
-            className={`h-2.5 rounded-full transition-all ${
+            className={`h-1.5 sm:h-2 md:h-2.5 rounded-full transition-all ${
               index === currentIndex
-                ? 'w-8 bg-white shadow-md'
-                : 'w-2.5 bg-white/60 hover:bg-white/80'
+                ? 'w-6 sm:w-8 bg-white shadow-md'
+                : 'w-1.5 sm:w-2 md:w-2.5 bg-white/60 hover:bg-white/80'
             }`}
             aria-label={`Go to slide ${index + 1}`}
           />

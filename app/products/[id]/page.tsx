@@ -23,6 +23,15 @@ export default function ProductDetailPage() {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [selectedVariant, setSelectedVariant] = useState(0);
   const [showToast, setShowToast] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  const closeMobileMenu = () => {
+    setIsMobileMenuOpen(false);
+  };
 
   if (!product) {
     return (
@@ -56,8 +65,8 @@ export default function ProductDetailPage() {
   return (
     <div className="min-h-screen bg-gray-50 text-black">
       <TopBar />
-      <Header />
-      <Navigation />
+      <Header onMenuToggle={toggleMobileMenu} isMenuOpen={isMobileMenuOpen} />
+      <Navigation isMobileMenuOpen={isMobileMenuOpen} onCloseMobileMenu={closeMobileMenu} />
       
       {/* Breadcrumbs */}
       <div className="bg-white border-b border-gray-200 py-3">

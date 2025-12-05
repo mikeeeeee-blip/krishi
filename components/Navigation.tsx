@@ -1,8 +1,15 @@
 'use client';
 
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronDown, ChevronUp, X, Home, FlaskConical, ChevronRight, User } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import Link from 'next/link';
+import { categorySlugs, type CategoryType } from '@/lib/categories';
+
+interface NavigationProps {
+  isMobileMenuOpen?: boolean;
+  onCloseMobileMenu?: () => void;
+}
 
 interface Category {
   name: string;
@@ -177,13 +184,15 @@ const categories: Category[] = [
   },
 ];
 
-export default function Navigation() {
+export default function Navigation({ isMobileMenuOpen = false, onCloseMobileMenu }: NavigationProps) {
   const [hoveredCategory, setHoveredCategory] = useState<string | null>(null);
+  const [expandedMobileCategory, setExpandedMobileCategory] = useState<string | null>(null);
   const buttonRefs = useRef<{ [key: string]: HTMLButtonElement | null }>({});
   const [dropdownPosition, setDropdownPosition] = useState<{ top: number; left: number; width: number; height: number } | null>(null);
   const [mounted, setMounted] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const navScrollRef = useRef<HTMLDivElement | null>(null);
+  const mobileMenuRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -193,6 +202,31 @@ export default function Navigation() {
       }
     };
   }, []);
+
+  // Close mobile menu when clicking outside
+  useEffect(() => {
+    if (!isMobileMenuOpen) return;
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target as Node)) {
+        onCloseMobileMenu?.();
+      }
+    };
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        onCloseMobileMenu?.();
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleEscape);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [isMobileMenuOpen, onCloseMobileMenu]);
 
   const updateDropdownPosition = () => {
     if (hoveredCategory && buttonRefs.current[hoveredCategory]) {
@@ -297,16 +331,19 @@ export default function Navigation() {
                 {currentCategory!.name}
               </h3>
               <div className="grid grid-cols-2 gap-x-3 md:gap-x-4 gap-y-0.5">
-                {currentCategory!.items!.map((item, index) => (
-                  <a
-                    key={index}
-                    href="#"
-                    className="block py-1 hover:text-green-600 transition-colors text-sm text-gray-700 hover:font-medium"
-                    onClick={(e) => e.preventDefault()}
-                  >
-                    {item}
-                  </a>
-                ))}
+                {currentCategory!.items!.map((item, index) => {
+                  // Map category name to slug
+                  const categorySlug = categorySlugs[currentCategory!.name as CategoryType] || '';
+                  return (
+                    <Link
+                      key={index}
+                      href={`/categories/${categorySlug}`}
+                      className="block py-1 hover:text-green-600 transition-colors text-sm text-gray-700 hover:font-medium"
+                    >
+                      {item}
+                    </Link>
+                  );
+                })}
               </div>
             </div>
           </div>
@@ -344,20 +381,21 @@ export default function Navigation() {
 
   return (
     <>
-      <nav className="bg-[#16a34a] text-white shadow-md relative w-full" style={{ zIndex: 1000, overflow: 'hidden', height: '48px', maxHeight: '48px' }}>
-        <div className="w-full h-full" style={{ position: 'relative', overflow: 'hidden', height: '48px', maxHeight: '48px' }}>
+      {/* Desktop Navigation - Hidden on mobile */}
+      <nav className="hidden lg:block bg-[#16a34a] text-white shadow-md relative w-full" style={{ zIndex: 1000, overflow: 'hidden', height: '44px', maxHeight: '44px' }}>
+        <div className="w-full h-full" style={{ position: 'relative', overflow: 'hidden', height: '44px', maxHeight: '44px' }}>
           <div 
             ref={navScrollRef}
-            className="flex items-center gap-1 md:gap-2 px-3 md:px-4 scrollbar-hide h-full"
+            className="flex items-center gap-0.5 sm:gap-1 md:gap-2 px-2 sm:px-3 md:px-4 scrollbar-hide h-full"
             style={{ 
               overflowX: 'auto',
               overflowY: 'hidden',
               position: 'relative',
               WebkitOverflowScrolling: 'touch',
               flexWrap: 'nowrap',
-              height: '48px',
-              maxHeight: '48px',
-              minHeight: '48px',
+              height: '44px',
+              maxHeight: '44px',
+              minHeight: '44px',
             }}
           >
             {categories.map((category) => {
@@ -386,31 +424,156 @@ export default function Navigation() {
                     }, 100);
                   }}
                 >
-                  <button 
-                    ref={(el) => { buttonRefs.current[category.name] = el; }}
-                    type="button"
-                    className={`px-3 md:px-4 py-0 transition-colors flex items-center gap-1 whitespace-nowrap text-sm md:text-base font-medium ${
+                  <Link
+                    href={`/categories/${categorySlugs[category.name as CategoryType] || category.name.toLowerCase().replace(/\s+/g, '-')}`}
+                    ref={(el) => { buttonRefs.current[category.name] = el as any; }}
+                    className={`px-2 sm:px-2.5 md:px-3 lg:px-4 py-0 transition-colors flex items-center gap-0.5 sm:gap-1 whitespace-nowrap text-xs sm:text-sm md:text-base font-medium ${
                       isHovered ? 'bg-[#15803d]' : 'hover:bg-[#15803d]'
                     }`}
-                    style={{ height: '48px', lineHeight: '48px', display: 'flex', alignItems: 'center' }}
+                    style={{ height: '44px', lineHeight: '44px', display: 'flex', alignItems: 'center' }}
                   >
-                    <span>{category.name}</span>
+                    <span className="truncate max-w-[120px] sm:max-w-none">{category.name}</span>
                     {hasItems && (
                       isHovered ? (
-                        <ChevronUp size={14} className="md:w-4 md:h-4 flex-shrink-0" />
+                        <ChevronUp size={12} className="sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 flex-shrink-0" />
                       ) : (
-                        <ChevronDown size={14} className="md:w-4 md:h-4 flex-shrink-0" />
+                        <ChevronDown size={12} className="sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 flex-shrink-0" />
                       )
                     )}
-                  </button>
+                  </Link>
                 </div>
               );
             })}
           </div>
         </div>
       </nav>
+
+      {/* Mobile Side Menu - Slide in from left (for hamburger menu) */}
+      {mounted && (
+        <>
+          {/* Overlay */}
+          {isMobileMenuOpen && (
+            <div 
+              className="fixed inset-0 bg-black bg-opacity-50 z-[9998] lg:hidden transition-opacity duration-300"
+              onClick={onCloseMobileMenu}
+            />
+          )}
+
+          {/* Mobile Side Menu */}
+          <div
+            ref={mobileMenuRef}
+            className={`fixed top-0 left-0 h-full w-[85%] max-w-sm bg-white shadow-2xl z-[9999] lg:hidden transform transition-transform duration-300 ease-in-out overflow-y-auto ${
+              isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+            }`}
+          >
+            {/* Drawer Header - User Profile Section */}
+            <div className="bg-white border-b border-gray-200 p-4 flex items-center justify-between sticky top-0 z-10">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
+                  <User size={20} className="text-gray-600" />
+                </div>
+                <span className="text-gray-800 font-medium">Guest User</span>
+              </div>
+              <button
+                onClick={onCloseMobileMenu}
+                className="p-2 hover:bg-gray-100 rounded transition-colors"
+                aria-label="Close menu"
+              >
+                <X size={24} className="text-gray-600" />
+              </button>
+            </div>
+
+            {/* Mobile Menu Content */}
+            <div className="py-2">
+              {/* Primary Navigation Links */}
+              <Link
+                href="/"
+                className="flex items-center gap-3 px-4 py-3 text-gray-800 hover:bg-gray-50 transition-colors"
+                onClick={() => onCloseMobileMenu?.()}
+              >
+                <Home size={20} className="text-[#16a34a]" strokeWidth={2} />
+                <span className="font-medium text-base">Home</span>
+              </Link>
+              
+              <Link
+                href="/search"
+                className="flex items-center gap-3 px-4 py-3 text-gray-800 hover:bg-gray-50 transition-colors"
+                onClick={() => onCloseMobileMenu?.()}
+              >
+                <FlaskConical size={20} className="text-[#16a34a]" strokeWidth={2} />
+                <span className="font-medium text-base">Search by Technical Name</span>
+              </Link>
+
+              {/* Divider */}
+              <div className="border-t border-gray-200 my-2"></div>
+
+              {/* Product Category Links */}
+              {categories.map((category) => {
+                const categoryInitial = category.name.charAt(0).toUpperCase();
+                const hasItems = category.items && category.items.length > 0;
+                const isExpanded = expandedMobileCategory === category.name;
+                
+                return (
+                  <div key={category.name} className="border-b border-gray-200">
+                    <Link
+                      href={`/categories/${categorySlugs[category.name as CategoryType] || category.name.toLowerCase().replace(/\s+/g, '-')}`}
+                      className="flex items-center justify-between px-4 py-3 text-gray-800 hover:bg-gray-50 transition-colors"
+                      onClick={(e) => {
+                        if (hasItems) {
+                          e.preventDefault();
+                          setExpandedMobileCategory(isExpanded ? null : category.name);
+                        } else {
+                          onCloseMobileMenu?.();
+                        }
+                      }}
+                    >
+                      <div className="flex items-center gap-3">
+                        {/* Circular icon with initial */}
+                        <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                          <span className="text-[#15803d] font-bold text-lg">{categoryInitial}</span>
+                        </div>
+                        <span className="font-medium text-base text-gray-800">{category.name}</span>
+                      </div>
+                      <ChevronRight size={20} className="text-gray-400 flex-shrink-0" />
+                    </Link>
+                    
+                    {/* Subcategories */}
+                    {hasItems && isExpanded && (
+                      <div className="bg-gray-50 border-t border-gray-200">
+                        {category.items!.map((item, index) => (
+                          <Link
+                            key={index}
+                            href={`/categories/${categorySlugs[category.name as CategoryType] || category.name.toLowerCase().replace(/\s+/g, '-')}`}
+                            className="block px-8 py-2.5 text-sm text-gray-700 hover:bg-gray-100 hover:text-[#16a34a] transition-colors"
+                            onClick={() => onCloseMobileMenu?.()}
+                          >
+                            {item}
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+
+              {/* Policies & Support Section */}
+              <div className="border-t border-gray-200 mt-2">
+                <button
+                  className="w-full flex items-center justify-between px-4 py-3 text-[#16a34a] hover:bg-gray-50 transition-colors"
+                  onClick={() => {
+                    // Toggle policies section if needed
+                  }}
+                >
+                  <span className="font-semibold text-sm uppercase">Policies & Support</span>
+                  <ChevronDown size={20} className="text-gray-400" />
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
       
-      {/* Render dropdown outside navbar using portal */}
+      {/* Render dropdown outside navbar using portal (Desktop only) */}
       {mounted && hoveredCategory && hasItems && typeof window !== 'undefined' && createPortal(
         <DropdownContent />,
         document.body

@@ -515,60 +515,273 @@ export const productData = {
     "freeDelivery": null,
     "isBestSeller": null
   },
-'6': {
-    id: '6',
-    name: "HUBEL - Humic Acid 98% Potassium Humate, Suitable for All Crops, Enhances Root Mass, Brix Level, and Plant Growth",
-    brand: "Noble Crop Science",
-    rating: 4.68,
-    reviews: 468,
-    originalPrice: 670,
-    currentPrice: 261,
-    discount: 409,
-    discountPercent: 61,
-    images: [
-      "https://agribegri.com/_next/image?url=https%3A%2F%2Fdujjhct8zer0r.cloudfront.net%2Fmedia%2Fprod_image%2F3748729181735026400.webp&w=1080&q=75",
+  "6": {
+    "id": "6",
+    "name": "Flow N - Nitrobenzene 35% Flowering Stimulant, Promotes Root Growth, Water Retention, Reduces Soil Erosion, Organic Fertilizer",
+    "brand": "Noble Crop Science",
+    "rating": 4.7,
+    "reviews": 192,
+    "originalPrice": 1508,
+    "currentPrice": 545,
+    "discount": 963,
+    "discountPercent": 63,
+    "images": [
+      "https://dujjhct8zer0r.cloudfront.net/media/prod_image/20447868851735639283.webp",
+      "https://dujjhct8zer0r.cloudfront.net/media/prod_image/834350fa06a83eb59f8ff5f409a77e0b-12-31-24-15-32-45.webp",
+      "https://dujjhct8zer0r.cloudfront.net/media/prod_image/e94414dbf7e34471aa8a01fd82f848bf-12-31-24-15-32-54.webp",
+      "https://dujjhct8zer0r.cloudfront.net/media/prod_image/d22c6ec590033f0edd956eddd47887cb-12-31-24-15-33-01.webp",
+      "https://dujjhct8zer0r.cloudfront.net/media/prod_image/c74e92c20ae312256eeb03ca5e437c03-12-31-24-15-33-08.webp",
+      "https://dujjhct8zer0r.cloudfront.net/media/prod_image/e4826b529cae6f05089d8c24052f0cdc-12-31-24-15-33-16.webp"
     ],
-    variants: [
-      { name: "300 gm", quantity: "300 Gm x 1 Qty", price: 261, inStock: true, isBestSeller: true },
-      { name: "600 gm", quantity: "300 Gm x 2 Qty", price: 387, inStock: true, isBestSeller: false },
-      { name: "900 gm", quantity: "300 Gm x 3 Qty", price: 530, inStock: true, isBestSeller: false },
-      { name: "900 gm", quantity: "900 Gm x 1 Qty", price: 490, inStock: true, isBestSeller: false },
-      { name: "1500 gm", quantity: "300 Gm x 5 Qty", price: 695, inStock: true, isBestSeller: false },
-      { name: "2700 gm", quantity: "900 Gm x 3 Qty", price: 1050, inStock: true, isBestSeller: false },
-      { name: "3 kg", quantity: "300 Gm x 10 Qty", price: 1254, inStock: true, isBestSeller: false },
-      { name: "4500 gm", quantity: "900 Gm x 5 Qty", price: 1645, inStock: true, isBestSeller: false },
-      { name: "5 kg", quantity: "5 Kg x 1 Qty", price: 1576, inStock: true, isBestSeller: false },
-      { name: "6 kg", quantity: "300 Gm x 20 Qty", price: 2429, inStock: true, isBestSeller: false },
-      { name: "9 kg", quantity: "900 Gm x 10 Qty", price: 3080, inStock: true, isBestSeller: false },
-      { name: "12 kg", quantity: "300 Gm x 40 Qty", price: 4556, inStock: true, isBestSeller: false },
-      { name: "18 kg", quantity: "900 Gm x 20 Qty", price: 5975, inStock: true, isBestSeller: false },
-      { name: "50 kg", quantity: "5 Kg x 10 Qty", price: 9744, inStock: true, isBestSeller: false },
-      { name: "60 kg", quantity: "300 Gm x 200 Qty", price: 16487, inStock: true, isBestSeller: false },
-      { name: "90 kg", quantity: "900 Gm x 100 Qty", price: 20812, inStock: true, isBestSeller: false },
-      { name: "150 kg", quantity: "300 Gm x 500 Qty", price: 39100, inStock: true, isBestSeller: false },
+    "variants": [
+      {
+        "name": "600 gm",
+        "quantity": "600 gm",
+        "price": 545,
+        "inStock": null,
+        "isBestSeller": null
+      },
+      {
+        "name": "900 gm",
+        "quantity": "900 gm",
+        "price": 594,
+        "inStock": null,
+        "isBestSeller": null
+      },
+      {
+        "name": "900 gm",
+        "quantity": "900 gm",
+        "price": 2343,
+        "inStock": null,
+        "isBestSeller": null
+      },
+      {
+        "name": "1500 gm",
+        "quantity": "1500 gm",
+        "price": 2582,
+        "inStock": null,
+        "isBestSeller": null
+      },
+      {
+        "name": "2700 gm",
+        "quantity": "2700 gm",
+        "price": 2772,
+        "inStock": null,
+        "isBestSeller": null
+      },
+      {
+        "name": "3 kg",
+        "quantity": "3 kg",
+        "price": 3057,
+        "inStock": null,
+        "isBestSeller": null
+      },
+      {
+        "name": "4500 gm",
+        "quantity": "4500 gm",
+        "price": 3899,
+        "inStock": null,
+        "isBestSeller": null
+      },
+      {
+        "name": "5 kg",
+        "quantity": "5 kg",
+        "price": 4374,
+        "inStock": null,
+        "isBestSeller": null
+      },
+      {
+        "name": "6 kg",
+        "quantity": "6 kg",
+        "price": 12126,
+        "inStock": null,
+        "isBestSeller": null
+      },
+      {
+        "name": "1 liter",
+        "quantity": "1 liter",
+        "price": 2,
+        "inStock": null,
+        "isBestSeller": null
+      },
+      {
+        "name": "1 liter",
+        "quantity": "1 liter",
+        "price": 3,
+        "inStock": null,
+        "isBestSeller": null
+      },
+      {
+        "name": "5 liter",
+        "quantity": "5 liter",
+        "price": null,
+        "inStock": null,
+        "isBestSeller": null
+      },
+      {
+        "name": "5 liter",
+        "quantity": "5 liter",
+        "price": null,
+        "inStock": null,
+        "isBestSeller": null
+      },
+      {
+        "name": "5 liter",
+        "quantity": "5 liter",
+        "price": null,
+        "inStock": null,
+        "isBestSeller": null
+      },
+      {
+        "name": "5 liter",
+        "quantity": "5 liter",
+        "price": null,
+        "inStock": null,
+        "isBestSeller": null
+      },
+      {
+        "name": "10 liter",
+        "quantity": "10 liter",
+        "price": null,
+        "inStock": null,
+        "isBestSeller": null
+      },
+      {
+        "name": "10 liter",
+        "quantity": "10 liter",
+        "price": null,
+        "inStock": null,
+        "isBestSeller": null
+      },
+      {
+        "name": "50 liter",
+        "quantity": "50 liter",
+        "price": null,
+        "inStock": null,
+        "isBestSeller": null
+      }
     ],
-    description: '',
-    technicalComposition: '',
-    keyFeatures: [],
-    dosage: {},
-    suitableCrops: '',
-    safetyTips: [],
-    note: '',
-    technicalDetails: {
-      brand: "Noble Crop Science",
-      productCode: '',
-      countryOfOrigin: 'India',
-      category: '',
-      subCategory: '',
-      pickupAddress: '',
-      addressOfOrigin: ''
+    "description": "Flow N is a Nitrobenzene fertilizer containing Nitrobenzene 35% SL to boost plant performance. It increases the vitamin content of plants and helps break down nutrients in the soil for better absorption, which is perfect for prolonging the quality of post-harvest crops and achieving better yields.",
+    "technicalComposition": "Nitrobenzene 35% SL",
+    "keyFeatures": [
+      {
+        "title": null,
+        "description": "Boosts"
+      },
+      {
+        "title": null,
+        "description": "Root"
+      },
+      {
+        "title": null,
+        "description": "Growth:"
+      },
+      {
+        "title": null,
+        "description": "Nitrobenzene fertilizer helps enhance root development, resulting in more vigorous plant growth."
+      },
+      {
+        "title": null,
+        "description": "Balance"
+      },
+      {
+        "title": null,
+        "description": "Soil pH:"
+      },
+      {
+        "title": null,
+        "description": "Flow N balances the soil’s pH level, making it more fertile for optimal crop growth."
+      },
+      {
+        "title": null,
+        "description": "Enhance"
+      },
+      {
+        "title": null,
+        "description": "Quality"
+      },
+      {
+        "title": null,
+        "description": "Yields:"
+      },
+      {
+        "title": null,
+        "description": "It helps plants grow more efficiently and stay healthier, resulting in increased yields and profits."
+      },
+      {
+        "title": null,
+        "description": "Better"
+      },
+      {
+        "title": null,
+        "description": "Nutrient"
+      },
+      {
+        "title": null,
+        "description": "Uptake:"
+      },
+      {
+        "title": null,
+        "description": "Nitrobenzene fertilizer also helps absorb better nutritional components and supply nutrients efficiently."
+      },
+      {
+        "title": null,
+        "description": "Increase"
+      },
+      {
+        "title": null,
+        "description": "Water"
+      },
+      {
+        "title": null,
+        "description": "Retention:"
+      },
+      {
+        "title": null,
+        "description": "It improves soil moisture and reduces water requirement by enhancing its water-holding capacity in crops."
+      },
+      {
+        "title": null,
+        "description": "Improves"
+      },
+      {
+        "title": null,
+        "description": "Resistance:"
+      },
+      {
+        "title": null,
+        "description": "Flow N allows plants and crops to withstand drought and build resistance to diseases."
+      }
+    ],
+    "dosage": {
+      "spraying": "For Foliar Application: Use 35 to 40 ml of Nitrobenzene fertilizer per 15-litre spray volume.",
+      "sugarcane": null,
+      "soilApplication": null
     },
-    phoneNumber: '9016760339',
-    pricePerUnit: '',
-    freeDelivery: true,
-    isBestSeller: true,
+    "suitableCrops": "Flow N is suitable for various crops, including Vegetables, Fruits, Plantation crops, Flowers and pot plants, Turf, and Lawns.",
+    "safetyTips": [
+      "Always wear gloves",
+      "eyeglasses",
+      "a face mask.Avoid drinking",
+      "eating",
+      "smoking while using the product.Keep it away from children",
+      "animals."
+    ],
+    "note": "This Nitrobenzene fertilizer product is intended for agricultural use only.",
+    "technicalDetails": {
+      "brand": "Noble Crop Science",
+      "productCode": null,
+      "countryOfOrigin": "India",
+      "category": "Fertilizers",
+      "subCategory": "Organic Fertilizers",
+      "pickupAddress": null,
+      "addressOfOrigin": null
+    },
+    "phoneNumber": "7428208822",
+    "pricePerUnit": "(₹54.50 /100 ml)",
+    "freeDelivery": null,
+    "isBestSeller": null
   },
-  
   "7": {
     "id": "7",
     "name": "AgriBegri Combo Pack (Emoctan 250gm + Agrigib 500ml) Powerful Combination, Complete Crop Protection and Growth Solution",

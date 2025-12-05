@@ -125,3 +125,94 @@ body > div {
 * {
   box-sizing: border-box;
 }
+
+/* Smooth scrolling for mobile */
+@media (max-width: 768px) {
+  html {
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+  }
+  
+  /* Better touch targets on mobile */
+  button, a {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Improve text readability on mobile */
+  body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* Responsive image optimization */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Better horizontal scrolling on mobile */
+@media (max-width: 640px) {
+  .overflow-x-auto {
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x proximity;
+  }
+  
+  .overflow-x-auto > div > div {
+    scroll-snap-align: start;
+  }
+}
+
+/* Responsive container improvements */
+@media (max-width: 640px) {
+  .container {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+}
+
+/* Better product card spacing on mobile */
+@media (max-width: 640px) {
+  .product-card-mobile {
+    min-width: 160px;
+    max-width: 180px;
+  }
+}
+
+/* Improved touch targets for mobile */
+@media (max-width: 768px) {
+  button, a, input, select {
+    touch-action: manipulation;
+  }
+  
+  /* Prevent double-tap zoom on buttons */
+  button, a {
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* Ensure consistent product card heights */
+.product-card-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.product-card-wrapper > a {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* Ensure all product cards in grids have same height */
+.grid > div {
+  display: flex;
+  flex-direction: column;
+}
+
+.grid > div > a {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}

@@ -13,6 +13,15 @@ import { useCart } from '@/contexts/CartContext';
 export default function CartPage() {
   const { items, updateQuantity, removeFromCart, clearCart, getTotalPrice } = useCart();
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  const closeMobileMenu = () => {
+    setIsMobileMenuOpen(false);
+  };
 
   const handleCheckout = () => {
     setIsProcessing(true);
@@ -28,8 +37,8 @@ export default function CartPage() {
     return (
       <div className="min-h-screen bg-gray-50">
         <TopBar />
-        <Header />
-        <Navigation />
+        <Header onMenuToggle={toggleMobileMenu} isMenuOpen={isMobileMenuOpen} />
+        <Navigation isMobileMenuOpen={isMobileMenuOpen} onCloseMobileMenu={closeMobileMenu} />
         
         <div className="container mx-auto px-4 py-16">
           <div className="max-w-2xl mx-auto text-center">
@@ -58,8 +67,8 @@ export default function CartPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <TopBar />
-      <Header />
-      <Navigation />
+      <Header onMenuToggle={toggleMobileMenu} isMenuOpen={isMobileMenuOpen} />
+      <Navigation isMobileMenuOpen={isMobileMenuOpen} onCloseMobileMenu={closeMobileMenu} />
       
       <div className="container mx-auto px-4 py-8">
         {/* Breadcrumbs */}
