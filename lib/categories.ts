@@ -56,31 +56,89 @@ export function categorizeProduct(product: {
   const techCategory = product.technicalDetails?.category?.toLowerCase() || '';
   const subCategory = product.technicalDetails?.subCategory?.toLowerCase() || '';
 
-  // Growth Regulators - Check FIRST to override incorrect technicalDetails.category
+  // Seeds - Check FIRST to override incorrect technicalDetails.category
+  // Seed products should be identified by name even if technicalDetails says "Fertilizers"
+  if (
+    name.endsWith(' seeds') ||
+    name.endsWith(' seed') ||
+    (name.includes(' seeds') && !name.includes('treatment') && !name.includes('insecticide') && !name.includes('fungicide')) ||
+    (name.includes(' seed') && !name.includes('treatment') && !name.includes('insecticide') && !name.includes('fungicide')) ||
+    (name.includes('hybrid') && (name.includes('seed') || name.includes('f1')) && !name.includes('treatment') && !name.includes('insecticide')) ||
+    name.includes('cotton seed') ||
+    name.includes('vegetable seed') ||
+    name.includes('field crop seed') ||
+    name.includes('sunflower seed') ||
+    name.includes('cabbage seed') ||
+    name.includes('brinjal seed') ||
+    name.includes('cauliflower seed') ||
+    name.includes('maize seed') ||
+    name.includes('makka ke beej') ||
+    name.includes('f1 hybrid') ||
+    (name.includes('hybrid') && (name.includes('brinjal') || name.includes('cauliflower') || name.includes('cabbage') || name.includes('maize') || name.includes('sunflower'))) ||
+    (techCategory.includes('seed') && !techCategory.includes('treatment')) ||
+    subCategory.includes('seed')
+  ) {
+    return 'Seeds';
+  }
+
+  // Crop Protection - Check BEFORE Growth Regulators to catch insecticides/fungicides/herbicides
+  // Check for common active ingredients and patterns
+  const cropProtectionPatterns = [
+    'insecticide', 'fungicide', 'herbicide', 'pesticide', 'nematicide', 'bactericide', 'acaricide', 'miticide',
+    'animal repellent', 'pest control', 'disease control', 'weed control', 'virus control', 'viral',
+    // Common insecticide active ingredients
+    'emamectin', 'thiamethoxam', 'chlorantraniliprole', 'fipronil', 'imidacloprid', 'acetamiprid', 'cypermethrin',
+    'lambda-cyhalothrin', 'cartap', 'chlorpyrifos', 'dimethoate', 'monocrotophos',
+    // Common fungicide active ingredients
+    'hexaconazole', 'azoxystrobin', 'tebuconazole', 'validamycin', 'propiconazole', 'carbendazim', 'mancozeb',
+    'copper', 'sulphur', 'bordeaux',
+    // Common herbicide active ingredients
+    'oxyfluorfen', 'glyphosate', '2,4-d', 'atrazine', 'pendimethalin', 'paraquat',
+    // Seed treatment insecticides/fungicides
+    'seed treatment',
+  ];
+  
+  // Check for combo packs with pest/virus control (prioritize Crop Protection over Growth Regulators)
+  const isComboWithPestControl = name.includes('combo') && (
+    name.includes('pest') || 
+    name.includes('virus') || 
+    name.includes('insecticide') || 
+    name.includes('fungicide') ||
+    name.includes('disease control')
+  );
+  
+  if (
+    cropProtectionPatterns.some(pattern => name.includes(pattern)) ||
+    isComboWithPestControl ||
+    techCategory.includes('crop protection') ||
+    techCategory.includes('insecticide') ||
+    techCategory.includes('fungicide') ||
+    techCategory.includes('herbicide') ||
+    subCategory.includes('insecticide') ||
+    subCategory.includes('fungicide') ||
+    subCategory.includes('herbicide')
+  ) {
+    return 'Crop Protection';
+  }
+
+  // Growth Regulators - Check AFTER Crop Protection to override incorrect technicalDetails.category
   // Products with humic acid, gibberellic, paclobutrazol, flowering stimulants, etc. should be Growth Regulators
   // even if technicalDetails says "Fertilizers"
+  const growthRegulatorPatterns = [
+    'growth regulator', 'gibberellic', 'paclobutrazol', 'humic acid', 'fulvic acid',
+    'pgr', 'pgp', 'pgh', 'flowering stimulant', 'yield enhancer', 'plant growth',
+    'plant growth promoter', 'bio-stimulant', 'bio stimulant', 'biosimulant',
+    'growth enhancer', 'spring flower', 'spring ever', 'nuclear', 'flowie', 'flow n',
+    'nitrobenzene', 'cytokinin', 'auxin', 'brassinosteroid', 'jasmonic', 'salicylic',
+  ];
+  
   if (
-    name.includes('growth regulator') ||
-    name.includes('gibberellic') ||
-    name.includes('paclobutrazol') ||
-    name.includes('humic acid') ||
-    name.includes('fulvic acid') ||
-    name.includes('pgr') ||
-    name.includes('pgp') ||
-    name.includes('flowering stimulant') ||
-    name.includes('yield enhancer') ||
-    name.includes('plant growth') ||
-    name.includes('plant growth promoter') ||
-    name.includes('bio-stimulant') ||
-    name.includes('bio stimulant') ||
-    name.includes('growth enhancer') ||
-    name.includes('spring flower') ||
-    name.includes('spring ever') ||
-    name.includes('nuclear') ||
-    name.includes('flowie') ||
-    name.includes('flow n') ||
+    growthRegulatorPatterns.some(pattern => name.includes(pattern)) ||
     (name.includes('seaweed extract') && (name.includes('bio-stimulant') || name.includes('bio stimulant') || name.includes('specialized'))) ||
-    techCategory.includes('growth regulator')
+    techCategory.includes('growth regulator') ||
+    subCategory.includes('pgr') ||
+    subCategory.includes('pgp') ||
+    subCategory.includes('pgh')
   ) {
     return 'Growth Regulators';
   }
@@ -96,41 +154,6 @@ export function categorizeProduct(product: {
     (techCategory.includes('organic') && !name.includes('humic') && !name.includes('fulvic') && !name.includes('growth'))
   ) {
     return 'Organic Farming';
-  }
-
-  // Crop Protection
-  if (
-    name.includes('insecticide') ||
-    name.includes('fungicide') ||
-    name.includes('herbicide') ||
-    name.includes('pesticide') ||
-    name.includes('nematicide') ||
-    name.includes('bactericide') ||
-    name.includes('acaricide') ||
-    name.includes('miticide') ||
-    name.includes('animal repellent') ||
-    techCategory.includes('crop protection') ||
-    techCategory.includes('insecticide') ||
-    techCategory.includes('fungicide')
-  ) {
-    return 'Crop Protection';
-  }
-
-  // Seeds - Check BEFORE Fertilizers to override incorrect technicalDetails.category
-  // Seed products should be identified by name even if technicalDetails says "Fertilizers"
-  if (
-    name.endsWith(' seeds') ||
-    name.endsWith('seeds') ||
-    (name.includes(' seeds') && !name.includes('treatment') && !name.includes('insecticide')) ||
-    (name.includes('hybrid') && name.includes('seed') && !name.includes('treatment')) ||
-    name.includes('cotton seed') ||
-    name.includes('vegetable seed') ||
-    name.includes('field crop seed') ||
-    name.includes('sunflower seed') ||
-    name.includes('cabbage seed') ||
-    (techCategory.includes('seed') && !techCategory.includes('treatment'))
-  ) {
-    return 'Seeds';
   }
 
   // Irrigation - Check BEFORE Equipments to catch irrigation connectors
@@ -206,15 +229,24 @@ export function categorizeProduct(product: {
     return 'Gardening';
   }
 
-  // Fertilizers - Check after Equipments and Gardening to avoid false matches
+  // Fertilizers - Check after other categories to avoid false matches
   // BUT exclude products that are Growth Regulators (even if they mention "fertilizer" in name)
+  // Check for NPK patterns, micronutrients, and fertilizer-specific terms
+  const fertilizerPatterns = [
+    'npk', 'nitrogen', 'phosphorus', 'potassium', 'urea', 'dap', 'ssp', 'mop', 'sop',
+    'micronutrient', 'macronutrient', 'zinc', 'iron', 'manganese', 'copper', 'boron', 'molybdenum',
+    'sulphur', 'calcium', 'magnesium', 'foliar nutrient', 'liquid fertilizer', 'bio fertilizer',
+    'fertilizer', 'fertiliser', 'nutrient', 'manure', 'compost', 'dung',
+  ];
+  
+  // Check for NPK ratio patterns (e.g., "25:25:25", "00:00:50", "19:19:19")
+  const npkRatioPattern = /\d+:\d+:\d+/;
+  
   if (
-    (name.includes('fertilizer') && !name.includes('flowering stimulant') && !name.includes('organic fertilizer') && !name.includes('bio-stimulant') && !name.includes('bio stimulant')) ||
-    name.includes('npk') ||
-    (name.includes('micronutrient') && !name.includes('growth')) ||
-    name.includes('bio fertilizer') ||
-    name.includes('liquid fertilizer') ||
-    (techCategory.includes('fertilizer') && !name.includes('humic') && !name.includes('fulvic') && !name.includes('growth regulator') && !name.includes('plant growth'))
+    fertilizerPatterns.some(pattern => name.includes(pattern)) ||
+    npkRatioPattern.test(name) ||
+    (name.includes('fertilizer') && !name.includes('flowering stimulant') && !name.includes('organic fertilizer') && !name.includes('bio-stimulant') && !name.includes('bio stimulant') && !name.includes('growth regulator')) ||
+    (techCategory.includes('fertilizer') && !name.includes('humic') && !name.includes('fulvic') && !name.includes('growth regulator') && !name.includes('plant growth') && !name.includes('bio-stimulant'))
   ) {
     return 'Fertilizers';
   }
