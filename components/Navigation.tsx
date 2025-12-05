@@ -3,6 +3,8 @@
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import Link from 'next/link';
+import { categorySlugs, type CategoryType } from '@/lib/categories';
 
 interface Category {
   name: string;
@@ -297,16 +299,19 @@ export default function Navigation() {
                 {currentCategory!.name}
               </h3>
               <div className="grid grid-cols-2 gap-x-3 md:gap-x-4 gap-y-0.5">
-                {currentCategory!.items!.map((item, index) => (
-                  <a
-                    key={index}
-                    href="#"
-                    className="block py-1 hover:text-green-600 transition-colors text-sm text-gray-700 hover:font-medium"
-                    onClick={(e) => e.preventDefault()}
-                  >
-                    {item}
-                  </a>
-                ))}
+                {currentCategory!.items!.map((item, index) => {
+                  // Map category name to slug
+                  const categorySlug = categorySlugs[currentCategory!.name as CategoryType] || '';
+                  return (
+                    <Link
+                      key={index}
+                      href={`/categories/${categorySlug}`}
+                      className="block py-1 hover:text-green-600 transition-colors text-sm text-gray-700 hover:font-medium"
+                    >
+                      {item}
+                    </Link>
+                  );
+                })}
               </div>
             </div>
           </div>
@@ -344,20 +349,20 @@ export default function Navigation() {
 
   return (
     <>
-      <nav className="bg-[#16a34a] text-white shadow-md relative w-full" style={{ zIndex: 1000, overflow: 'hidden', height: '48px', maxHeight: '48px' }}>
-        <div className="w-full h-full" style={{ position: 'relative', overflow: 'hidden', height: '48px', maxHeight: '48px' }}>
+      <nav className="bg-[#16a34a] text-white shadow-md relative w-full" style={{ zIndex: 1000, overflow: 'hidden', height: '44px', maxHeight: '44px' }}>
+        <div className="w-full h-full" style={{ position: 'relative', overflow: 'hidden', height: '44px', maxHeight: '44px' }}>
           <div 
             ref={navScrollRef}
-            className="flex items-center gap-1 md:gap-2 px-3 md:px-4 scrollbar-hide h-full"
+            className="flex items-center gap-0.5 sm:gap-1 md:gap-2 px-2 sm:px-3 md:px-4 scrollbar-hide h-full"
             style={{ 
               overflowX: 'auto',
               overflowY: 'hidden',
               position: 'relative',
               WebkitOverflowScrolling: 'touch',
               flexWrap: 'nowrap',
-              height: '48px',
-              maxHeight: '48px',
-              minHeight: '48px',
+              height: '44px',
+              maxHeight: '44px',
+              minHeight: '44px',
             }}
           >
             {categories.map((category) => {
@@ -386,23 +391,23 @@ export default function Navigation() {
                     }, 100);
                   }}
                 >
-                  <button 
-                    ref={(el) => { buttonRefs.current[category.name] = el; }}
-                    type="button"
-                    className={`px-3 md:px-4 py-0 transition-colors flex items-center gap-1 whitespace-nowrap text-sm md:text-base font-medium ${
+                  <Link
+                    href={`/categories/${categorySlugs[category.name as CategoryType] || category.name.toLowerCase().replace(/\s+/g, '-')}`}
+                    ref={(el) => { buttonRefs.current[category.name] = el as any; }}
+                    className={`px-2 sm:px-2.5 md:px-3 lg:px-4 py-0 transition-colors flex items-center gap-0.5 sm:gap-1 whitespace-nowrap text-xs sm:text-sm md:text-base font-medium ${
                       isHovered ? 'bg-[#15803d]' : 'hover:bg-[#15803d]'
                     }`}
-                    style={{ height: '48px', lineHeight: '48px', display: 'flex', alignItems: 'center' }}
+                    style={{ height: '44px', lineHeight: '44px', display: 'flex', alignItems: 'center' }}
                   >
-                    <span>{category.name}</span>
+                    <span className="truncate max-w-[120px] sm:max-w-none">{category.name}</span>
                     {hasItems && (
                       isHovered ? (
-                        <ChevronUp size={14} className="md:w-4 md:h-4 flex-shrink-0" />
+                        <ChevronUp size={12} className="sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 flex-shrink-0" />
                       ) : (
-                        <ChevronDown size={14} className="md:w-4 md:h-4 flex-shrink-0" />
+                        <ChevronDown size={12} className="sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 flex-shrink-0" />
                       )
                     )}
-                  </button>
+                  </Link>
                 </div>
               );
             })}

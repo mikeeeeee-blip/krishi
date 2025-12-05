@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 import { 
   Facebook, 
   Linkedin, 
@@ -17,69 +18,69 @@ const Footer = () => {
     <footer className="w-full">
       {/* Upper Section - Dark Blue */}
       <div className="bg-[#1e3a5f] text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 md:py-8">
           {/* Guarantee Boxes */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            <div className="bg-gray-800 rounded-lg p-4 flex items-center gap-3">
-              <div className="bg-green-600 rounded-full p-2">
-                <CheckCircle2 className="w-6 h-6 text-white" />
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3 md:gap-4 mb-6 sm:mb-7 md:mb-8">
+            <div className="bg-gray-800 rounded-lg p-2 sm:p-3 md:p-4 flex items-center gap-1.5 sm:gap-2 md:gap-3">
+              <div className="bg-green-600 rounded-full p-1.5 sm:p-2 flex-shrink-0">
+                <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white" />
               </div>
               <div>
-                <p className="font-semibold text-sm">Guaranteed Lowest Prices</p>
+                <p className="font-semibold text-[10px] xs:text-xs sm:text-sm leading-tight">Guaranteed Lowest Prices</p>
               </div>
             </div>
-            <div className="bg-gray-800 rounded-lg p-4 flex items-center gap-3">
-              <div className="bg-blue-600 rounded-full p-2">
-                <Truck className="w-6 h-6 text-white" />
+            <div className="bg-gray-800 rounded-lg p-2 sm:p-3 md:p-4 flex items-center gap-1.5 sm:gap-2 md:gap-3">
+              <div className="bg-blue-600 rounded-full p-1.5 sm:p-2 flex-shrink-0">
+                <Truck className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white" />
               </div>
               <div>
-                <p className="font-semibold text-sm">FREE India Wide Shipping</p>
+                <p className="font-semibold text-[10px] xs:text-xs sm:text-sm leading-tight">FREE India Wide Shipping</p>
               </div>
             </div>
-            <div className="bg-gray-800 rounded-lg p-4 flex items-center gap-3">
-              <div className="bg-green-600 rounded-full p-2">
-                <Shield className="w-6 h-6 text-white" />
+            <div className="bg-gray-800 rounded-lg p-2 sm:p-3 md:p-4 flex items-center gap-1.5 sm:gap-2 md:gap-3">
+              <div className="bg-green-600 rounded-full p-1.5 sm:p-2 flex-shrink-0">
+                <Shield className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white" />
               </div>
               <div>
-                <p className="font-semibold text-sm">SAFE SHOPPING Guarantee</p>
+                <p className="font-semibold text-[10px] xs:text-xs sm:text-sm leading-tight">SAFE SHOPPING Guarantee</p>
               </div>
             </div>
-            <div className="bg-gray-800 rounded-lg p-4 flex items-center gap-3">
-              <div className="bg-blue-600 rounded-full p-2">
-                <HandCoins className="w-6 h-6 text-white" />
+            <div className="bg-gray-800 rounded-lg p-2 sm:p-3 md:p-4 flex items-center gap-1.5 sm:gap-2 md:gap-3">
+              <div className="bg-blue-600 rounded-full p-1.5 sm:p-2 flex-shrink-0">
+                <HandCoins className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white" />
               </div>
               <div>
-                <p className="font-semibold text-sm">EASY Returns & Replacements</p>
+                <p className="font-semibold text-[10px] xs:text-xs sm:text-sm leading-tight">EASY Returns & Replacements</p>
               </div>
             </div>
           </div>
 
           {/* Footer Navigation Links */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8 mb-6 sm:mb-7 md:mb-8">
             {/* Categories */}
             <div>
-              <h3 className="font-bold text-lg mb-4">Categories</h3>
-              <ul className="space-y-2 text-sm">
-                <li><a href="#" className="hover:text-blue-300 transition-colors">Equipments</a></li>
-                <li><a href="#" className="hover:text-blue-300 transition-colors">Gardening</a></li>
-                <li><a href="#" className="hover:text-blue-300 transition-colors">Crop protection</a></li>
-                <li><a href="#" className="hover:text-blue-300 transition-colors">Fertilizers</a></li>
-                <li><a href="#" className="hover:text-blue-300 transition-colors">Organic Farming</a></li>
-                <li><a href="#" className="hover:text-blue-300 transition-colors">Bulk</a></li>
-                <li><a href="#" className="hover:text-blue-300 transition-colors">Seeds</a></li>
-                <li><a href="#" className="hover:text-blue-300 transition-colors">Irrigation</a></li>
-                <li><a href="#" className="hover:text-blue-300 transition-colors">Cattle & Bird Care</a></li>
-                <li><a href="#" className="hover:text-blue-300 transition-colors">Farm Products</a></li>
-                <li><a href="#" className="hover:text-blue-300 transition-colors">Media</a></li>
-                <li><a href="#" className="hover:text-blue-300 transition-colors">Health & Wellness</a></li>
-                <li><a href="#" className="hover:text-blue-300 transition-colors">Growth Regulators</a></li>
+              <h3 className="font-bold text-sm sm:text-base md:text-lg mb-2 sm:mb-3 md:mb-4">Categories</h3>
+              <ul className="space-y-1 sm:space-y-1.5 md:space-y-2 text-xs sm:text-sm">
+                <li><Link href="/categories/equipments" className="hover:text-blue-300 transition-colors">Equipments</Link></li>
+                <li><Link href="/categories/gardening" className="hover:text-blue-300 transition-colors">Gardening</Link></li>
+                <li><Link href="/categories/crop-protection" className="hover:text-blue-300 transition-colors">Crop protection</Link></li>
+                <li><Link href="/categories/fertilizers" className="hover:text-blue-300 transition-colors">Fertilizers</Link></li>
+                <li><Link href="/categories/organic-farming" className="hover:text-blue-300 transition-colors">Organic Farming</Link></li>
+                <li><Link href="/categories/bulk" className="hover:text-blue-300 transition-colors">Bulk</Link></li>
+                <li><Link href="/categories/seeds" className="hover:text-blue-300 transition-colors">Seeds</Link></li>
+                <li><Link href="/categories/irrigation" className="hover:text-blue-300 transition-colors">Irrigation</Link></li>
+                <li><Link href="/categories/cattle-bird-care" className="hover:text-blue-300 transition-colors">Cattle & Bird Care</Link></li>
+                <li><Link href="/categories/farm-products" className="hover:text-blue-300 transition-colors">Farm Products</Link></li>
+                <li><Link href="/categories/media" className="hover:text-blue-300 transition-colors">Media</Link></li>
+                <li><Link href="/categories/health-wellness" className="hover:text-blue-300 transition-colors">Health & Wellness</Link></li>
+                <li><Link href="/categories/growth-regulators" className="hover:text-blue-300 transition-colors">Growth Regulators</Link></li>
               </ul>
             </div>
 
             {/* Know Us Better */}
             <div>
-              <h3 className="font-bold text-lg mb-4">Know Us Better</h3>
-              <ul className="space-y-2 text-sm">
+              <h3 className="font-bold text-sm sm:text-base md:text-lg mb-2 sm:mb-3 md:mb-4">Know Us Better</h3>
+              <ul className="space-y-1 sm:space-y-1.5 md:space-y-2 text-xs sm:text-sm">
                 <li><a href="#" className="hover:text-blue-300 transition-colors">About Us</a></li>
                 <li><a href="#" className="hover:text-blue-300 transition-colors">Why AgriBegri</a></li>
                 <li><a href="#" className="hover:text-blue-300 transition-colors">Careers</a></li>
@@ -97,8 +98,8 @@ const Footer = () => {
 
             {/* Our Policies */}
             <div>
-              <h3 className="font-bold text-lg mb-4">Our Policies</h3>
-              <ul className="space-y-2 text-sm">
+              <h3 className="font-bold text-sm sm:text-base md:text-lg mb-2 sm:mb-3 md:mb-4">Our Policies</h3>
+              <ul className="space-y-1 sm:space-y-1.5 md:space-y-2 text-xs sm:text-sm">
                 <li><a href="#" className="hover:text-blue-300 transition-colors">Privacy Policy</a></li>
                 <li><a href="#" className="hover:text-blue-300 transition-colors">Shipping / Delivery</a></li>
                 <li><a href="#" className="hover:text-blue-300 transition-colors">Cancellation Policy</a></li>
@@ -111,8 +112,8 @@ const Footer = () => {
 
             {/* Services */}
             <div>
-              <h3 className="font-bold text-lg mb-4">Services</h3>
-              <ul className="space-y-2 text-sm">
+              <h3 className="font-bold text-sm sm:text-base md:text-lg mb-2 sm:mb-3 md:mb-4">Services</h3>
+              <ul className="space-y-1 sm:space-y-1.5 md:space-y-2 text-xs sm:text-sm">
                 <li><a href="#" className="hover:text-blue-300 transition-colors">Sell on AgriBegri</a></li>
                 <li><a href="#" className="hover:text-blue-300 transition-colors">Customer Login</a></li>
               </ul>
@@ -120,28 +121,28 @@ const Footer = () => {
           </div>
 
           {/* Copyright and Social Media */}
-          <div className="flex flex-col md:flex-row justify-between items-center pt-6 border-t border-gray-600">
-            <p className="text-sm mb-4 md:mb-0">Copyright©2025@agribegri.com. All rights reserved.</p>
-            <div className="flex items-center gap-4">
-              <span className="text-sm mr-2">Connect With</span>
-              <div className="flex gap-3">
+          <div className="flex flex-col md:flex-row justify-between items-center pt-4 sm:pt-5 md:pt-6 border-t border-gray-600 gap-3 sm:gap-4">
+            <p className="text-xs sm:text-sm text-center md:text-left mb-2 md:mb-0">Copyright©2025@agribegri.com. All rights reserved.</p>
+            <div className="flex items-center gap-2 sm:gap-3 md:gap-4 flex-wrap justify-center md:justify-start">
+              <span className="text-xs sm:text-sm mr-1 sm:mr-2">Connect With</span>
+              <div className="flex gap-2 sm:gap-3">
                 <a href="#" className="hover:text-blue-300 transition-colors" aria-label="Facebook">
-                  <Facebook className="w-5 h-5" />
+                  <Facebook className="w-4 h-4 sm:w-5 sm:h-5" />
                 </a>
                 <a href="#" className="hover:text-blue-300 transition-colors" aria-label="LinkedIn">
-                  <Linkedin className="w-5 h-5" />
+                  <Linkedin className="w-4 h-4 sm:w-5 sm:h-5" />
                 </a>
                 <a href="#" className="hover:text-blue-300 transition-colors" aria-label="Twitter">
-                  <Twitter className="w-5 h-5" />
+                  <Twitter className="w-4 h-4 sm:w-5 sm:h-5" />
                 </a>
                 <a href="#" className="hover:text-blue-300 transition-colors" aria-label="YouTube">
-                  <Youtube className="w-5 h-5" />
+                  <Youtube className="w-4 h-4 sm:w-5 sm:h-5" />
                 </a>
                 <a href="#" className="hover:text-blue-300 transition-colors" aria-label="Instagram">
-                  <Instagram className="w-5 h-5" />
+                  <Instagram className="w-4 h-4 sm:w-5 sm:h-5" />
                 </a>
                 <a href="#" className="hover:text-blue-300 transition-colors" aria-label="WhatsApp">
-                  <MessageCircle className="w-5 h-5" />
+                  <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5" />
                 </a>
               </div>
             </div>
@@ -151,14 +152,14 @@ const Footer = () => {
 
       {/* Lower Section - Lighter Blue */}
       <div className="bg-[#4a7ba7] text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <h2 className="text-2xl font-bold mb-6">Most Searched on AgriBegri</h2>
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 md:py-8">
+          <h2 className="text-lg sm:text-xl md:text-2xl font-bold mb-4 sm:mb-5 md:mb-6">Most Searched on AgriBegri</h2>
           
-          <div className="space-y-6 text-sm">
+          <div className="space-y-4 sm:space-y-5 md:space-y-6 text-xs sm:text-sm">
             {/* Equipments */}
             <div>
-              <h3 className="font-bold mb-2">Equipments :</h3>
-              <p className="text-gray-100">
+              <h3 className="font-bold mb-1.5 sm:mb-2 text-sm sm:text-base">Equipments :</h3>
+              <p className="text-gray-100 leading-relaxed">
                 Hand Operated Tools | Spray Pump | Tarpaulin | Mulching | Brush Cutter | Weeders | Water Pump | Pond Liner | Vermi Compost Bed | Biofloc Fish Tank | Head Torch | Azolla Growing Bed | Weed Control Mat | Solar Products | Fogging Machine | Chain Saw | Crop Protection Cover | Hedge Trimmer | Earth Auger | Other Hardware | Traps
               </p>
             </div>
