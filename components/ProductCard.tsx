@@ -39,17 +39,26 @@ interface ProductCardProps {
 export default function ProductCard({ product }: ProductCardProps) {
   const { addToCart } = useCart();
   const [showToast, setShowToast] = useState(false);
-  const selectedVariant = product.variants[0];
+  
+  // Safe array access with fallbacks
+  const selectedVariant = product.variants?.[0];
+  const productImage = product.images?.[0] || '/placeholder-image.png';
+
+  // Early return if no variant or image
+  const hasImages = product.images && Array.isArray(product.images) && product.images.length > 0;
+  if (!selectedVariant || !hasImages) {
+    return null;
+  }
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (selectedVariant.price === null) return; // Don't add if price is null
+    if (!selectedVariant || selectedVariant.price === null) return; // Don't add if price is null
     addToCart({
       productId: product.id,
       name: product.name,
       brand: product.brand || '',
-      image: product.images[0],
+      image: productImage,
       variant: selectedVariant.name,
       quantity: selectedVariant.quantity,
       price: selectedVariant.price,
@@ -64,11 +73,16 @@ export default function ProductCard({ product }: ProductCardProps) {
         {/* Image Section - Fixed height */}
         <div className="relative aspect-square bg-white flex-shrink-0">
           <Image
-            src={product.images[0]}
-            alt={product.name}
+            src={productImage}
+            alt={product.name || 'Product image'}
             fill
             className="object-contain p-1.5 sm:p-2 md:p-3 lg:p-4"
             sizes="(max-width: 640px) 50vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, (max-width: 1280px) 20vw, 16vw"
+            onError={(e) => {
+              // Fallback to placeholder if image fails to load
+              const target = e.target as HTMLImageElement;
+              target.src = '/placeholder-image.png';
+            }}
           />
 
           {/* Discount Badge - Top Left - Matching agribegri.com style */}

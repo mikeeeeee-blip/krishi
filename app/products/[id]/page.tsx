@@ -41,15 +41,27 @@ export default function ProductDetailPage() {
     );
   }
 
-  const selectedVariantData = product.variants[selectedVariant];
+  // Safe array access with validation
+  const selectedVariantData = product.variants?.[selectedVariant];
+  const productImage = product.images?.[0] || '/placeholder-image.png';
+
+  // Validate that we have required data
+  const hasImages = product.images && Array.isArray(product.images) && product.images.length > 0;
+  if (!selectedVariantData || !hasImages) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-xl text-gray-600">Product data incomplete</p>
+      </div>
+    );
+  }
 
   const handleAddToCart = () => {
-    if (selectedVariantData.price === null) return; // Don't add if price is null
+    if (!selectedVariantData || selectedVariantData.price === null) return; // Don't add if price is null
     addToCart({
       productId: product.id,
       name: product.name,
       brand: product.brand || '',
-      image: product.images[0],
+      image: productImage,
       variant: selectedVariantData.name,
       quantity: selectedVariantData.quantity,
       price: selectedVariantData.price,
@@ -74,10 +86,18 @@ export default function ProductDetailPage() {
         <div className="container mx-auto px-4">
           <div className="flex items-center gap-2 text-sm text-gray-600">
             <Link href="/" className="hover:text-green-600">Home</Link>
-            <ChevronRight size={16} />
-            <span>{product.technicalDetails.category}</span>
-            <ChevronRight size={16} />
-            <span>{product.technicalDetails.subCategory}</span>
+            {product.technicalDetails?.category && (
+              <>
+                <ChevronRight size={16} />
+                <span>{product.technicalDetails.category}</span>
+              </>
+            )}
+            {product.technicalDetails?.subCategory && (
+              <>
+                <ChevronRight size={16} />
+                <span>{product.technicalDetails.subCategory}</span>
+              </>
+            )}
             <ChevronRight size={16} />
             <span className="text-gray-900 font-medium">Product Details</span>
           </div>
@@ -98,18 +118,24 @@ export default function ProductDetailPage() {
               </div>
 
               <Image
-                src={product.images[selectedImageIndex]}
-                alt={product.name}
+                src={product.images[selectedImageIndex] || productImage}
+                alt={product.name || 'Product image'}
                 fill
                 className="object-contain p-4"
                 sizes="(max-width: 1024px) 100vw, 50vw"
                 priority
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.src = '/placeholder-image.png';
+                }}
               />
 
               {/* Image Counter */}
-              <div className="absolute bottom-4 right-4 bg-black/50 text-white text-xs px-2 py-1 rounded">
-                {selectedImageIndex + 1}/{product.images.length}
-              </div>
+              {product.images && product.images.length > 1 && (
+                <div className="absolute bottom-4 right-4 bg-black/50 text-white text-xs px-2 py-1 rounded">
+                  {selectedImageIndex + 1}/{product.images.length}
+                </div>
+              )}
             </div>
 
             {/* Thumbnail Images */}
@@ -147,62 +173,78 @@ export default function ProductDetailPage() {
             )}
 
             {/* Rating */}
-            <div className="flex items-center gap-2 mb-4">
-              <div className="flex items-center">
-                <Star size={20} className="fill-yellow-400 text-yellow-400" />
-                <span className="ml-1 font-semibold">{product.rating}</span>
+            {product.rating !== null && product.reviews !== null && (
+              <div className="flex items-center gap-2 mb-4">
+                <div className="flex items-center">
+                  <Star size={20} className="fill-yellow-400 text-yellow-400" />
+                  <span className="ml-1 font-semibold">{product.rating}</span>
+                </div>
+                <span className="text-gray-600">({product.reviews} reviews)</span>
               </div>
-              <span className="text-gray-600">({product.reviews} reviews)</span>
-            </div>
+            )}
 
             {/* Price */}
             <div className="mb-6">
-              <div className="flex items-baseline gap-3 mb-2">
-                <span className="text-3xl font-bold text-gray-900">
-                  ₹{selectedVariantData.price}
-                </span>
-                <span className="text-xl text-gray-500 line-through">
-                  ₹{product.originalPrice}
-                </span>
-              </div>
-              <p className="text-green-600 font-semibold mb-1">
-                You save ₹{product.discount} ({product.discountPercent}% off)
-              </p>
-              <p className="text-gray-600">Free Delivery</p>
+              {selectedVariantData.price !== null ? (
+                <>
+                  <div className="flex items-baseline gap-3 mb-2">
+                    <span className="text-3xl font-bold text-gray-900">
+                      ₹{selectedVariantData.price}
+                    </span>
+                    <span className="text-xl text-gray-500 line-through">
+                      ₹{product.originalPrice}
+                    </span>
+                  </div>
+                  {product.discount > 0 && (
+                    <p className="text-green-600 font-semibold mb-1">
+                      You save ₹{product.discount} ({product.discountPercent}% off)
+                    </p>
+                  )}
+                  {product.freeDelivery && (
+                    <p className="text-gray-600">Free Delivery</p>
+                  )}
+                </>
+              ) : (
+                <p className="text-gray-600 text-lg">Price not available</p>
+              )}
             </div>
 
             {/* Variant Selection */}
-            <div className="mb-6">
-              <h3 className="text-lg font-semibold mb-3">Select Variant</h3>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 max-h-64 overflow-y-auto p-2 border border-gray-200 rounded">
-                {product.variants.map((variant, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => setSelectedVariant(idx)}
-                    className={`p-3 border-2 rounded text-left transition-all ${
-                      selectedVariant === idx
-                        ? 'border-green-600 bg-green-50'
-                        : 'border-gray-200 hover:border-gray-300'
-                    } ${!variant.inStock ? 'opacity-50 cursor-not-allowed' : ''}`}
-                    disabled={!variant.inStock}
-                  >
-                    <div className="font-semibold text-sm">{variant.name}</div>
-                    <div className="text-xs text-gray-600 mt-1">{variant.quantity}</div>
-                    <div className="text-sm font-bold mt-1">₹{variant.price}</div>
-                    {'isBestSeller' in variant && variant.isBestSeller && (
-                      <span className="inline-block mt-1 bg-red-500 text-white text-xs px-2 py-0.5 rounded">
-                        BEST SELLER
-                      </span>
-                    )}
-                    {!variant.inStock && (
-                      <span className="inline-block mt-1 bg-red-500 text-white text-xs px-2 py-0.5 rounded">
-                        SOLD OUT
-                      </span>
-                    )}
-                  </button>
-                ))}
+            {product.variants && product.variants.length > 1 && (
+              <div className="mb-6">
+                <h3 className="text-lg font-semibold mb-3">Select Variant</h3>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 max-h-64 overflow-y-auto p-2 border border-gray-200 rounded">
+                  {product.variants.map((variant, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setSelectedVariant(idx)}
+                      className={`p-3 border-2 rounded text-left transition-all ${
+                        selectedVariant === idx
+                          ? 'border-green-600 bg-green-50'
+                          : 'border-gray-200 hover:border-gray-300'
+                      } ${variant.inStock !== true ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      disabled={variant.inStock !== true}
+                    >
+                      <div className="font-semibold text-sm">{variant.name}</div>
+                      <div className="text-xs text-gray-600 mt-1">{variant.quantity}</div>
+                        <div className="text-sm font-bold mt-1">
+                        {variant.price !== null ? `₹${variant.price}` : 'Price N/A'}
+                      </div>
+                      {'isBestSeller' in variant && variant.isBestSeller && (
+                        <span className="inline-block mt-1 bg-red-500 text-white text-xs px-2 py-0.5 rounded">
+                          BEST SELLER
+                        </span>
+                      )}
+                      {variant.inStock !== true && (
+                        <span className="inline-block mt-1 bg-red-500 text-white text-xs px-2 py-0.5 rounded">
+                          SOLD OUT
+                        </span>
+                      )}
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Action Buttons */}
             <div className="flex gap-4 mb-6">
