@@ -46,7 +46,7 @@ export default function WhyEclatAgroxglobalPage() {
       {/* Hero Banner */}
       <div className="hero-banner">
         <div className="hero-banner-content">
-          <h1>Why Choose ECLAT AGROXGLOBAL?</h1>
+          <h1>Why Choose ECLAT AGROXGLOBAL ?</h1>
           <p>India&apos;s Most Trusted Agricultural Marketplace</p>
         </div>
       </div>

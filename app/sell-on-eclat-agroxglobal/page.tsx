@@ -220,7 +220,7 @@ export default function SellOnEclatAgroxglobalPage() {
               <Mail className="w-5 h-5" />
               Register Now
             </a>
-            <a href="tel:7065060162" className="inline-flex items-center gap-2 bg-white/20 text-white px-6 py-3 rounded-lg font-semibold hover:bg-white/30 transition-colors">
+            <a href="tel:7065060162" className="cta-banner-btn-secondary">
               <Phone className="w-5 h-5" />
               Talk to Us
             </a>

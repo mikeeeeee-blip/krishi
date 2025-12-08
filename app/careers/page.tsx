@@ -23,14 +23,14 @@ export default function CareersPage() {
     {
       title: "Software Engineer",
       department: "Technology",
-      location: "Noida, UP",
+      location: "Madhya Pradesh, India",
       type: "Full-time",
       description: "Join our tech team to build and scale our e-commerce platform serving millions of farmers across India."
     },
     {
       title: "Product Manager",
       department: "Product",
-      location: "Noida, UP",
+      location: "Madhya Pradesh, India",
       type: "Full-time",
       description: "Lead product development initiatives and work closely with engineering teams to deliver innovative solutions."
     },
@@ -44,7 +44,7 @@ export default function CareersPage() {
     {
       title: "Digital Marketing Specialist",
       department: "Marketing",
-      location: "Noida, UP",
+      location: "Madhya Pradesh, India",
       type: "Full-time",
       description: "Drive digital marketing campaigns and grow our online presence across various channels."
     },
@@ -166,34 +166,32 @@ export default function CareersPage() {
         </div>
 
         {/* How to Apply */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">How to Apply</h2>
-            <div className="process-steps">
-              <div className="process-step">
-                <div className="process-step-number">1</div>
-                <h3>Submit Resume</h3>
-                <p>Send your resume to careers@eclatagro.com</p>
-              </div>
-              <div className="process-step">
-                <div className="process-step-number">2</div>
-                <h3>Initial Screening</h3>
-                <p>Our HR team reviews your application</p>
-              </div>
-              <div className="process-step">
-                <div className="process-step-number">3</div>
-                <h3>Interview</h3>
-                <p>Technical and cultural fit interviews</p>
-              </div>
-              <div className="process-step">
-                <div className="process-step-number">4</div>
-                <h3>Welcome Aboard!</h3>
-                <p>Receive offer and join our team</p>
-              </div>
+        <div className="mb-12">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">How to Apply</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+            <div className="process-step text-center">
+              <div className="process-step-number mx-auto">1</div>
+              <h3>Submit Resume</h3>
+              <p>Send your resume to careers@eclatagro.com</p>
+            </div>
+            <div className="process-step text-center">
+              <div className="process-step-number mx-auto">2</div>
+              <h3>Initial Screening</h3>
+              <p>Our HR team reviews your application</p>
+            </div>
+            <div className="process-step text-center">
+              <div className="process-step-number mx-auto">3</div>
+              <h3>Interview</h3>
+              <p>Technical and cultural fit interviews</p>
+            </div>
+            <div className="process-step text-center">
+              <div className="process-step-number mx-auto">4</div>
+              <h3>Welcome Aboard!</h3>
+              <p>Receive offer and join our team</p>
             </div>
           </div>
           
-          <div className="info-box">
+          <div className="info-box max-w-2xl mx-auto">
             <h3 className="text-xl font-bold text-gray-900 mb-4">Don&apos;t See a Suitable Opening?</h3>
             <p className="text-gray-600 mb-4">
               We&apos;re always looking for talented individuals to join our team. If you&apos;re passionate 

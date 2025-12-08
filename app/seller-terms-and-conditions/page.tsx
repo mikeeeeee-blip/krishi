@@ -190,10 +190,12 @@ export default function SellerTermsPage() {
           <div className="cta-banner mt-8">
             <h3>Ready to Start Selling?</h3>
             <p>Join thousands of sellers on ECLAT AGROXGLOBAL and grow your business!</p>
-            <Link href="/sell-on-eclat-agroxglobal" className="cta-banner-btn">
-              <Store className="w-5 h-5" />
-              Register as Seller
-            </Link>
+
+            <a href="/sell-on-eclat-agroxglobal" className="cta-banner-btn text-white hover:text-white">
+            <Store className="w-5 h-5 text-white" />
+              Register as a Seller
+            </a>
+            
           </div>
         </div>
       </div>
