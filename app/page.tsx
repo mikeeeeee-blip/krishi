@@ -45,15 +45,15 @@ export default function Home() {
       <TopBar />
       <Header onMenuToggle={toggleMobileMenu} isMenuOpen={isMobileMenuOpen} />
       <Navigation isMobileMenuOpen={isMobileMenuOpen} onCloseMobileMenu={closeMobileMenu} />
-      <TrustBadges />
       <Carousel />
-      <CampaignBanners />
+      {/* <CampaignBanners /> */}
       <BestSellers />
       <GrowthRegulators />
       <FeaturedProducts />
       <TodaysOffers />
       <NewArrivals />
       <HarDinSastaSection />
+      <Carousel />
       <SeedsSection />
       <EquipmentsSection />
       <FertilizersSection />
@@ -66,6 +66,7 @@ export default function Home() {
       <FarmProductsSection />
       <MediaSection />
       <HealthWellnessSection />
+      {/* <TrustBadges /> */}
       <TrendingProducts />
       <WhatsAppButton />
       <Footer />

@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "AgriBegri - Your Trusted Agricultural Marketplace",
+  title: "Eclat Agroxglobal- Your Trusted Agricultural Marketplace",
   description: "Shop for agricultural products, seeds, fertilizers, equipment and more. Best prices, free delivery across India.",
 };
 

@@ -4,6 +4,7 @@ import { Search, ShoppingCart, User, Truck, Menu, X } from 'lucide-react';
 import Link from 'next/link';
 import { useCart } from '@/contexts/CartContext';
 import { useState } from 'react';
+import Image from 'next/image';
 
 interface HeaderProps {
   onMenuToggle?: () => void;
@@ -36,13 +37,7 @@ export default function Header({ onMenuToggle, isMenuOpen = false }: HeaderProps
 
             {/* Logo - Centered */}
             <Link href="/" className="flex items-center gap-1.5 flex-shrink-0 flex-1 justify-center">
-              <div className="text-base sm:text-lg font-bold flex items-center">
-                <span className="text-green-600">Agri</span>
-                <span className="text-[#2563eb] relative">
-                  <span className="absolute -top-0.5 left-0 text-green-600 text-sm sm:text-base">🌿</span>
-                  <span className="relative z-10">Begri</span>
-                </span>
-              </div>
+              <Image src='/logo.png' alt='logo' className='object-cover' height={100} width={200}></Image>
             </Link>
 
             {/* Right Icons: Delivery Truck, Shopping Cart, User */}
@@ -81,13 +76,7 @@ export default function Header({ onMenuToggle, isMenuOpen = false }: HeaderProps
         <div className="hidden lg:flex items-center justify-between py-4 md:py-5 gap-4 md:gap-6">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 flex-shrink-0">
-            <div className="text-xl md:text-2xl font-bold flex items-center">
-              <span className="text-green-600">Agri</span>
-              <span className="text-[#2563eb] relative">
-                <span className="absolute -top-1 left-0 text-green-600 text-lg md:text-xl">🌿</span>
-                <span className="relative z-10">Begri</span>
-              </span>
-            </div>
+           <Image src='/logo.png' alt='logo' className='object-cover' height={100} width={200}></Image>
           </Link>
 
           {/* Search Bar */}

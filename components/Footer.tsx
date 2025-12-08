@@ -92,7 +92,7 @@ const Footer = () => {
                 <li><a href="#" className="hover:text-blue-300 transition-colors">Find Commodity Prices</a></li>
                 <li><a href="#" className="hover:text-blue-300 transition-colors">Agri E-Magazines</a></li>
                 <li><a href="#" className="hover:text-blue-300 transition-colors">How Referral works</a></li>
-                <li><a href="#" className="hover:text-blue-300 transition-colors">AgriBegri Blog</a></li>
+                <li><a href="#" className="hover:text-blue-300 transition-colors">Eclat AgroxglobalBlog</a></li>
               </ul>
             </div>
 
