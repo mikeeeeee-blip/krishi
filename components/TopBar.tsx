@@ -31,9 +31,6 @@ export default function TopBar() {
                 <ChevronDown size={10} className={`sm:w-3.5 sm:h-3.5 transition-transform ${showLanguageDropdown ? 'rotate-180' : ''}`} />
               </button>
             </div>
-            <a href="#" className="hover:underline whitespace-nowrap text-[10px] xs:text-xs sm:text-sm font-medium hidden sm:inline">Sell</a>
-            <a href="#" className="hover:underline whitespace-nowrap text-[10px] xs:text-xs sm:text-sm font-medium hidden md:inline">Login</a>
-            <a href="#" className="hover:underline whitespace-nowrap text-[10px] xs:text-xs sm:text-sm font-medium hidden lg:inline">Partner</a>
             <a href="#" className="hover:underline whitespace-nowrap text-[10px] xs:text-xs sm:text-sm font-medium hidden xl:inline">Experts</a>
             <a href="#" className="hover:underline whitespace-nowrap text-[10px] xs:text-xs sm:text-sm font-medium hidden xl:inline">Track</a>
             <a href="#" className="hover:underline whitespace-nowrap text-[10px] xs:text-xs sm:text-sm font-medium hidden xl:inline">APP</a>
