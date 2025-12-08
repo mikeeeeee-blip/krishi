@@ -1,7 +1,7 @@
 'use client';
 
 import { ChevronDown, ChevronUp, X, Home, FlaskConical, ChevronRight, User } from 'lucide-react';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import { categorySlugs, type CategoryType } from '@/lib/categories';
@@ -58,10 +58,6 @@ const categories: Category[] = [
       'Bio Pesticides',
       'Disinfectant & Sanitation',
     ],
-  },
-  {
-    name: 'Har Din Sasta',
-    items: [],
   },
   {
     name: 'Seeds',
@@ -195,8 +191,10 @@ export default function Navigation({ isMobileMenuOpen = false, onCloseMobileMenu
   const mobileMenuRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    setMounted(true);
+    // Set mounted state - this is safe to call in useEffect for hydration detection
+    const timer = setTimeout(() => setMounted(true), 0);
     return () => {
+      clearTimeout(timer);
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
       }
@@ -228,7 +226,7 @@ export default function Navigation({ isMobileMenuOpen = false, onCloseMobileMenu
     };
   }, [isMobileMenuOpen, onCloseMobileMenu]);
 
-  const updateDropdownPosition = () => {
+  const updateDropdownPosition = useCallback(() => {
     if (hoveredCategory && buttonRefs.current[hoveredCategory]) {
       const button = buttonRefs.current[hoveredCategory];
       if (button) {
@@ -255,8 +253,10 @@ export default function Navigation({ isMobileMenuOpen = false, onCloseMobileMenu
           height: dropdownHeight,
         });
       }
+    } else {
+      setDropdownPosition(null);
     }
-  };
+  }, [hoveredCategory]);
 
   useEffect(() => {
     updateDropdownPosition();
@@ -284,100 +284,95 @@ export default function Navigation({ isMobileMenuOpen = false, onCloseMobileMenu
           navContainer.removeEventListener('scroll', handleScroll, true);
         }
       };
-    } else {
-      setDropdownPosition(null);
     }
-  }, [hoveredCategory]);
+  }, [hoveredCategory, updateDropdownPosition]);
 
   const currentCategory = categories.find(cat => cat.name === hoveredCategory);
   const hasItems = currentCategory?.items && currentCategory.items.length > 0;
 
-  const DropdownContent = () => {
-    if (!hoveredCategory || !hasItems || !dropdownPosition) return null;
-
-    return (
-      <div 
-        className="bg-white text-gray-900 shadow-xl border border-gray-300 w-screen"
-        style={{ 
-          position: 'fixed',
-          top: `${dropdownPosition.top}px`,
-          left: `${dropdownPosition.left}px`,
-          width: `${dropdownPosition.width}px`,
-          height: `${dropdownPosition.height}px`,
-          zIndex: 999999,
-          boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
-          overflow: 'hidden',
-          display: 'flex',
-          flexDirection: 'column',
-        }}
-        onMouseEnter={(e) => {
-          e.stopPropagation();
-          if (timeoutRef.current) {
-            clearTimeout(timeoutRef.current);
-            timeoutRef.current = null;
-          }
-          setHoveredCategory(hoveredCategory);
-        }}
-        onMouseLeave={(e) => {
-          e.stopPropagation();
-          setHoveredCategory(null);
-        }}
-      >
-        <div className="flex flex-col md:flex-row h-full w-full">
-          {/* Left side - Category items in two columns */}
-          <div className="flex-1 p-3 md:p-4 overflow-y-auto">
-            <div className="max-w-7xl mx-auto w-full">
-              <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-2">
-                {currentCategory!.name}
-              </h3>
-              <div className="grid grid-cols-2 gap-x-3 md:gap-x-4 gap-y-0.5">
-                {currentCategory!.items!.map((item, index) => {
-                  // Map category name to slug
-                  const categorySlug = categorySlugs[currentCategory!.name as CategoryType] || '';
-                  return (
-                    <Link
-                      key={index}
-                      href={`/categories/${categorySlug}`}
-                      className="block py-1 hover:text-green-600 transition-colors text-sm text-gray-700 hover:font-medium"
-                    >
-                      {item}
-                    </Link>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-
-          {/* Right side - Placeholder message */}
-          <div className="hidden md:flex items-center justify-center p-4 border-t md:border-t-0 md:border-l border-gray-200 w-[280px] bg-gray-50 flex-shrink-0">
-            <div className="text-center">
-              <div className="mb-2 flex justify-center">
-                <svg 
-                  className="w-12 h-12 text-gray-400" 
-                  fill="none" 
-                  stroke="currentColor" 
-                  viewBox="0 0 24 24"
-                >
-                  <path 
-                    strokeLinecap="round" 
-                    strokeLinejoin="round" 
-                    strokeWidth={1.5} 
-                    d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" 
-                  />
-                </svg>
-              </div>
-              <p className="text-gray-700 font-medium text-xs mb-1">
-                Hover over a category to see subcategories
-              </p>
-              <p className="text-gray-500 text-xs">
-                Browse through our extensive product range
-              </p>
+  // Dropdown content rendered inline to avoid creating components during render
+  const dropdownContent = hoveredCategory && hasItems && dropdownPosition ? (
+    <div 
+      className="bg-white text-gray-900 shadow-xl border border-gray-300 w-screen"
+      style={{ 
+        position: 'fixed',
+        top: `${dropdownPosition.top}px`,
+        left: `${dropdownPosition.left}px`,
+        width: `${dropdownPosition.width}px`,
+        height: `${dropdownPosition.height}px`,
+        zIndex: 999999,
+        boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+        overflow: 'hidden',
+        display: 'flex',
+        flexDirection: 'column',
+      }}
+      onMouseEnter={(e) => {
+        e.stopPropagation();
+        if (timeoutRef.current) {
+          clearTimeout(timeoutRef.current);
+          timeoutRef.current = null;
+        }
+        setHoveredCategory(hoveredCategory);
+      }}
+      onMouseLeave={(e) => {
+        e.stopPropagation();
+        setHoveredCategory(null);
+      }}
+    >
+      <div className="flex flex-col md:flex-row h-full w-full">
+        {/* Left side - Category items in two columns */}
+        <div className="flex-1 p-3 md:p-4 overflow-y-auto">
+          <div className="max-w-7xl mx-auto w-full">
+            <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-2">
+              {currentCategory!.name}
+            </h3>
+            <div className="grid grid-cols-2 gap-x-3 md:gap-x-4 gap-y-0.5">
+              {currentCategory!.items!.map((item, index) => {
+                // Map category name to slug
+                const categorySlug = categorySlugs[currentCategory!.name as CategoryType] || '';
+                return (
+                  <Link
+                    key={index}
+                    href={`/categories/${categorySlug}`}
+                    className="block py-1 hover:text-green-600 transition-colors text-sm text-gray-700 hover:font-medium"
+                  >
+                    {item}
+                  </Link>
+                );
+              })}
             </div>
           </div>
         </div>
+
+        {/* Right side - Placeholder message */}
+        <div className="hidden md:flex items-center justify-center p-4 border-t md:border-t-0 md:border-l border-gray-200 w-[280px] bg-gray-50 flex-shrink-0">
+          <div className="text-center">
+            <div className="mb-2 flex justify-center">
+              <svg 
+                className="w-12 h-12 text-gray-400" 
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round" 
+                  strokeWidth={1.5} 
+                  d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" 
+                />
+              </svg>
+            </div>
+            <p className="text-gray-700 font-medium text-xs mb-1">
+              Hover over a category to see subcategories
+            </p>
+            <p className="text-gray-500 text-xs">
+              Browse through our extensive product range
+            </p>
+          </div>
+        </div>
       </div>
-    );
-  };
+    </div>
+  ) : null;
 
   return (
     <>
@@ -426,7 +421,7 @@ export default function Navigation({ isMobileMenuOpen = false, onCloseMobileMenu
                 >
                   <Link
                     href={`/categories/${categorySlugs[category.name as CategoryType] || category.name.toLowerCase().replace(/\s+/g, '-')}`}
-                    ref={(el) => { buttonRefs.current[category.name] = el as any; }}
+                    ref={(el) => { buttonRefs.current[category.name] = el as HTMLButtonElement | null; }}
                     className={`px-2 sm:px-2.5 md:px-3 lg:px-4 py-0 transition-colors flex items-center gap-0.5 sm:gap-1 whitespace-nowrap text-xs sm:text-sm md:text-base font-medium ${
                       isHovered ? 'bg-[#15803d]' : 'hover:bg-[#15803d]'
                     }`}
@@ -575,7 +570,7 @@ export default function Navigation({ isMobileMenuOpen = false, onCloseMobileMenu
       
       {/* Render dropdown outside navbar using portal (Desktop only) */}
       {mounted && hoveredCategory && hasItems && typeof window !== 'undefined' && createPortal(
-        <DropdownContent />,
+        dropdownContent,
         document.body
       )}
     </>

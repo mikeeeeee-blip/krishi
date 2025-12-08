@@ -4,14 +4,12 @@ import { useState } from 'react';
 import TopBar from "@/components/TopBar";
 import Header from "@/components/Header";
 import Navigation from "@/components/Navigation";
-import TrustBadges from "@/components/TrustBadges";
 import Carousel from "@/components/Carousel";
-import CampaignBanners from "@/components/CampaignBanners";
 import BestSellers from "@/components/BestSellers";
 import TodaysOffers from "@/components/TodaysOffers";
 import NewArrivals from "@/components/NewArrivals";
 import GrowthRegulators from "@/components/GrowthRegulators";
-import HarDinSastaSection from "@/components/HarDinSastaSection";
+
 import SeedsSection from "@/components/SeedsSection";
 import EquipmentsSection from "@/components/EquipmentsSection";
 import FertilizersSection from "@/components/FertilizersSection";
@@ -52,7 +50,7 @@ export default function Home() {
       <FeaturedProducts />
       <TodaysOffers />
       <NewArrivals />
-      <HarDinSastaSection />
+     
       <Carousel />
       <SeedsSection />
       <EquipmentsSection />

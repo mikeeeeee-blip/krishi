@@ -30,19 +30,22 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // Load cart from localStorage on mount
+  // Load cart from localStorage on mount using setTimeout to avoid sync setState in effect
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const savedCart = localStorage.getItem('cart');
-      if (savedCart) {
-        try {
-          setItems(JSON.parse(savedCart));
-        } catch (error) {
-          console.error('Error loading cart from localStorage:', error);
+    const timer = setTimeout(() => {
+      if (typeof window !== 'undefined') {
+        const savedCart = localStorage.getItem('cart');
+        if (savedCart) {
+          try {
+            setItems(JSON.parse(savedCart));
+          } catch (error) {
+            console.error('Error loading cart from localStorage:', error);
+          }
         }
+        setIsLoaded(true);
       }
-      setIsLoaded(true);
-    }
+    }, 0);
+    return () => clearTimeout(timer);
   }, []);
 
   // Save cart to localStorage whenever items change

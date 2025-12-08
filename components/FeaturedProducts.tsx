@@ -4,12 +4,12 @@ import ProductCard from './ProductCard';
 import { productData } from '@/data/products';
 
 export default function FeaturedProducts() {
-  // Filter featured products - match agribegri.com Featured Products section
+  // Filter featured products - match eclatagro.com Featured Products section
   // These are primarily Exylon products (Crop Protection) and other high-quality products
   const featuredProducts = Object.values(productData)
     .filter((product) => {
       const name = product.name.toLowerCase();
-      // Include Exylon products (from agribegri.com Featured Products)
+      // Include Exylon products (from eclatagro.com Featured Products)
       if (name.includes('exylon')) return true;
       // Include Perfect Crop Dekkan Charger Plus
       if (name.includes('perfect crop') && name.includes('dekkan')) return true;
@@ -30,15 +30,15 @@ export default function FeaturedProducts() {
     .slice(0, 12); // Show first 12 featured products
 
   return (
-    <section className="py-6 md:py-8 bg-white">
-      <div className="container mx-auto px-4 md:px-6">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900">Featured Products</h2>
-          <a href="#" className="text-[#16a34a] hover:text-[#15803d] font-semibold text-base md:text-lg transition-colors whitespace-nowrap">
+    <section className="py-6 md:py-8 lg:py-10 bg-white">
+      <div className="container mx-auto px-4 md:px-6 max-w-7xl">
+        <div className="flex items-center justify-between mb-6 md:mb-8">
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900">Featured Products</h2>
+          <a href="#" className="text-[#16a34a] hover:text-[#15803d] font-semibold text-base md:text-lg transition-colors whitespace-nowrap hover:underline">
             View All →
           </a>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2 sm:gap-3 md:gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-2.5 md:gap-3">
           {featuredProducts.map((product) => (
             <div key={product.id} className="w-full h-full flex flex-col">
               <ProductCard product={product} />

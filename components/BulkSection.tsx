@@ -1,6 +1,5 @@
 'use client';
 
-import CategorySection from './CategorySection';
 import { productData } from '@/data/products';
 import { categorizeProduct } from '@/lib/categories';
 import ProductCard from './ProductCard';

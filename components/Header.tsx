@@ -3,7 +3,6 @@
 import { Search, ShoppingCart, User, Truck, Menu, X } from 'lucide-react';
 import Link from 'next/link';
 import { useCart } from '@/contexts/CartContext';
-import { useState } from 'react';
 import Image from 'next/image';
 
 interface HeaderProps {
@@ -16,8 +15,8 @@ export default function Header({ onMenuToggle, isMenuOpen = false }: HeaderProps
   const cartCount = getTotalItems();
 
   return (
-    <header className="bg-white shadow-sm border-b border-gray-100 relative z-30 w-full">
-      <div className="w-full px-3 sm:px-4 md:px-6">
+    <header className="bg-white shadow-md border-b border-gray-200 relative z-30 w-full">
+      <div className="w-full px-3 sm:px-4 md:px-6 max-w-7xl mx-auto">
         {/* Mobile Layout */}
         <div className="lg:hidden">
           {/* Top Row: Menu, Logo, Icons */}
@@ -88,10 +87,10 @@ export default function Header({ onMenuToggle, isMenuOpen = false }: HeaderProps
                 className="w-full px-4 py-2.5 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-green-500 text-sm md:text-base h-[42px] md:h-[44px]"
               />
             </div>
-            <button className="bg-[#2563eb] text-white px-3 md:px-4 py-0 rounded-r-md hover:bg-[#1d4ed8] flex items-center justify-center transition-colors h-[42px] md:h-[44px] aspect-square flex-shrink-0">
-              <Search size={16} className="md:w-4 md:h-4" />
+            <button className="bg-[#2563eb] text-white px-4 md:px-5 py-0 rounded-r-md hover:bg-[#1d4ed8] flex items-center justify-center transition-colors h-[42px] md:h-[44px] min-w-[42px] md:min-w-[44px] flex-shrink-0">
+              <Search size={18} className="md:w-5 md:h-5" />
             </button>
-            <button className="bg-[#16a34a] text-white px-3 md:px-4 py-2.5 rounded-md hover:bg-[#15803d] flex items-center gap-1.5 text-xs md:text-sm whitespace-nowrap hidden xl:flex transition-colors font-medium h-[42px] md:h-[44px]">
+            <button className="bg-[#16a34a] text-white px-4 md:px-5 py-2.5 rounded-md hover:bg-[#15803d] flex items-center gap-1.5 text-xs md:text-sm whitespace-nowrap hidden xl:flex transition-colors font-semibold h-[42px] md:h-[44px] shadow-sm">
               <Search size={16} />
               <span>Search by Technical Name</span>
             </button>

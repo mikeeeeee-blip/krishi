@@ -56,93 +56,363 @@ const Footer = () => {
           </div>
 
           {/* Footer Navigation Links */}
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8 mb-6 sm:mb-7 md:mb-8">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 md:gap-10 lg:gap-12 mb-6 sm:mb-8 md:mb-10">
             {/* Categories */}
             <div>
-              <h3 className="font-bold text-sm sm:text-base md:text-lg mb-2 sm:mb-3 md:mb-4">Categories</h3>
-              <ul className="space-y-1 sm:space-y-1.5 md:space-y-2 text-xs sm:text-sm">
-                <li><Link href="/categories/equipments" className="hover:text-blue-300 transition-colors">Equipments</Link></li>
-                <li><Link href="/categories/gardening" className="hover:text-blue-300 transition-colors">Gardening</Link></li>
-                <li><Link href="/categories/crop-protection" className="hover:text-blue-300 transition-colors">Crop protection</Link></li>
-                <li><Link href="/categories/fertilizers" className="hover:text-blue-300 transition-colors">Fertilizers</Link></li>
-                <li><Link href="/categories/organic-farming" className="hover:text-blue-300 transition-colors">Organic Farming</Link></li>
-                <li><Link href="/categories/bulk" className="hover:text-blue-300 transition-colors">Bulk</Link></li>
-                <li><Link href="/categories/seeds" className="hover:text-blue-300 transition-colors">Seeds</Link></li>
-                <li><Link href="/categories/irrigation" className="hover:text-blue-300 transition-colors">Irrigation</Link></li>
-                <li><Link href="/categories/cattle-bird-care" className="hover:text-blue-300 transition-colors">Cattle & Bird Care</Link></li>
-                <li><Link href="/categories/farm-products" className="hover:text-blue-300 transition-colors">Farm Products</Link></li>
-                <li><Link href="/categories/media" className="hover:text-blue-300 transition-colors">Media</Link></li>
-                <li><Link href="/categories/health-wellness" className="hover:text-blue-300 transition-colors">Health & Wellness</Link></li>
-                <li><Link href="/categories/growth-regulators" className="hover:text-blue-300 transition-colors">Growth Regulators</Link></li>
+              <h3 className="font-bold text-base sm:text-lg md:text-xl mb-3 sm:mb-4 md:mb-5 text-white">Categories</h3>
+              <ul className="space-y-2 sm:space-y-2.5 md:space-y-3">
+                <li>
+                  <Link 
+                    href="/categories/equipments" 
+                    className="text-sm sm:text-base text-gray-200 hover:text-white hover:underline transition-all duration-200 inline-block"
+                  >
+                    Equipments
+                  </Link>
+                </li>
+                <li>
+                  <Link 
+                    href="/categories/gardening" 
+                    className="text-sm sm:text-base text-gray-200 hover:text-white hover:underline transition-all duration-200 inline-block"
+                  >
+                    Gardening
+                  </Link>
+                </li>
+                <li>
+                  <Link 
+                    href="/categories/crop-protection" 
+                    className="text-sm sm:text-base text-gray-200 hover:text-white hover:underline transition-all duration-200 inline-block"
+                  >
+                    Crop protection
+                  </Link>
+                </li>
+                <li>
+                  <Link 
+                    href="/categories/fertilizers" 
+                    className="text-sm sm:text-base text-gray-200 hover:text-white hover:underline transition-all duration-200 inline-block"
+                  >
+                    Fertilizers
+                  </Link>
+                </li>
+                <li>
+                  <Link 
+                    href="/categories/organic-farming" 
+                    className="text-sm sm:text-base text-gray-200 hover:text-white hover:underline transition-all duration-200 inline-block"
+                  >
+                    Organic Farming
+                  </Link>
+                </li>
+                <li>
+                  <Link 
+                    href="/categories/bulk" 
+                    className="text-sm sm:text-base text-gray-200 hover:text-white hover:underline transition-all duration-200 inline-block"
+                  >
+                    Bulk
+                  </Link>
+                </li>
+                <li>
+                  <Link 
+                    href="/categories/seeds" 
+                    className="text-sm sm:text-base text-gray-200 hover:text-white hover:underline transition-all duration-200 inline-block"
+                  >
+                    Seeds
+                  </Link>
+                </li>
+                <li>
+                  <Link 
+                    href="/categories/irrigation" 
+                    className="text-sm sm:text-base text-gray-200 hover:text-white hover:underline transition-all duration-200 inline-block"
+                  >
+                    Irrigation
+                  </Link>
+                </li>
+                <li>
+                  <Link 
+                    href="/categories/cattle-bird-care" 
+                    className="text-sm sm:text-base text-gray-200 hover:text-white hover:underline transition-all duration-200 inline-block"
+                  >
+                    Cattle & Bird Care
+                  </Link>
+                </li>
+                <li>
+                  <Link 
+                    href="/categories/farm-products" 
+                    className="text-sm sm:text-base text-gray-200 hover:text-white hover:underline transition-all duration-200 inline-block"
+                  >
+                    Farm Products
+                  </Link>
+                </li>
+                <li>
+                  <Link 
+                    href="/categories/media" 
+                    className="text-sm sm:text-base text-gray-200 hover:text-white hover:underline transition-all duration-200 inline-block"
+                  >
+                    Media
+                  </Link>
+                </li>
+                <li>
+                  <Link 
+                    href="/categories/health-wellness" 
+                    className="text-sm sm:text-base text-gray-200 hover:text-white hover:underline transition-all duration-200 inline-block"
+                  >
+                    Health & Wellness
+                  </Link>
+                </li>
+                <li>
+                  <Link 
+                    href="/categories/growth-regulators" 
+                    className="text-sm sm:text-base text-gray-200 hover:text-white hover:underline transition-all duration-200 inline-block"
+                  >
+                    Growth Regulators
+                  </Link>
+                </li>
               </ul>
             </div>
 
             {/* Know Us Better */}
             <div>
-              <h3 className="font-bold text-sm sm:text-base md:text-lg mb-2 sm:mb-3 md:mb-4">Know Us Better</h3>
-              <ul className="space-y-1 sm:space-y-1.5 md:space-y-2 text-xs sm:text-sm">
-                <li><a href="#" className="hover:text-blue-300 transition-colors">About Us</a></li>
-                <li><a href="#" className="hover:text-blue-300 transition-colors">Why AgriBegri</a></li>
-                <li><a href="#" className="hover:text-blue-300 transition-colors">Careers</a></li>
-                <li><a href="#" className="hover:text-blue-300 transition-colors">Contact us</a></li>
-                <li><a href="#" className="hover:text-blue-300 transition-colors">New Arrivals</a></li>
-                <li><a href="#" className="hover:text-blue-300 transition-colors">Agri Sale</a></li>
-                <li><a href="#" className="hover:text-blue-300 transition-colors">Today&apos;s Offers</a></li>
-                <li><a href="#" className="hover:text-blue-300 transition-colors">Agri Talk</a></li>
-                <li><a href="#" className="hover:text-blue-300 transition-colors">Find Commodity Prices</a></li>
-                <li><a href="#" className="hover:text-blue-300 transition-colors">Agri E-Magazines</a></li>
-                <li><a href="#" className="hover:text-blue-300 transition-colors">How Referral works</a></li>
-                <li><a href="#" className="hover:text-blue-300 transition-colors">Eclat AgroxglobalBlog</a></li>
+              <h3 className="font-bold text-base sm:text-lg md:text-xl mb-3 sm:mb-4 md:mb-5 text-white">Know Us Better</h3>
+              <ul className="space-y-2 sm:space-y-2.5 md:space-y-3">
+                <li>
+                  <Link 
+                    href="/about-us" 
+                    className="text-sm sm:text-base text-gray-200 hover:text-white hover:underline transition-all duration-200 inline-block"
+                  >
+                    About Us
+                  </Link>
+                </li>
+                <li>
+                  <Link 
+                    href="/why-eclat-agroxglobal" 
+                    className="text-sm sm:text-base text-gray-200 hover:text-white hover:underline transition-all duration-200 inline-block"
+                  >
+                    Why ECLAT AGROXGLOBAL
+                  </Link>
+                </li>
+                <li>
+                  <Link 
+                    href="/careers" 
+                    className="text-sm sm:text-base text-gray-200 hover:text-white hover:underline transition-all duration-200 inline-block"
+                  >
+                    Careers
+                  </Link>
+                </li>
+                <li>
+                  <Link 
+                    href="/contact-us" 
+                    className="text-sm sm:text-base text-gray-200 hover:text-white hover:underline transition-all duration-200 inline-block"
+                  >
+                    Contact us
+                  </Link>
+                </li>
+                <li>
+                  <Link 
+                    href="/new-arrivals" 
+                    className="text-sm sm:text-base text-gray-200 hover:text-white hover:underline transition-all duration-200 inline-block"
+                  >
+                    New Arrivals
+                  </Link>
+                </li>
+                <li>
+                  <Link 
+                    href="/eclat-sale" 
+                    className="text-sm sm:text-base text-gray-200 hover:text-white hover:underline transition-all duration-200 inline-block"
+                  >
+                    ECLAT Sale
+                  </Link>
+                </li>
+                <li>
+                  <Link 
+                    href="/todays-offers" 
+                    className="text-sm sm:text-base text-gray-200 hover:text-white hover:underline transition-all duration-200 inline-block"
+                  >
+                    Today&apos;s Offers
+                  </Link>
+                </li>
+                <li>
+                  <Link 
+                    href="/eclat-talk" 
+                    className="text-sm sm:text-base text-gray-200 hover:text-white hover:underline transition-all duration-200 inline-block"
+                  >
+                    ECLAT Talk
+                  </Link>
+                </li>
+                <li>
+                  <Link 
+                    href="/find-commodity-prices" 
+                    className="text-sm sm:text-base text-gray-200 hover:text-white hover:underline transition-all duration-200 inline-block"
+                  >
+                    Find Commodity Prices
+                  </Link>
+                </li>
+                <li>
+                  <Link 
+                    href="/eclat-e-magazines" 
+                    className="text-sm sm:text-base text-gray-200 hover:text-white hover:underline transition-all duration-200 inline-block"
+                  >
+                    ECLAT E-Magazines
+                  </Link>
+                </li>
+                <li>
+                  <Link 
+                    href="/how-referral-works" 
+                    className="text-sm sm:text-base text-gray-200 hover:text-white hover:underline transition-all duration-200 inline-block"
+                  >
+                    How Referral works
+                  </Link>
+                </li>
+                <li>
+                  <Link 
+                    href="/eclat-agroxglobal-blog" 
+                    className="text-sm sm:text-base text-gray-200 hover:text-white hover:underline transition-all duration-200 inline-block"
+                  >
+                    ECLAT AGROXGLOBAL Blog
+                  </Link>
+                </li>
+                <li>
+                  <Link 
+                    href="/sitemap" 
+                    className="text-sm sm:text-base text-gray-200 hover:text-white hover:underline transition-all duration-200 inline-block"
+                  >
+                    Sitemap
+                  </Link>
+                </li>
               </ul>
             </div>
 
             {/* Our Policies */}
             <div>
-              <h3 className="font-bold text-sm sm:text-base md:text-lg mb-2 sm:mb-3 md:mb-4">Our Policies</h3>
-              <ul className="space-y-1 sm:space-y-1.5 md:space-y-2 text-xs sm:text-sm">
-                <li><a href="#" className="hover:text-blue-300 transition-colors">Privacy Policy</a></li>
-                <li><a href="#" className="hover:text-blue-300 transition-colors">Shipping / Delivery</a></li>
-                <li><a href="#" className="hover:text-blue-300 transition-colors">Cancellation Policy</a></li>
-                <li><a href="#" className="hover:text-blue-300 transition-colors">Return Policy</a></li>
-                <li><a href="#" className="hover:text-blue-300 transition-colors">FAQ</a></li>
-                <li><a href="#" className="hover:text-blue-300 transition-colors">Terms of Use</a></li>
-                <li><a href="#" className="hover:text-blue-300 transition-colors">Seller Terms and Conditions</a></li>
+              <h3 className="font-bold text-base sm:text-lg md:text-xl mb-3 sm:mb-4 md:mb-5 text-white">Our Policies</h3>
+              <ul className="space-y-2 sm:space-y-2.5 md:space-y-3">
+                <li>
+                  <Link 
+                    href="/privacy-policy" 
+                    className="text-sm sm:text-base text-gray-200 hover:text-white hover:underline transition-all duration-200 inline-block"
+                  >
+                    Privacy Policy
+                  </Link>
+                </li>
+                <li>
+                  <Link 
+                    href="/shipping-delivery" 
+                    className="text-sm sm:text-base text-gray-200 hover:text-white hover:underline transition-all duration-200 inline-block"
+                  >
+                    Shipping / Delivery
+                  </Link>
+                </li>
+                <li>
+                  <Link 
+                    href="/cancellation-policy" 
+                    className="text-sm sm:text-base text-gray-200 hover:text-white hover:underline transition-all duration-200 inline-block"
+                  >
+                    Cancellation Policy
+                  </Link>
+                </li>
+                <li>
+                  <Link 
+                    href="/return-policy" 
+                    className="text-sm sm:text-base text-gray-200 hover:text-white hover:underline transition-all duration-200 inline-block"
+                  >
+                    Return Policy
+                  </Link>
+                </li>
+                <li>
+                  <Link 
+                    href="/faq" 
+                    className="text-sm sm:text-base text-gray-200 hover:text-white hover:underline transition-all duration-200 inline-block"
+                  >
+                    FAQ
+                  </Link>
+                </li>
+                <li>
+                  <Link 
+                    href="/terms-of-use" 
+                    className="text-sm sm:text-base text-gray-200 hover:text-white hover:underline transition-all duration-200 inline-block"
+                  >
+                    Terms of Use
+                  </Link>
+                </li>
+                <li>
+                  <Link 
+                    href="/seller-terms-and-conditions" 
+                    className="text-sm sm:text-base text-gray-200 hover:text-white hover:underline transition-all duration-200 inline-block"
+                  >
+                    Seller Terms and Conditions
+                  </Link>
+                </li>
               </ul>
             </div>
 
             {/* Services */}
             <div>
-              <h3 className="font-bold text-sm sm:text-base md:text-lg mb-2 sm:mb-3 md:mb-4">Services</h3>
-              <ul className="space-y-1 sm:space-y-1.5 md:space-y-2 text-xs sm:text-sm">
-                <li><a href="#" className="hover:text-blue-300 transition-colors">Sell on AgriBegri</a></li>
-                <li><a href="#" className="hover:text-blue-300 transition-colors">Customer Login</a></li>
+              <h3 className="font-bold text-base sm:text-lg md:text-xl mb-3 sm:mb-4 md:mb-5 text-white">Services</h3>
+              <ul className="space-y-2 sm:space-y-2.5 md:space-y-3">
+                <li>
+                  <Link 
+                    href="/sell-on-eclat-agroxglobal" 
+                    className="text-sm sm:text-base text-gray-200 hover:text-white hover:underline transition-all duration-200 inline-block"
+                  >
+                    Sell on ECLAT AGROXGLOBAL
+                  </Link>
+                </li>
+                <li>
+                  <Link 
+                    href="/customer-login" 
+                    className="text-sm sm:text-base text-gray-200 hover:text-white hover:underline transition-all duration-200 inline-block"
+                  >
+                    Customer Login
+                  </Link>
+                </li>
               </ul>
             </div>
           </div>
 
           {/* Copyright and Social Media */}
-          <div className="flex flex-col md:flex-row justify-between items-center pt-4 sm:pt-5 md:pt-6 border-t border-gray-600 gap-3 sm:gap-4">
-            <p className="text-xs sm:text-sm text-center md:text-left mb-2 md:mb-0">Copyright©2025@agribegri.com. All rights reserved.</p>
-            <div className="flex items-center gap-2 sm:gap-3 md:gap-4 flex-wrap justify-center md:justify-start">
-              <span className="text-xs sm:text-sm mr-1 sm:mr-2">Connect With</span>
-              <div className="flex gap-2 sm:gap-3">
-                <a href="#" className="hover:text-blue-300 transition-colors" aria-label="Facebook">
-                  <Facebook className="w-4 h-4 sm:w-5 sm:h-5" />
+          <div className="flex flex-col md:flex-row justify-between items-center pt-5 sm:pt-6 md:pt-8 border-t border-gray-600 gap-4 sm:gap-5">
+            <p className="text-sm sm:text-base text-gray-200 text-center md:text-left mb-2 md:mb-0">Copyright©2025@eclatagro.com. All rights reserved.</p>
+            <div className="flex items-center gap-3 sm:gap-4 md:gap-5 flex-wrap justify-center md:justify-start">
+              <span className="text-sm sm:text-base text-gray-200 mr-2 sm:mr-3">Connect With</span>
+              <div className="flex gap-3 sm:gap-4">
+                <a 
+                  href="#" 
+                  className="text-gray-200 hover:text-white hover:scale-110 transition-all duration-200" 
+                  aria-label="Facebook"
+                >
+                  <Facebook className="w-5 h-5 sm:w-6 sm:h-6" />
                 </a>
-                <a href="#" className="hover:text-blue-300 transition-colors" aria-label="LinkedIn">
-                  <Linkedin className="w-4 h-4 sm:w-5 sm:h-5" />
+                <a 
+                  href="#" 
+                  className="text-gray-200 hover:text-white hover:scale-110 transition-all duration-200" 
+                  aria-label="LinkedIn"
+                >
+                  <Linkedin className="w-5 h-5 sm:w-6 sm:h-6" />
                 </a>
-                <a href="#" className="hover:text-blue-300 transition-colors" aria-label="Twitter">
-                  <Twitter className="w-4 h-4 sm:w-5 sm:h-5" />
+                <a 
+                  href="#" 
+                  className="text-gray-200 hover:text-white hover:scale-110 transition-all duration-200" 
+                  aria-label="Twitter"
+                >
+                  <Twitter className="w-5 h-5 sm:w-6 sm:h-6" />
                 </a>
-                <a href="#" className="hover:text-blue-300 transition-colors" aria-label="YouTube">
-                  <Youtube className="w-4 h-4 sm:w-5 sm:h-5" />
+                <a 
+                  href="#" 
+                  className="text-gray-200 hover:text-white hover:scale-110 transition-all duration-200" 
+                  aria-label="YouTube"
+                >
+                  <Youtube className="w-5 h-5 sm:w-6 sm:h-6" />
                 </a>
-                <a href="#" className="hover:text-blue-300 transition-colors" aria-label="Instagram">
-                  <Instagram className="w-4 h-4 sm:w-5 sm:h-5" />
+                <a 
+                  href="#" 
+                  className="text-gray-200 hover:text-white hover:scale-110 transition-all duration-200" 
+                  aria-label="Instagram"
+                >
+                  <Instagram className="w-5 h-5 sm:w-6 sm:h-6" />
                 </a>
-                <a href="#" className="hover:text-blue-300 transition-colors" aria-label="WhatsApp">
-                  <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5" />
+                <a 
+                  href="#" 
+                  className="text-gray-200 hover:text-white hover:scale-110 transition-all duration-200" 
+                  aria-label="WhatsApp"
+                >
+                  <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6" />
                 </a>
               </div>
             </div>
@@ -153,7 +423,7 @@ const Footer = () => {
       {/* Lower Section - Lighter Blue */}
       <div className="bg-[#4a7ba7] text-white">
         <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 md:py-8">
-          <h2 className="text-lg sm:text-xl md:text-2xl font-bold mb-4 sm:mb-5 md:mb-6">Most Searched on AgriBegri</h2>
+          <h2 className="text-lg sm:text-xl md:text-2xl font-bold mb-4 sm:mb-5 md:mb-6">Most Searched on ECLAT AGROXGLOBAL</h2>
           
           <div className="space-y-4 sm:space-y-5 md:space-y-6 text-xs sm:text-sm">
             {/* Equipments */}

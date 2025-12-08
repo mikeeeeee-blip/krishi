@@ -1,4 +1,4 @@
-// Category mapping based on agribegri.com footer categories
+// Category mapping based on eclatagro.com footer categories
 export const categories = [
   'Equipments',
   'Gardening',
@@ -52,7 +52,6 @@ export function categorizeProduct(product: {
   } | null;
 }): CategoryType | null {
   const name = product.name.toLowerCase();
-  const brand = product.brand?.toLowerCase() || '';
   const techCategory = product.technicalDetails?.category?.toLowerCase() || '';
   const subCategory = product.technicalDetails?.subCategory?.toLowerCase() || '';
 

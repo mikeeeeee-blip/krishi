@@ -35,15 +35,15 @@ export default function TrendingProducts() {
   ];
 
   return (
-    <section className="py-4 sm:py-5 md:py-6 bg-gray-50 border-t border-gray-200">
-      <div className="container mx-auto px-3 sm:px-4">
-        <h3 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-gray-900 mb-3 sm:mb-4">Trending Products</h3>
-        <div className="flex flex-wrap gap-1.5 sm:gap-2">
+    <section className="py-4 sm:py-5 md:py-6 lg:py-8 bg-gray-50 border-t border-gray-200">
+      <div className="container mx-auto px-3 sm:px-4 md:px-6 max-w-7xl">
+        <h3 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-gray-900 mb-3 sm:mb-4 md:mb-5">Trending Products</h3>
+        <div className="flex flex-wrap gap-1.5 sm:gap-2 md:gap-2.5">
           {trendingProducts.map((product, index) => (
             <a
               key={index}
               href="#"
-              className="inline-block px-2 sm:px-2.5 md:px-3 py-1 sm:py-1.5 bg-white border border-gray-300 rounded-md text-[11px] sm:text-xs md:text-sm text-gray-700 hover:border-green-500 hover:text-green-600 transition-colors"
+              className="inline-block px-2.5 sm:px-3 md:px-3.5 py-1 sm:py-1.5 md:py-2 bg-white border border-gray-300 rounded-md text-[11px] sm:text-xs md:text-sm text-gray-700 hover:border-[#16a34a] hover:text-[#16a34a] transition-base shadow-sm hover:shadow-md"
             >
               {product}
             </a>

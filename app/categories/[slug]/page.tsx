@@ -25,7 +25,8 @@ export default function CategoryPage() {
 
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [sortBy, setSortBy] = useState<'default' | 'price-low' | 'price-high' | 'rating' | 'discount'>('default');
-  const [filteredProducts, setFilteredProducts] = useState(categoryProducts);
+  // Using categoryProducts directly for now, can add filtering later
+  const filteredProducts = categoryProducts;
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -97,7 +98,7 @@ export default function CategoryPage() {
                 <Filter size={16} className="sm:w-4 sm:h-4.5 text-gray-600 flex-shrink-0" />
                 <select
                   value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value as any)}
+                  onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
                   className="flex-1 sm:flex-none px-3 sm:px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 text-xs sm:text-sm"
                 >
                   <option value="default">Default</option>
