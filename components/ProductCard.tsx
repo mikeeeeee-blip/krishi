@@ -48,7 +48,7 @@ export default function ProductCard({ product }: ProductCardProps) {
     addToCart({
       productId: product.id,
       name: product.name,
-      brand: product.brand,
+      brand: product.brand || '',
       image: product.images[0],
       variant: selectedVariant.name,
       quantity: selectedVariant.quantity,

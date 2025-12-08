@@ -6,3 +6,6 @@ export default function HealthWellnessSection() {
   return <CategorySection categoryName="Health & Wellness" limit={10} bgColor="white" />;
 }
 
+
+
+

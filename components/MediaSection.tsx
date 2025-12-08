@@ -6,3 +6,6 @@ export default function MediaSection() {
   return <CategorySection categoryName="Media" limit={10} bgColor="gray" />;
 }
 
+
+
+

@@ -6,3 +6,6 @@ export default function FarmProductsSection() {
   return <CategorySection categoryName="Farm Products" limit={10} bgColor="white" />;
 }
 
+
+
+

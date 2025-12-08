@@ -35,10 +35,11 @@ export default function ProductDetailPage() {
   const selectedVariantData = product.variants[selectedVariant];
 
   const handleAddToCart = () => {
+    if (selectedVariantData.price === null) return; // Don't add if price is null
     addToCart({
       productId: product.id,
       name: product.name,
-      brand: product.brand,
+      brand: product.brand || '',
       image: product.images[0],
       variant: selectedVariantData.name,
       quantity: selectedVariantData.quantity,
@@ -132,7 +133,9 @@ export default function ProductDetailPage() {
               {product.name}
             </h1>
 
-            <p className="text-gray-600 mb-4">Brand: {product.brand}</p>
+            {product.brand && (
+              <p className="text-gray-600 mb-4">Brand: {product.brand}</p>
+            )}
 
             {/* Rating */}
             <div className="flex items-center gap-2 mb-4">
