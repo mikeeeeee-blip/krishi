@@ -82,7 +82,7 @@ export const productData = {
   '2': {
     id: '2',
     name: 'Pellot - Paclobutrazol 23% SC Plant Growth Regulator, Ideal for Mango and Other Major Vegetable Crops',
-    brand: 'Eclat AgroxglobalTrade Link Private Limited',
+    brand: 'KRISHANSHECLAT AGROXGLOBAL Trade Link Private Limited',
     rating: 4.49,
     reviews: 242,
     originalPrice: 3740,
@@ -152,7 +152,7 @@ export const productData = {
     ],
     note: 'This product is for agricultural purposes only. Please verify proper compatibility before placing your order.',
     technicalDetails: {
-      brand: 'Eclat AgroxglobalTrade Link Private Limited',
+      brand: 'KRISHANSHECLAT AGROXGLOBAL Trade Link Private Limited',
       productCode: '10149',
       countryOfOrigin: 'India',
       category: 'Growth Regulators',
@@ -168,7 +168,7 @@ export const productData = {
   '3': {
     id: '3',
     name: 'Clorentis Insecticide - Chlorantraniliprole 18.5% SC',
-    brand: 'Eclat AgroxglobalTrade Link Private Limited',
+    brand: 'KRISHANSHECLAT AGROXGLOBAL Trade Link Private Limited',
     rating: 4.57,
     reviews: 303,
     originalPrice: 460,
@@ -253,7 +253,7 @@ export const productData = {
     ],
     note: 'Chlorantraniliprole 18.5% SC is intended for agricultural purposes only.',
     technicalDetails: {
-      brand: 'Eclat AgroxglobalTrade Link Private Limited',
+      brand: 'KRISHANSHECLAT AGROXGLOBAL Trade Link Private Limited',
       productCode: '10141',
       countryOfOrigin: 'India',
       category: 'Crop Protection',
@@ -270,7 +270,7 @@ export const productData = {
   '4': {
     id: '4',
     name: 'Agrigib - Gibberellic Acid 0.001% L',
-    brand: 'Eclat AgroxglobalTrade Link Private Limited',
+    brand: 'KRISHANSHECLAT AGROXGLOBAL Trade Link Private Limited',
     rating: 4.57,
     reviews: 209,
     originalPrice: 960,
@@ -347,7 +347,7 @@ export const productData = {
     ],
     note: 'Agrigib (Gibberellic Acid 0.001% L) is compatible with commonly used fertilizers and pesticides except for sulfur, copper fungicides, Bordeaux mixtures, and alkaline substances.',
     technicalDetails: {
-      brand: 'Eclat AgroxglobalTrade Link Private Limited',
+      brand: 'KRISHANSHECLAT AGROXGLOBAL Trade Link Private Limited',
       productCode: '10151',
       countryOfOrigin: 'India',
       category: 'Growth Regulators',

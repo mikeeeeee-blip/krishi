@@ -235,7 +235,7 @@ export default function ContactUsPage() {
                 <div>
                   <h3 className="font-semibold text-gray-900">Office Address</h3>
                   <p className="text-gray-600">
-                    ECLAT AGROXGLOBAL Pvt. Ltd.<br />
+                    KRISHANSHECLAT AGROXGLOBAL Pvt. Ltd.<br />
                     Sector 62, Noida<br />
                     Uttar Pradesh - 201301<br />
                     India

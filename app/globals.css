@@ -1,13 +1,21 @@
 @import "tailwindcss";
 
 :root {
-  /* Colors - Primary */
+  /* Colors - Primary - Matching agribegri.com */
   --color-primary-green: #16a34a;
   --color-primary-green-hover: #15803d;
   --color-primary-blue: #2563eb;
   --color-primary-blue-hover: #1d4ed8;
   --color-footer-dark: #1e3a5f;
   --color-footer-light: #4a7ba7;
+  
+  /* Agribegri specific colors */
+  --agri-topbar-blue: #2563eb;
+  --agri-nav-green: #16a34a;
+  --agri-nav-green-hover: #15803d;
+  --agri-text-dark: #1f2937;
+  --agri-text-gray: #6b7280;
+  --agri-border-gray: #e5e7eb;
   
   /* Colors - Neutral */
   --background: #ffffff;
@@ -84,21 +92,56 @@ body > div {
   overflow-x: hidden;
 }
 
-/* Typography */
+/* Typography - Matching agribegri.com */
 section h2 {
   font-weight: 700;
   letter-spacing: -0.025em;
   line-height: 1.2;
+  color: #1f2937;
 }
 
-/* Links - optimized transitions */
+/* Section titles matching agribegri.com */
+.section-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 1.5rem;
+  line-height: 1.2;
+}
+
+@media (min-width: 768px) {
+  .section-title {
+    font-size: 1.75rem;
+    margin-bottom: 2rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .section-title {
+    font-size: 2rem;
+  }
+}
+
+/* Links - optimized transitions matching agribegri.com */
 a {
   transition: color var(--transition-base), opacity var(--transition-base), text-decoration var(--transition-fast);
   text-decoration: none;
+  color: inherit;
 }
 
 a:hover {
   text-decoration: underline;
+}
+
+/* Link colors matching agribegri.com */
+a.text-green-600,
+a[class*="text-green"] {
+  color: #16a34a;
+}
+
+a.text-green-600:hover,
+a[class*="text-green"]:hover {
+  color: #15803d;
 }
 
 /* Buttons - optimized transitions */
@@ -123,13 +166,27 @@ img {
   content-visibility: auto;
 }
 
-/* Container - optimized */
+/* Container - optimized matching agribegri.com */
 .container {
   max-width: 1280px;
   margin-left: auto;
   margin-right: auto;
   padding-left: 1rem;
   padding-right: 1rem;
+}
+
+@media (min-width: 640px) {
+  .container {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
 }
 
 /* Scrollbar utilities - optimized */
@@ -265,7 +322,7 @@ nav .bg-white {
   }
 }
 
-/* Product cards - optimized layout */
+/* Product cards - optimized layout matching agribegri.com */
 .product-card-wrapper,
 .grid > div {
   display: flex;
@@ -281,6 +338,23 @@ nav .bg-white {
   height: 100%;
 }
 
+/* Product card styling matching agribegri.com */
+.product-card-wrapper > a > div,
+.grid > div > a > div {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.375rem;
+  transition: all 200ms ease-in-out;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+}
+
+.product-card-wrapper > a:hover > div,
+.grid > div > a:hover > div {
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  transform: translateY(-2px);
+  border-color: #d1d5db;
+}
+
 /* Ensure 5 products per row on large screens */
 @media (min-width: 1024px) {
   .grid.grid-cols-5 > div {
@@ -289,7 +363,7 @@ nav .bg-white {
   }
 }
 
-/* Footer - optimized selectors */
+/* Footer - optimized selectors matching agribegri.com */
 footer {
   contain: layout style;
 }
@@ -298,15 +372,30 @@ footer h3 {
   color: #ffffff;
   font-weight: 700;
   letter-spacing: 0.3px;
+  font-size: 1rem;
+}
+
+@media (min-width: 640px) {
+  footer h3 {
+    font-size: 1.125rem;
+  }
+}
+
+@media (min-width: 768px) {
+  footer h3 {
+    font-size: 1.25rem;
+  }
 }
 
 footer ul li a {
   display: inline-block;
   line-height: 1.6;
+  color: rgba(229, 231, 235, 1);
   transition: color var(--transition-base), text-decoration var(--transition-fast);
 }
 
 footer ul li a:hover {
+  color: #ffffff;
   text-decoration: underline;
 }
 
@@ -347,7 +436,7 @@ footer ul li a:hover {
   perspective: 1000px;
 }
 
-/* Page Content Styling - Matching eclatagro.com */
+/* Page Content Styling - Matching krishansheclatagro.com */
 .page-content {
   max-width: 1200px;
   margin: 0 auto;
@@ -410,7 +499,7 @@ footer ul li a:hover {
   line-height: 1.4;
 }
 
-/* Prose Content - Matching eclatagro.com */
+/* Prose Content - Matching krishansheclatagro.com */
 .page-content .prose {
   max-width: 65ch;
   color: #374151;
@@ -438,7 +527,7 @@ footer ul li a:hover {
   color: #111827;
 }
 
-/* Info Boxes - Matching eclatagro.com style */
+/* Info Boxes - Matching krishansheclatagro.com style */
 .info-box {
   background-color: #ffffff;
   border: 1px solid #e5e7eb;
@@ -463,7 +552,7 @@ footer ul li a:hover {
   border-left: 4px solid #6b7280;
 }
 
-/* Cards - Matching eclatagro.com */
+/* Cards - Matching krishansheclatagro.com */
 .content-card {
   background: white;
   border: 1px solid #e5e7eb;
@@ -478,7 +567,7 @@ footer ul li a:hover {
   transition: box-shadow var(--transition-base);
 }
 
-/* Feature Grid - Matching eclatagro.com */
+/* Feature Grid - Matching krishansheclatagro.com */
 .feature-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -519,28 +608,39 @@ footer ul li a:hover {
   margin-bottom: 1rem;
 }
 
-/* Forms - Matching eclatagro.com */
+/* Forms - Professional styling matching agribegri.com */
 .form-group {
-  margin-bottom: 1.25rem;
+  margin-bottom: 1.5rem;
 }
 
 .form-label {
   display: block;
   font-size: 0.875rem;
-  font-weight: 500;
+  font-weight: 600;
   color: #374151;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.625rem;
+  letter-spacing: 0.01em;
 }
 
 .form-input,
 .form-textarea,
 .form-select {
   width: 100%;
-  padding: 0.75rem 1rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.375rem;
-  font-size: 1rem;
-  transition: border-color var(--transition-base), box-shadow var(--transition-base);
+  padding: 0.875rem 1rem;
+  padding-left: 2.75rem;
+  border: 1.5px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  transition: all 200ms ease-in-out;
+  background-color: #ffffff;
+  color: #1f2937;
+}
+
+.form-input::placeholder,
+.form-textarea::placeholder {
+  color: #9ca3af;
+  font-size: 0.9375rem;
 }
 
 .form-input:focus,
@@ -549,26 +649,331 @@ footer ul li a:hover {
   outline: none;
   border-color: #16a34a;
   box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+  background-color: #ffffff;
+}
+
+.form-input:hover:not(:focus),
+.form-textarea:hover:not(:focus),
+.form-select:hover:not(:focus) {
+  border-color: #9ca3af;
+}
+
+.form-input:disabled,
+.form-textarea:disabled,
+.form-select:disabled {
+  background-color: #f3f4f6;
+  color: #6b7280;
+  cursor: not-allowed;
+}
+
+/* Form icon positioning */
+.form-input-icon {
+  position: absolute;
+  left: 0.875rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1.25rem;
+  height: 1.25rem;
+  color: #6b7280;
+  pointer-events: none;
+  transition: color 200ms ease-in-out;
+}
+
+.form-input:focus ~ .form-input-icon,
+.form-input-container:focus-within .form-input-icon {
+  color: #16a34a;
 }
 
 .form-button {
   background-color: #16a34a;
   color: white;
-  padding: 0.75rem 1.5rem;
+  padding: 0.875rem 1.75rem;
   border: none;
-  border-radius: 0.375rem;
-  font-weight: 500;
+  border-radius: 0.5rem;
+  font-weight: 600;
   font-size: 1rem;
+  letter-spacing: 0.01em;
   cursor: pointer;
-  transition: background-color var(--transition-base);
+  transition: all 200ms ease-in-out;
+  box-shadow: 0 2px 4px rgba(22, 163, 74, 0.2);
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
 }
 
 .form-button:hover {
   background-color: #15803d;
+  box-shadow: 0 4px 8px rgba(22, 163, 74, 0.3);
+  transform: translateY(-1px);
 }
 
 .form-button:active {
-  transform: scale(0.98);
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(22, 163, 74, 0.2);
+}
+
+.form-button:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Form container */
+.form-container {
+  background: #ffffff;
+  border-radius: 1rem;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  padding: 2.5rem;
+  max-width: 28rem;
+  width: 100%;
+}
+
+@media (min-width: 640px) {
+  .form-container {
+    padding: 3rem;
+    max-width: 32rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .form-container {
+    padding: 3.5rem;
+    max-width: 36rem;
+  }
+}
+
+/* Form header */
+.form-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.form-header-icon {
+  width: 4rem;
+  height: 4rem;
+  background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.25rem;
+  box-shadow: 0 4px 6px -1px rgba(22, 163, 74, 0.1);
+}
+
+.form-header-icon svg {
+  width: 2rem;
+  height: 2rem;
+  color: #16a34a;
+}
+
+.form-header h1,
+.form-header h2 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 0.5rem;
+  line-height: 1.2;
+}
+
+@media (min-width: 640px) {
+  .form-header h1,
+  .form-header h2 {
+    font-size: 2rem;
+  }
+}
+
+.form-header p {
+  font-size: 0.9375rem;
+  color: #6b7280;
+  line-height: 1.5;
+}
+
+/* Error message */
+.form-error {
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  border-left: 4px solid #ef4444;
+  border-radius: 0.5rem;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.form-error p {
+  font-size: 0.875rem;
+  color: #dc2626;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+/* Success message */
+.form-success {
+  background-color: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-left: 4px solid #16a34a;
+  border-radius: 0.5rem;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.form-success p {
+  font-size: 0.875rem;
+  color: #15803d;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+/* Form footer */
+.form-footer {
+  margin-top: 1.75rem;
+  text-align: center;
+  padding-top: 1.75rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.form-footer p {
+  font-size: 0.9375rem;
+  color: #6b7280;
+  line-height: 1.5;
+}
+
+.form-footer a,
+.form-footer button {
+  color: #16a34a;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 200ms ease-in-out;
+}
+
+.form-footer a:hover,
+.form-footer button:hover {
+  color: #15803d;
+  text-decoration: underline;
+}
+
+/* Checkbox styling */
+.form-checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.form-checkbox input[type="checkbox"] {
+  width: 1.125rem;
+  height: 1.125rem;
+  margin-top: 0.125rem;
+  border: 1.5px solid #d1d5db;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  transition: all 200ms ease-in-out;
+  flex-shrink: 0;
+}
+
+.form-checkbox input[type="checkbox"]:checked {
+  background-color: #16a34a;
+  border-color: #16a34a;
+}
+
+.form-checkbox input[type="checkbox"]:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+}
+
+.form-checkbox label {
+  font-size: 0.875rem;
+  color: #374151;
+  line-height: 1.5;
+  cursor: pointer;
+}
+
+.form-checkbox label a {
+  color: #16a34a;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.form-checkbox label a:hover {
+  text-decoration: underline;
+}
+
+/* Password toggle button */
+.password-toggle {
+  position: absolute;
+  right: 0.875rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  padding: 0.25rem;
+  cursor: pointer;
+  color: #6b7280;
+  transition: color 200ms ease-in-out;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.password-toggle:hover {
+  color: #374151;
+}
+
+.password-toggle:focus {
+  outline: none;
+  color: #16a34a;
+}
+
+/* Input with icon wrapper */
+.form-input-container {
+  position: relative;
+}
+
+.form-input-container .form-input {
+  padding-left: 2.75rem;
+}
+
+.form-input-container .form-input-icon {
+  position: absolute;
+  left: 0.875rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1.25rem;
+  height: 1.25rem;
+  color: #6b7280;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Help text */
+.form-help-text {
+  font-size: 0.8125rem;
+  color: #6b7280;
+  margin-top: 0.5rem;
+  line-height: 1.4;
+}
+
+/* Divider */
+.form-divider {
+  display: flex;
+  align-items: center;
+  margin: 1.5rem 0;
+  text-align: center;
+}
+
+.form-divider::before,
+.form-divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.form-divider span {
+  padding: 0 1rem;
+  font-size: 0.875rem;
+  color: #6b7280;
 }
 
 /* Contact Info Cards */
@@ -1132,6 +1537,177 @@ footer ul li a:hover {
   height: 1px;
   background: linear-gradient(90deg, transparent, #e5e7eb, transparent);
   margin: 2rem 0;
+}
+
+/* Category Section Headers - Matching agribegri.com */
+.category-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.category-section-header h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0;
+}
+
+@media (min-width: 768px) {
+  .category-section-header h2 {
+    font-size: 1.75rem;
+  }
+}
+
+.category-section-header a {
+  color: #16a34a;
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-decoration: none;
+  transition: color var(--transition-base);
+}
+
+.category-section-header a:hover {
+  color: #15803d;
+  text-decoration: underline;
+}
+
+/* Section Container - Matching agribegri.com */
+.section-container {
+  background: #ffffff;
+  padding: 2rem 1rem;
+}
+
+@media (min-width: 768px) {
+  .section-container {
+    padding: 3rem 2rem;
+  }
+}
+
+/* Trending Products Section - Enhanced styling */
+.trending-products-section {
+  background: #f3f4f6;
+}
+
+.trending-product-tag {
+  background: #f3f4f6;
+  color: #6b7280;
+  border: none;
+  transition: all 200ms ease-in-out;
+}
+
+.trending-product-tag:hover {
+  background: #e5e7eb;
+  color: #374151;
+  transform: translateY(-1px);
+}
+
+/* Bulk Section - Enhanced horizontal scroll */
+.bulk-section-scroll {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x proximity;
+  margin-left: -1rem;
+  margin-right: -1rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.bulk-section-scroll > div > div {
+  scroll-snap-align: start;
+}
+
+/* Trust Badges Section - Matching agribegri.com */
+.trust-badges-section {
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 1.5rem 0;
+}
+
+@media (min-width: 768px) {
+  .trust-badges-section {
+    padding: 2rem 0;
+  }
+}
+
+.trust-badge-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 1rem;
+  background: #f9fafb;
+  border-radius: 0.5rem;
+  transition: all 200ms ease-in-out;
+}
+
+.trust-badge-item:hover {
+  background: #ffffff;
+  box-shadow: 0 2px 4px -1px rgb(0 0 0 / 0.1);
+  transform: translateY(-2px);
+}
+
+.trust-badge-icon {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.75rem;
+}
+
+.trust-badge-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #1f2937;
+  line-height: 1.3;
+}
+
+@media (min-width: 768px) {
+  .trust-badge-title {
+    font-size: 1rem;
+  }
+}
+
+/* Button Styles - Matching agribegri.com */
+.btn-primary {
+  background-color: #16a34a;
+  color: #ffffff;
+  font-weight: 600;
+  padding: 0.625rem 1.25rem;
+  border-radius: 0.375rem;
+  border: none;
+  cursor: pointer;
+  transition: all 200ms ease-in-out;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+}
+
+.btn-primary:hover {
+  background-color: #15803d;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background-color: #2563eb;
+  color: #ffffff;
+  font-weight: 600;
+  padding: 0.625rem 1.25rem;
+  border-radius: 0.375rem;
+  border: none;
+  cursor: pointer;
+  transition: all 200ms ease-in-out;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+}
+
+.btn-secondary:hover {
+  background-color: #1d4ed8;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  transform: translateY(-1px);
 }
 
 /* CTA Banner */

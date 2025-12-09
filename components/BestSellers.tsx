@@ -38,7 +38,7 @@ const products = [
   {
     id: '2',
     name: 'Pellot - Paclobutrazol 23% SC Plant Growth Regulator, Ideal for Mango and Other Major Vegetable Crops',
-    brand: 'Eclat AgroxglobalTrade Link Private Limited',
+    brand: 'KRISHANSHECLAT AGROXGLOBAL Trade Link Private Limited',
     rating: 4.49,
     reviews: 242,
     originalPrice: 3740,
@@ -67,7 +67,7 @@ const products = [
   {
     id: '3',
     name: 'Clorentis Insecticide - Chlorantraniliprole 18.5% SC',
-    brand: 'Eclat AgroxglobalTrade Link Private Limited',
+    brand: 'KRISHANSHECLAT AGROXGLOBAL Trade Link Private Limited',
     rating: 4.57,
     reviews: 303,
     originalPrice: 460,
@@ -104,7 +104,7 @@ const products = [
   {
     id: '4',
     name: 'Agrigib - Gibberellic Acid 0.001% L',
-    brand: 'Eclat AgroxglobalTrade Link Private Limited',
+    brand: 'KRISHANSHECLAT AGROXGLOBAL Trade Link Private Limited',
     rating: 4.57,
     reviews: 209,
     originalPrice: 960,
@@ -133,7 +133,7 @@ const products = [
   {
     id: '5',
     name: 'Empala - Emamectin Benzoate 1.5% + Fipronil 3.5% SC Insecticide, Effective Against Resistant Pests with Systemic and Contact Activity',
-    brand: 'Eclat AgroxglobalTrade Link Private Limited',
+    brand: 'KRISHANSHECLAT AGROXGLOBAL Trade Link Private Limited',
     rating: 4.6,
     reviews: 113,
     originalPrice: 910,

@@ -68,7 +68,7 @@ export default function PrivacyPolicyPage() {
 
           <div className="info-box mb-8">
             <p className="text-gray-700">
-              At ECLAT AGROXGLOBAL, we are committed to protecting your privacy and ensuring the security of your 
+              At KRISHANSHECLAT AGROXGLOBAL, we are committed to protecting your privacy and ensuring the security of your 
               personal information. This Privacy Policy explains how we collect, use, disclose, and safeguard 
               your information when you visit our website and use our services.
             </p>

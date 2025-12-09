@@ -23,7 +23,7 @@ export default function WhyEclatAgroxglobalPage() {
     {
       name: "Rajesh Kumar",
       role: "Farmer, Punjab",
-      content: "ECLAT AGROXGLOBAL has transformed how I purchase agricultural inputs. The quality of products and timely delivery has helped improve my farm's productivity significantly."
+      content: "KRISHANSHECLAT AGROXGLOBAL has transformed how I purchase agricultural inputs. The quality of products and timely delivery has helped improve my farm's productivity significantly."
     },
     {
       name: "Priya Sharma",
@@ -33,7 +33,7 @@ export default function WhyEclatAgroxglobalPage() {
     {
       name: "Mohammed Hassan",
       role: "Agricultural Consultant, Karnataka",
-      content: "I recommend ECLAT AGROXGLOBAL to all my clients. Their competitive prices and genuine products make them the best choice for agricultural supplies."
+      content: "I recommend KRISHANSHECLAT AGROXGLOBAL to all my clients. Their competitive prices and genuine products make them the best choice for agricultural supplies."
     }
   ];
 
@@ -46,7 +46,7 @@ export default function WhyEclatAgroxglobalPage() {
       {/* Hero Banner */}
       <div className="hero-banner">
         <div className="hero-banner-content">
-          <h1>Why Choose ECLAT AGROXGLOBAL ?</h1>
+          <h1>Why Choose KRISHANSHECLAT AGROXGLOBAL ?</h1>
           <p>India&apos;s Most Trusted Agricultural Marketplace</p>
         </div>
       </div>
@@ -56,7 +56,7 @@ export default function WhyEclatAgroxglobalPage() {
         <div className="breadcrumbs">
           <Link href="/">Home</Link>
           <span className="breadcrumbs-separator">/</span>
-          <span>Why ECLAT AGROXGLOBAL</span>
+          <span>Why KRISHANSHECLAT AGROXGLOBAL</span>
         </div>
 
         {/* Introduction */}
@@ -65,7 +65,7 @@ export default function WhyEclatAgroxglobalPage() {
             Your Success is Our Priority
           </h2>
           <p className="text-gray-600 text-lg max-w-3xl mx-auto leading-relaxed">
-            ECLAT AGROXGLOBAL is committed to empowering farmers and agricultural professionals with quality products, 
+            KRISHANSHECLAT AGROXGLOBAL is committed to empowering farmers and agricultural professionals with quality products, 
             competitive prices, and exceptional service. Here&apos;s why thousands of customers trust us.
           </p>
         </div>
@@ -225,7 +225,7 @@ export default function WhyEclatAgroxglobalPage() {
 
         {/* CTA */}
         <div className="cta-banner">
-          <h3>Ready to Experience the ECLAT AGROXGLOBAL Difference?</h3>
+          <h3>Ready to Experience the KRISHANSHECLAT AGROXGLOBAL Difference?</h3>
           <p>Join thousands of satisfied customers and start shopping today!</p>
           <Link href="/" className="cta-banner-btn">
             <Leaf className="w-5 h-5" />

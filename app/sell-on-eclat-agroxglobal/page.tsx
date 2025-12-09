@@ -61,7 +61,7 @@ export default function SellOnEclatAgroxglobalPage() {
       {/* Hero Banner */}
       <div className="hero-banner">
         <div className="hero-banner-content">
-          <h1>Sell on ECLAT AGROXGLOBAL</h1>
+          <h1>Sell on KRISHANSHECLAT AGROXGLOBAL</h1>
           <p>Join India&apos;s Largest Agricultural Marketplace</p>
         </div>
       </div>
@@ -71,7 +71,7 @@ export default function SellOnEclatAgroxglobalPage() {
         <div className="breadcrumbs">
           <Link href="/">Home</Link>
           <span className="breadcrumbs-separator">/</span>
-          <span>Sell on ECLAT AGROXGLOBAL</span>
+          <span>Sell on KRISHANSHECLAT AGROXGLOBAL</span>
         </div>
 
         {/* Introduction */}
@@ -80,7 +80,7 @@ export default function SellOnEclatAgroxglobalPage() {
             Start Selling to Millions of Farmers
           </h2>
           <p className="text-gray-600 text-lg max-w-3xl mx-auto leading-relaxed">
-            Join thousands of sellers on ECLAT AGROXGLOBAL and grow your agricultural business. 
+            Join thousands of sellers on KRISHANSHECLAT AGROXGLOBAL and grow your agricultural business. 
             Reach millions of customers across India with our easy-to-use platform.
           </p>
         </div>
@@ -107,7 +107,7 @@ export default function SellOnEclatAgroxglobalPage() {
 
         {/* Benefits */}
         <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6 text-center">
-          Why Sell on ECLAT AGROXGLOBAL?
+          Why Sell on KRISHANSHECLAT AGROXGLOBAL?
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
           {benefits.map((benefit, index) => (

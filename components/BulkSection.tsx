@@ -26,25 +26,23 @@ export default function BulkSection() {
   }
 
   return (
-    <section className="py-4 sm:py-6 md:py-8 bg-gray-50">
-      <div className="container mx-auto px-3 sm:px-4 md:px-6">
-        <div className="flex items-center justify-between mb-4 sm:mb-6 gap-2 sm:gap-4">
-          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">Bulk</h2>
+    <section className="py-6 md:py-8 lg:py-10 bg-white border-t border-gray-200">
+      <div className="container mx-auto px-4 md:px-6 max-w-7xl">
+        <div className="flex items-center justify-between mb-6 md:mb-8">
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900">Bulk</h2>
           <Link 
             href="/categories/bulk" 
-            className="text-[#16a34a] hover:text-[#15803d] font-semibold text-sm sm:text-base md:text-lg transition-colors whitespace-nowrap flex-shrink-0"
+            className="text-[#16a34a] hover:text-[#15803d] font-semibold text-base md:text-lg transition-colors whitespace-nowrap hover:underline flex items-center gap-1"
           >
             View All →
           </Link>
         </div>
-        <div className="overflow-x-auto scrollbar-hide -mx-3 sm:-mx-4 md:-mx-6 px-3 sm:px-4 md:px-6">
-          <div className="flex gap-3 sm:gap-4 pb-4" style={{ minWidth: 'max-content' }}>
-            {bulkProducts.map((product) => (
-              <div key={product.id} className="flex-shrink-0 w-[140px] xs:w-[160px] sm:w-[200px] md:w-[240px] lg:w-[260px]">
-                <ProductCard product={product} />
-              </div>
-            ))}
-          </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-2.5 md:gap-3">
+          {bulkProducts.map((product) => (
+            <div key={product.id} className="w-full h-full flex flex-col">
+              <ProductCard product={product} />
+            </div>
+          ))}
         </div>
       </div>
     </section>

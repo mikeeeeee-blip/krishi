@@ -185,7 +185,7 @@ const Footer = () => {
                     href="/why-eclat-agroxglobal" 
                     className="text-sm sm:text-base text-gray-200 hover:text-white hover:underline transition-all duration-200 inline-block"
                   >
-                    Why ECLAT AGROXGLOBAL
+                    Why KRISHANSHECLAT AGROXGLOBAL
                   </Link>
                 </li>
                 <li>
@@ -257,7 +257,7 @@ const Footer = () => {
                     href="/eclat-agroxglobal-blog" 
                     className="text-sm sm:text-base text-gray-200 hover:text-white hover:underline transition-all duration-200 inline-block"
                   >
-                    ECLAT AGROXGLOBAL Blog
+                    KRISHANSHECLAT AGROXGLOBAL Blog
                   </Link>
                 </li>
                 <li>
@@ -343,7 +343,7 @@ const Footer = () => {
                     href="/sell-on-eclat-agroxglobal" 
                     className="text-sm sm:text-base text-gray-200 hover:text-white hover:underline transition-all duration-200 inline-block"
                   >
-                    Sell on ECLAT AGROXGLOBAL
+                    Sell on KRISHANSHECLAT AGROXGLOBAL
                   </Link>
                 </li>
                 <li>
@@ -360,7 +360,7 @@ const Footer = () => {
 
           {/* Copyright and Social Media */}
           <div className="flex flex-col md:flex-row justify-between items-center pt-5 sm:pt-6 md:pt-8 border-t border-gray-600 gap-4 sm:gap-5">
-            <p className="text-sm sm:text-base text-gray-200 text-center md:text-left mb-2 md:mb-0">Copyright©2025@eclatagro.com. All rights reserved.</p>
+            <p className="text-sm sm:text-base text-gray-200 text-center md:text-left mb-2 md:mb-0">Copyright©2025@krishansheclatagro.com. All rights reserved.</p>
             <div className="flex items-center gap-3 sm:gap-4 md:gap-5 flex-wrap justify-center md:justify-start">
               <span className="text-sm sm:text-base text-gray-200 mr-2 sm:mr-3">Connect With</span>
               <div className="flex gap-3 sm:gap-4">
@@ -415,7 +415,7 @@ const Footer = () => {
       {/* Lower Section - Lighter Blue */}
       <div className="bg-[#4a7ba7] text-white">
         <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 md:py-8">
-          <h2 className="text-lg sm:text-xl md:text-2xl font-bold mb-4 sm:mb-5 md:mb-6">Most Searched on ECLAT AGROXGLOBAL</h2>
+          <h2 className="text-lg sm:text-xl md:text-2xl font-bold mb-4 sm:mb-5 md:mb-6">Most Searched on KRISHANSHECLAT AGROXGLOBAL</h2>
           
           <div className="space-y-4 sm:space-y-5 md:space-y-6 text-xs sm:text-sm">
             {/* Equipments */}

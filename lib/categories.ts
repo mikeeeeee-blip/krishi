@@ -1,4 +1,4 @@
-// Category mapping based on eclatagro.com footer categories
+// Category mapping based on krishansheclatagro.com footer categories
 export const categories = [
   'Equipments',
   'Gardening',

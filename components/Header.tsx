@@ -1,8 +1,11 @@
 'use client';
 
-import { Search, ShoppingCart, User, Truck, Menu, X } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Search, ShoppingCart, User, Truck, Menu, X, LogOut, Package } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useCart } from '@/contexts/CartContext';
+import { useAuth } from '@/contexts/AuthContext';
 import Image from 'next/image';
 
 interface HeaderProps {
@@ -11,8 +14,34 @@ interface HeaderProps {
 }
 
 export default function Header({ onMenuToggle, isMenuOpen = false }: HeaderProps) {
+  const router = useRouter();
   const { getTotalItems } = useCart();
+  const { isAuthenticated, user, logout } = useAuth();
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const userMenuRef = useRef<HTMLDivElement>(null);
   const cartCount = getTotalItems();
+
+  // Close user menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+        setShowUserMenu(false);
+      }
+    };
+
+    if (showUserMenu) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showUserMenu]);
+
+  const handleLogout = async () => {
+    await logout();
+    setShowUserMenu(false);
+  };
 
   return (
     <header className="bg-white shadow-md border-b border-gray-200 relative z-30 w-full">
@@ -52,9 +81,21 @@ export default function Header({ onMenuToggle, isMenuOpen = false }: HeaderProps
                   </span>
                 )}
               </Link>
-              <button className="text-gray-700 hover:text-green-600 transition-colors p-1.5 flex items-center justify-center">
-                <User size={18} className="sm:w-5 sm:h-5" />
-              </button>
+              {isAuthenticated ? (
+                <Link
+                  href="/my-orders"
+                  className="text-gray-700 hover:text-green-600 transition-colors p-1.5 flex items-center justify-center"
+                >
+                  <User size={18} className="sm:w-5 sm:h-5" />
+                </Link>
+              ) : (
+                <Link
+                  href="/login"
+                  className="text-gray-700 hover:text-green-600 transition-colors p-1.5 flex items-center justify-center"
+                >
+                  <User size={18} className="sm:w-5 sm:h-5" />
+                </Link>
+              )}
             </div>
           </div>
 
@@ -111,10 +152,50 @@ export default function Header({ onMenuToggle, isMenuOpen = false }: HeaderProps
                 </span>
               )}
             </Link>
-            <button className="flex flex-col items-center gap-0.5 text-gray-700 hover:text-green-600 transition-colors text-xs md:text-sm px-2 py-1.5">
-              <User size={20} className="md:w-6 md:h-6" />
-              <span className="whitespace-nowrap font-medium">My Account</span>
-            </button>
+            <div className="relative">
+              {isAuthenticated ? (
+                <div className="relative" ref={userMenuRef}>
+                  <button
+                    onClick={() => setShowUserMenu(!showUserMenu)}
+                    className="flex flex-col items-center gap-0.5 text-gray-700 hover:text-green-600 transition-colors text-xs md:text-sm px-2 py-1.5"
+                  >
+                    <User size={20} className="md:w-6 md:h-6" />
+                    <span className="whitespace-nowrap font-medium">My Account</span>
+                  </button>
+                  {showUserMenu && (
+                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+                      <div className="px-4 py-2 border-b border-gray-200">
+                        <p className="text-sm font-semibold text-gray-900">{user?.firstName}</p>
+                        <p className="text-xs text-gray-600 truncate">{user?.email}</p>
+                      </div>
+                      <Link
+                        href="/my-orders"
+                        onClick={() => setShowUserMenu(false)}
+                        className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      >
+                        <Package className="h-4 w-4" />
+                        My Orders
+                      </Link>
+                      <button
+                        onClick={handleLogout}
+                        className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                      >
+                        <LogOut className="h-4 w-4" />
+                        Logout
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <Link
+                  href="/login"
+                  className="flex flex-col items-center gap-0.5 text-gray-700 hover:text-green-600 transition-colors text-xs md:text-sm px-2 py-1.5"
+                >
+                  <User size={20} className="md:w-6 md:h-6" />
+                  <span className="whitespace-nowrap font-medium">Login</span>
+                </Link>
+              )}
+            </div>
           </div>
         </div>
       </div>

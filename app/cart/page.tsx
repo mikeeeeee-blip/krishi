@@ -1,14 +1,17 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { ShoppingCart, Plus, Minus, Trash2, ChevronRight, ArrowLeft, CreditCard, Banknote, Smartphone, X, CheckCircle, Truck, MapPin, User, Phone, Mail } from 'lucide-react';
 import TopBar from '@/components/TopBar';
 import Header from '@/components/Header';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import { useCart } from '@/contexts/CartContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { createOrder } from '@/lib/api/orders';
 
 type PaymentMethod = 'cod' | 'online' | 'upi';
 
@@ -23,21 +26,45 @@ interface ShippingAddress {
 }
 
 export default function CartPage() {
+  const router = useRouter();
   const { items, updateQuantity, removeFromCart, clearCart, getTotalPrice } = useCart();
+  const { isAuthenticated, user, loading: authLoading } = useAuth();
   const [isProcessing, setIsProcessing] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showCheckout, setShowCheckout] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('cod');
   const [orderPlaced, setOrderPlaced] = useState(false);
+  const [orderData, setOrderData] = useState<any>(null);
+  const [error, setError] = useState<string | null>(null);
   const [shippingAddress, setShippingAddress] = useState<ShippingAddress>({
-    fullName: '',
+    fullName: user?.firstName ? `${user.firstName} ${user.lastName || ''}`.trim() : '',
     phone: '',
-    email: '',
+    email: user?.email || '',
     address: '',
     city: '',
     state: '',
     pincode: ''
   });
+
+  // Redirect to login if not authenticated when trying to checkout
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated && showCheckout) {
+      router.push('/login?redirect=/cart');
+    }
+  }, [isAuthenticated, authLoading, showCheckout, router]);
+
+  // Update email when user is loaded
+  useEffect(() => {
+    if (user?.email && !shippingAddress.email) {
+      setShippingAddress(prev => ({ ...prev, email: user.email }));
+    }
+    if (user?.firstName && !shippingAddress.fullName) {
+      setShippingAddress(prev => ({ 
+        ...prev, 
+        fullName: `${user.firstName} ${user.lastName || ''}`.trim() 
+      }));
+    }
+  }, [user]);
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -48,18 +75,71 @@ export default function CartPage() {
   };
 
   const handleProceedToCheckout = () => {
+    if (!isAuthenticated) {
+      router.push('/login?redirect=/cart');
+      return;
+    }
     setShowCheckout(true);
   };
 
-  const handlePlaceOrder = (e: React.FormEvent) => {
+  const handlePlaceOrder = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsProcessing(true);
     
-    // Simulate order processing
-    setTimeout(() => {
+    if (!isAuthenticated) {
+      router.push('/login?redirect=/cart');
+      return;
+    }
+
+    setIsProcessing(true);
+    setError(null);
+
+    try {
+      // Prepare order items
+      const orderItems = items.map(item => ({
+        productId: item.productId,
+        variantId: undefined, // Variants don't have IDs in current data structure
+        quantity: item.count,
+      }));
+
+      // Prepare shipping address
+      const shippingAddr = {
+        fullName: shippingAddress.fullName,
+        phone: shippingAddress.phone,
+        addressLine1: shippingAddress.address,
+        city: shippingAddress.city,
+        state: shippingAddress.state,
+        pincode: shippingAddress.pincode,
+        country: 'India',
+      };
+
+      // Map payment method
+      let paymentMethodValue = 'COD';
+      if (paymentMethod === 'upi') {
+        paymentMethodValue = 'UPI';
+      } else if (paymentMethod === 'online') {
+        paymentMethodValue = 'CREDIT_CARD'; // or 'DEBIT_CARD', 'NET_BANKING'
+      }
+
+      // Create order via API
+      const response = await createOrder({
+        items: orderItems,
+        shippingAddress: shippingAddr,
+        billingAddress: shippingAddr,
+        paymentMethod: paymentMethodValue,
+        customerNotes: `Payment via ${paymentMethod === 'cod' ? 'Cash on Delivery' : paymentMethod === 'upi' ? 'UPI' : 'Online Payment'}`,
+      });
+
+      if (response.success) {
+        setOrderData(response.data);
+        setOrderPlaced(true);
+        clearCart();
+      }
+    } catch (err: any) {
+      setError(err.message || 'Failed to place order. Please try again.');
+      console.error('Order placement error:', err);
+    } finally {
       setIsProcessing(false);
-      setOrderPlaced(true);
-    }, 2000);
+    }
   };
 
   const handleCloseOrderSuccess = () => {
@@ -123,16 +203,27 @@ export default function CartPage() {
             
             <div className="bg-gray-50 rounded-lg p-4 mb-6 text-left">
               <h3 className="font-semibold text-gray-900 mb-2">Order Details:</h3>
-              <p className="text-sm text-gray-600">Order ID: #ORD{Date.now().toString().slice(-8)}</p>
-              <p className="text-sm text-gray-600">Payment Method: {paymentMethod === 'cod' ? 'Cash on Delivery' : paymentMethod === 'upi' ? 'UPI' : 'Online Payment'}</p>
-              <p className="text-sm text-gray-600">Total Amount: ₹{finalTotal.toFixed(2)}</p>
-              <p className="text-sm text-gray-600 mt-2">Delivery: 5-7 business days</p>
+              {orderData && (
+                <>
+                  <p className="text-sm text-gray-600">Order Number: {orderData.orderNumber}</p>
+                  <p className="text-sm text-gray-600">Payment Method: {orderData.paymentMethod}</p>
+                  <p className="text-sm text-gray-600">Total Amount: ₹{Number(orderData.totalAmount).toFixed(2)}</p>
+                  <p className="text-sm text-gray-600 mt-2">Delivery: 5-7 business days</p>
+                </>
+              )}
             </div>
 
             <div className="flex flex-col gap-3">
               <Link
+                href="/my-orders"
+                className="w-full bg-primary hover:bg-primary-dark text-white font-semibold py-3 px-6 rounded-lg transition-colors text-center"
+                onClick={handleCloseOrderSuccess}
+              >
+                View My Orders
+              </Link>
+              <Link
                 href="/"
-                className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+                className="w-full bg-gray-100 hover:bg-gray-200 text-gray-900 font-semibold py-3 px-6 rounded-lg transition-colors text-center"
                 onClick={handleCloseOrderSuccess}
               >
                 Continue Shopping
@@ -304,6 +395,12 @@ export default function CartPage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Checkout Form */}
             <div className="lg:col-span-2">
+              {error && (
+                <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                  <p className="text-sm text-red-800">{error}</p>
+                </div>
+              )}
+              
               <form onSubmit={handlePlaceOrder}>
                 {/* Shipping Address */}
                 <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">

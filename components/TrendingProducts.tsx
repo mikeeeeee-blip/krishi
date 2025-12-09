@@ -1,5 +1,7 @@
 'use client';
 
+import Link from 'next/link';
+
 export default function TrendingProducts() {
   const trendingProducts = [
     'Vesicular Arbuscular Mycorrhiza',
@@ -35,18 +37,18 @@ export default function TrendingProducts() {
   ];
 
   return (
-    <section className="py-4 sm:py-5 md:py-6 lg:py-8 bg-gray-50 border-t border-gray-200">
-      <div className="container mx-auto px-3 sm:px-4 md:px-6 max-w-7xl">
-        <h3 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-gray-900 mb-3 sm:mb-4 md:mb-5">Trending Products</h3>
-        <div className="flex flex-wrap gap-1.5 sm:gap-2 md:gap-2.5">
+    <section className="py-6 md:py-8 lg:py-10 bg-gray-50 border-t border-gray-200">
+      <div className="container mx-auto px-4 md:px-6 max-w-7xl">
+        <h3 className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-900 mb-4 md:mb-6">Trending Products</h3>
+        <div className="flex flex-wrap gap-2 md:gap-3">
           {trendingProducts.map((product, index) => (
-            <a
+            <Link
               key={index}
-              href="#"
-              className="inline-block px-2.5 sm:px-3 md:px-3.5 py-1 sm:py-1.5 md:py-2 bg-white border border-gray-300 rounded-md text-[11px] sm:text-xs md:text-sm text-gray-700 hover:border-[#16a34a] hover:text-[#16a34a] transition-base shadow-sm hover:shadow-md"
+              href={`/products?search=${encodeURIComponent(product)}`}
+              className="inline-block px-3 md:px-4 py-1.5 md:py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-xs md:text-sm text-black hover:text-gray-900 transition-all duration-200 font-medium cursor-pointer border border-transparent hover:border-gray-300"
             >
               {product}
-            </a>
+            </Link>
           ))}
         </div>
       </div>

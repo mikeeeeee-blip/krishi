@@ -23,7 +23,6 @@ import FarmProductsSection from "@/components/FarmProductsSection";
 import MediaSection from "@/components/MediaSection";
 import HealthWellnessSection from "@/components/HealthWellnessSection";
 import FeaturedProducts from "@/components/FeaturedProducts";
-import TrendingProducts from "@/components/TrendingProducts";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import Footer from "@/components/Footer";
 
@@ -65,7 +64,6 @@ export default function Home() {
       <MediaSection />
       <HealthWellnessSection />
       {/* <TrustBadges /> */}
-      <TrendingProducts />
       <WhatsAppButton />
       <Footer />
     </div>

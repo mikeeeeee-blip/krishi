@@ -35,14 +35,11 @@ export default function CategorySection({
   }
 
   return (
-    <section className={`py-6 md:py-8 lg:py-10 ${bgColor === 'gray' ? 'bg-gray-50' : 'bg-white'}`}>
+    <section className={`section-container ${bgColor === 'gray' ? 'bg-gray-50' : 'bg-white'}`}>
       <div className="container mx-auto px-4 md:px-6 max-w-7xl">
-        <div className="flex items-center justify-between mb-6 md:mb-8">
-          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900">{displayTitle}</h2>
-          <Link 
-            href={`/categories/${categorySlug}`} 
-            className="text-[#16a34a] hover:text-[#15803d] font-semibold text-base md:text-lg transition-colors whitespace-nowrap hover:underline"
-          >
+        <div className="category-section-header">
+          <h2>{displayTitle}</h2>
+          <Link href={`/categories/${categorySlug}`}>
             View All →
           </Link>
         </div>

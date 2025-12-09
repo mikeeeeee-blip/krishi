@@ -49,14 +49,14 @@ export default function TermsOfUsePage() {
 
           <div className="info-box mb-8">
             <p className="text-gray-700">
-              Welcome to ECLAT AGROXGLOBAL. By accessing or using our website and services, you agree to be bound 
+              Welcome to KRISHANSHECLAT AGROXGLOBAL. By accessing or using our website and services, you agree to be bound 
               by these Terms of Use. Please read them carefully before using our platform.
             </p>
           </div>
 
           <h2>1. Acceptance of Terms</h2>
           <p>
-            By accessing, browsing, or using the ECLAT AGROXGLOBAL website (www.eclatagro.com) or any of our mobile 
+            By accessing, browsing, or using the KRISHANSHECLAT AGROXGLOBAL website (www.eclatagro.com) or any of our mobile 
             applications, you acknowledge that you have read, understood, and agree to be bound by these 
             Terms of Use and our Privacy Policy.
           </p>
@@ -116,7 +116,7 @@ export default function TermsOfUsePage() {
           <h2>8. Intellectual Property</h2>
           <p>
             All content on this website, including but not limited to text, graphics, logos, images, 
-            audio clips, digital downloads, and software, is the property of ECLAT AGROXGLOBAL or its content 
+            audio clips, digital downloads, and software, is the property of KRISHANSHECLAT AGROXGLOBAL or its content 
             suppliers and is protected by intellectual property laws.
           </p>
           <ul>
@@ -142,7 +142,7 @@ export default function TermsOfUsePage() {
             <div className="flex items-start gap-3">
               <AlertCircle className="w-6 h-6 text-yellow-600 flex-shrink-0 mt-1" />
               <p className="text-gray-700">
-                ECLAT AGROXGLOBAL shall not be liable for any indirect, incidental, special, consequential, or 
+                KRISHANSHECLAT AGROXGLOBAL shall not be liable for any indirect, incidental, special, consequential, or 
                 punitive damages arising out of your use of our services. Our total liability shall not 
                 exceed the amount paid by you for the specific product or service in question.
               </p>
@@ -151,7 +151,7 @@ export default function TermsOfUsePage() {
 
           <h2>11. Indemnification</h2>
           <p>
-            You agree to indemnify and hold harmless ECLAT AGROXGLOBAL, its officers, directors, employees, and 
+            You agree to indemnify and hold harmless KRISHANSHECLAT AGROXGLOBAL, its officers, directors, employees, and 
             agents from any claims, damages, losses, liabilities, and expenses arising out of your use 
             of our services or violation of these terms.
           </p>

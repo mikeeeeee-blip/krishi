@@ -101,14 +101,14 @@ export default function CareersPage() {
             Grow With Us
           </h2>
           <p className="text-gray-600 text-lg max-w-3xl mx-auto leading-relaxed">
-            At ECLAT AGROXGLOBAL, we&apos;re on a mission to revolutionize agriculture in India. Join our team of 
+            At KRISHANSHECLAT AGROXGLOBAL, we&apos;re on a mission to revolutionize agriculture in India. Join our team of 
             passionate individuals working to empower millions of farmers with technology and innovation.
           </p>
         </div>
 
         {/* Why Work With Us */}
         <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-2xl p-8 mb-12">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">Why Work at ECLAT AGROXGLOBAL?</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">Why Work at KRISHANSHECLAT AGROXGLOBAL?</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {benefits.map((benefit, index) => (
               <div key={index} className="bg-white rounded-xl p-6 shadow-sm">

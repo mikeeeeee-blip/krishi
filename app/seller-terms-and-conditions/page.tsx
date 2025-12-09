@@ -29,7 +29,7 @@ export default function SellerTermsPage() {
       <div className="hero-banner">
         <div className="hero-banner-content">
           <h1>Seller Terms & Conditions</h1>
-          <p>Guidelines for Selling on ECLAT AGROXGLOBAL Platform</p>
+          <p>Guidelines for Selling on KRISHANSHECLAT AGROXGLOBAL Platform</p>
         </div>
       </div>
 
@@ -51,14 +51,14 @@ export default function SellerTermsPage() {
             <div className="flex items-start gap-3">
               <Store className="w-8 h-8 text-green-600 flex-shrink-0" />
               <p className="text-gray-700">
-                These Seller Terms and Conditions govern your use of the ECLAT AGROXGLOBAL platform as a seller. 
+                These Seller Terms and Conditions govern your use of the KRISHANSHECLAT AGROXGLOBAL platform as a seller. 
                 By registering as a seller, you agree to comply with these terms and all applicable laws.
               </p>
             </div>
           </div>
 
           <h2>1. Seller Registration</h2>
-          <p>To become a seller on ECLAT AGROXGLOBAL, you must:</p>
+          <p>To become a seller on KRISHANSHECLAT AGROXGLOBAL, you must:</p>
           <ul>
             <li>Be a registered business entity or individual with valid PAN</li>
             <li>Possess a valid GST registration (where applicable)</li>
@@ -81,7 +81,7 @@ export default function SellerTermsPage() {
           <h2>3. Pricing and Commission</h2>
           <ul>
             <li>Sellers are responsible for setting competitive product prices</li>
-            <li>ECLAT AGROXGLOBAL charges a commission on each successful sale (5-10% based on category)</li>
+            <li>KRISHANSHECLAT AGROXGLOBAL charges a commission on each successful sale (5-10% based on category)</li>
             <li>Commission rates may be revised with prior notice</li>
             <li>Prices must include all applicable taxes</li>
             <li>Sellers must honor listed prices for confirmed orders</li>
@@ -94,7 +94,7 @@ export default function SellerTermsPage() {
             <li>Package products securely to prevent damage during transit</li>
             <li>Provide accurate shipping information and tracking details</li>
             <li>Ensure timely delivery as per committed timelines</li>
-            <li>Handle returns and refunds as per ECLAT AGROXGLOBAL&apos;s policies</li>
+            <li>Handle returns and refunds as per KRISHANSHECLAT AGROXGLOBAL&apos;s policies</li>
           </ul>
 
           <h2>5. Quality Standards</h2>
@@ -128,7 +128,7 @@ export default function SellerTermsPage() {
             <li>Respond to customer queries within 24 hours</li>
             <li>Provide helpful and accurate product information</li>
             <li>Handle complaints professionally and promptly</li>
-            <li>Cooperate with ECLAT AGROXGLOBAL&apos;s customer service team</li>
+            <li>Cooperate with KRISHANSHECLAT AGROXGLOBAL&apos;s customer service team</li>
             <li>Maintain a minimum customer satisfaction rating</li>
           </ul>
 
@@ -139,13 +139,13 @@ export default function SellerTermsPage() {
             <li>Engage in price manipulation or unfair practices</li>
             <li>Provide false or misleading product information</li>
             <li>Share customer data outside the platform</li>
-            <li>Directly solicit customers outside ECLAT AGROXGLOBAL</li>
+            <li>Directly solicit customers outside KRISHANSHECLAT AGROXGLOBAL</li>
             <li>Engage in any fraudulent activities</li>
           </ul>
 
           <h2>9. Account Suspension</h2>
           <p>
-            ECLAT AGROXGLOBAL reserves the right to suspend or terminate seller accounts for:
+            KRISHANSHECLAT AGROXGLOBAL reserves the right to suspend or terminate seller accounts for:
           </p>
           <ul>
             <li>Violation of these terms and conditions</li>
@@ -158,14 +158,14 @@ export default function SellerTermsPage() {
           <h2>10. Liability</h2>
           <ul>
             <li>Sellers are fully responsible for their products and services</li>
-            <li>ECLAT AGROXGLOBAL is not liable for seller-customer disputes</li>
+            <li>KRISHANSHECLAT AGROXGLOBAL is not liable for seller-customer disputes</li>
             <li>Sellers must maintain appropriate business insurance</li>
-            <li>Sellers indemnify ECLAT AGROXGLOBAL against any claims arising from their products</li>
+            <li>Sellers indemnify KRISHANSHECLAT AGROXGLOBAL against any claims arising from their products</li>
           </ul>
 
           <h2>11. Modifications</h2>
           <p>
-            ECLAT AGROXGLOBAL may modify these terms with prior notice. Continued use of the platform 
+            KRISHANSHECLAT AGROXGLOBAL may modify these terms with prior notice. Continued use of the platform 
             after modifications constitutes acceptance of the updated terms.
           </p>
 
@@ -189,7 +189,7 @@ export default function SellerTermsPage() {
           {/* CTA */}
           <div className="cta-banner mt-8">
             <h3>Ready to Start Selling?</h3>
-            <p>Join thousands of sellers on ECLAT AGROXGLOBAL and grow your business!</p>
+            <p>Join thousands of sellers on KRISHANSHECLAT AGROXGLOBAL and grow your business!</p>
 
             <a href="/sell-on-eclat-agroxglobal" className="cta-banner-btn text-white hover:text-white">
             <Store className="w-5 h-5 text-white" />
