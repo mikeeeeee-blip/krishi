@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from 'express';
-import { Prisma } from '@prisma/client';
 import { config } from '../config/index.js';
 import { HTTP_STATUS, ERROR_MESSAGES } from '../constants/index.js';
 
@@ -51,7 +50,7 @@ export const notFoundHandler = (req: Request, res: Response) => {
  * Handles all errors and returns appropriate responses
  */
 export const errorHandler = (
-  err: ApiError | Error | Prisma.PrismaClientKnownRequestError | Prisma.PrismaClientValidationError,
+  err: any,
   req: Request,
   res: Response,
   _next: NextFunction
@@ -69,40 +68,28 @@ export const errorHandler = (
     errors = err.errors;
     code = err.code;
   }
-  // Handle Prisma errors
-  else if (err instanceof Prisma.PrismaClientKnownRequestError) {
+  // Mongoose: CastError (Invalid ID)
+  else if (err.name === 'CastError') {
     statusCode = HTTP_STATUS.BAD_REQUEST;
-    
-    switch (err.code) {
-      case 'P2002':
-        statusCode = HTTP_STATUS.CONFLICT;
-        message = 'Unique constraint violation';
-        errors = [{ message: 'A record with this value already exists' }];
-        code = 'UNIQUE_CONSTRAINT_VIOLATION';
-        break;
-      case 'P2025':
-        statusCode = HTTP_STATUS.NOT_FOUND;
-        message = ERROR_MESSAGES.NOT_FOUND;
-        code = 'RECORD_NOT_FOUND';
-        break;
-      case 'P2003':
-        statusCode = HTTP_STATUS.BAD_REQUEST;
-        message = 'Foreign key constraint violation';
-        errors = [{ message: 'Referenced record does not exist' }];
-        code = 'FOREIGN_KEY_VIOLATION';
-        break;
-      default:
-        statusCode = HTTP_STATUS.INTERNAL_SERVER_ERROR;
-        message = 'Database error occurred';
-        code = 'DATABASE_ERROR';
-    }
+    message = `Invalid ${err.path}: ${err.value}`;
+    code = 'INVALID_ID';
   }
-  // Handle Prisma validation errors
-  else if (err instanceof Prisma.PrismaClientValidationError) {
+  // Mongoose: ValidationError
+  else if (err.name === 'ValidationError') {
     statusCode = HTTP_STATUS.BAD_REQUEST;
     message = ERROR_MESSAGES.VALIDATION_FAILED;
-    errors = [{ message: err.message }];
+    errors = Object.values(err.errors).map((val: any) => ({
+      message: val.message,
+    }));
     code = 'VALIDATION_ERROR';
+  }
+  // Mongoose: Duplicate Key Error
+  else if (err.code === 11000) {
+    statusCode = HTTP_STATUS.CONFLICT;
+    message = 'Duplicate field value entered';
+    // const field = Object.keys(err.keyValue)[0];
+    errors = [{ message: 'A record with this value already exists' }];
+    code = 'DUPLICATE_KEY_ERROR';
   }
   // Handle JWT errors
   else if (err.name === 'JsonWebTokenError') {
@@ -114,12 +101,6 @@ export const errorHandler = (
     statusCode = HTTP_STATUS.UNAUTHORIZED;
     message = ERROR_MESSAGES.TOKEN_EXPIRED;
     code = 'TOKEN_EXPIRED';
-  }
-  // Handle validation errors
-  else if (err.name === 'ValidationError') {
-    statusCode = HTTP_STATUS.BAD_REQUEST;
-    message = ERROR_MESSAGES.VALIDATION_FAILED;
-    code = 'VALIDATION_ERROR';
   }
   // Handle unknown errors
   else {
@@ -162,7 +143,7 @@ export const errorHandler = (
     message,
     errors,
     code,
-    ...(config.nodeEnv === 'development' && { 
+    ...(config.nodeEnv === 'development' && {
       stack: err.stack,
       details: errorLog,
     }),
@@ -175,4 +156,3 @@ export const asyncHandler = (fn: Function) => {
     Promise.resolve(fn(req, res, next)).catch(next);
   };
 };
-

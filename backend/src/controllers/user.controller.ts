@@ -1,130 +1,164 @@
 import { Request, Response } from 'express';
-import { prisma } from '../lib/prisma.js';
+import { User } from '../models/user.model.js';
 import { ApiError, asyncHandler } from '../middleware/errorHandler.js';
-import { HTTP_STATUS } from '../constants/index.js';
 
 export class UserController {
-  // Get user addresses
+  /**
+   * Get user addresses
+   */
   getAddresses = asyncHandler(async (req: Request, res: Response) => {
-    const addresses = await prisma.address.findMany({
-      where: { userId: req.user!.id },
-      orderBy: [{ isDefault: 'desc' }, { createdAt: 'desc' }],
+    const user: any = await User.findById(req.user!.id).select('addresses');
+
+    // Sort addresses: default first, then by creation date descending
+    const sortedAddresses = user?.addresses.sort((a: any, b: any) => {
+      if (a.isDefault && !b.isDefault) return -1;
+      if (!a.isDefault && b.isDefault) return 1;
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     });
 
-    res.json({ success: true, data: addresses });
+    res.json({ success: true, data: sortedAddresses || [] });
   });
 
-  // Add address
+  /**
+   * Add address
+   */
   addAddress = asyncHandler(async (req: Request, res: Response) => {
     const { fullName, phone, addressLine1, addressLine2, landmark, city, state, pincode, isDefault } = req.body;
 
     // If setting as default, unset other defaults
     if (isDefault) {
-      await prisma.address.updateMany({
-        where: { userId: req.user!.id },
-        data: { isDefault: false },
-      });
+      await User.updateOne(
+        { _id: req.user!.id, 'addresses.isDefault': true },
+        { $set: { 'addresses.$.isDefault': false } }
+      );
     }
 
-    const address = await prisma.address.create({
-      data: {
-        userId: req.user!.id,
-        fullName,
-        phone,
-        addressLine1,
-        addressLine2,
-        landmark,
-        city,
-        state,
-        pincode,
-        isDefault: isDefault || false,
-      },
-    });
+    const newAddress = {
+      fullName,
+      phone,
+      addressLine1,
+      addressLine2,
+      landmark,
+      city,
+      state,
+      pincode,
+      isDefault: isDefault || false,
+    };
 
-    res.status(201).json({ success: true, data: address });
+    const user: any = await User.findByIdAndUpdate(
+      req.user!.id,
+      { $push: { addresses: newAddress } },
+      { new: true, runValidators: true }
+    );
+
+    // Get the added address (last one)
+    const addedAddress = user?.addresses[user.addresses.length - 1];
+
+    res.status(201).json({ success: true, data: addedAddress });
   });
 
-  // Update address
+  /**
+   * Update address
+   */
   updateAddress = asyncHandler(async (req: Request, res: Response) => {
-    const { id } = req.params;
+    const { id } = req.params; // address id
     const updateData = req.body;
 
-    const address = await prisma.address.findFirst({
-      where: { id, userId: req.user!.id },
-    });
-
-    if (!address) {
+    // Check if address exists
+    const user: any = await User.findOne({ _id: req.user!.id, 'addresses._id': id });
+    if (!user) {
       throw new ApiError(404, 'Address not found');
     }
 
-    const updated = await prisma.address.update({
-      where: { id },
-      data: updateData,
-    });
+    // If setting as default, unset other defaults
+    if (updateData.isDefault) {
+      await User.updateOne(
+        { _id: req.user!.id, 'addresses.isDefault': true },
+        { $set: { 'addresses.$.isDefault': false } }
+      );
+    }
 
-    res.json({ success: true, data: updated });
+    // Construct update object
+    const setOptions: any = {};
+    for (const key in updateData) {
+      setOptions[`addresses.$.${key}`] = updateData[key];
+    }
+
+    const updatedUser: any = await User.findOneAndUpdate(
+      { _id: req.user!.id, 'addresses._id': id },
+      { $set: setOptions },
+      { new: true, runValidators: true }
+    );
+
+    const updatedAddress = updatedUser?.addresses.find((addr: any) => addr._id.toString() === id);
+
+    res.json({ success: true, data: updatedAddress });
   });
 
-  // Delete address
+  /**
+   * Delete address
+   */
   deleteAddress = asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params;
 
-    const address = await prisma.address.findFirst({
-      where: { id, userId: req.user!.id },
-    });
+    const user: any = await User.findOneAndUpdate(
+      { _id: req.user!.id, 'addresses._id': id },
+      { $pull: { addresses: { _id: id } } },
+      { new: true }
+    );
 
-    if (!address) {
+    if (!user) {
       throw new ApiError(404, 'Address not found');
     }
-
-    await prisma.address.delete({ where: { id } });
 
     res.json({ success: true, message: 'Address deleted' });
   });
 
-  // Set default address
+  /**
+   * Set default address
+   */
   setDefaultAddress = asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params;
 
-    await prisma.address.updateMany({
-      where: { userId: req.user!.id },
-      data: { isDefault: false },
-    });
+    // Unset current default
+    await User.updateOne(
+      { _id: req.user!.id, 'addresses.isDefault': true },
+      { $set: { 'addresses.$.isDefault': false } }
+    );
 
-    await prisma.address.update({
-      where: { id },
-      data: { isDefault: true },
-    });
+    // Set new default
+    const user: any = await User.findOneAndUpdate(
+      { _id: req.user!.id, 'addresses._id': id },
+      { $set: { 'addresses.$.isDefault': true } },
+      { new: true }
+    );
+
+    if (!user) {
+      throw new ApiError(404, 'Address not found');
+    }
 
     res.json({ success: true, message: 'Default address updated' });
   });
 
-  // Admin: Get all users
+  /**
+   * Admin: Get all users
+   */
   getAllUsers = asyncHandler(async (req: Request, res: Response) => {
     const { page = 1, limit = 20, role, status } = req.query;
 
-    const where: any = { deletedAt: null };
-    if (role) where.role = role;
-    if (status) where.status = status;
+    const query: any = { deletedAt: null };
+    if (role) query.role = role;
+    if (status) query.status = status;
+
+    const skip = (Number(page) - 1) * Number(limit);
 
     const [users, total] = await Promise.all([
-      prisma.user.findMany({
-        where,
-        skip: (Number(page) - 1) * Number(limit),
-        take: Number(limit),
-        select: {
-          id: true,
-          email: true,
-          phone: true,
-          firstName: true,
-          lastName: true,
-          role: true,
-          status: true,
-          createdAt: true,
-        },
-        orderBy: { createdAt: 'desc' },
-      }),
-      prisma.user.count({ where }),
+      User.find(query)
+        .select('id email phone firstName lastName role status createdAt')
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(Number(limit)),
+      User.countDocuments(query),
     ]);
 
     res.json({
@@ -139,12 +173,11 @@ export class UserController {
     });
   });
 
-  // Admin: Get user by ID
+  /**
+   * Admin: Get user by ID
+   */
   getUserById = asyncHandler(async (req: Request, res: Response) => {
-    const user = await prisma.user.findUnique({
-      where: { id: req.params.id },
-      include: { addresses: true },
-    });
+    const user = await User.findById(req.params.id);
 
     if (!user) {
       throw new ApiError(404, 'User not found');
@@ -153,17 +186,22 @@ export class UserController {
     res.json({ success: true, data: user });
   });
 
-  // Admin: Update user status
+  /**
+   * Admin: Update user status
+   */
   updateUserStatus = asyncHandler(async (req: Request, res: Response) => {
     const { status } = req.body;
 
-    const user = await prisma.user.update({
-      where: { id: req.params.id },
-      data: { status },
-      select: { id: true, email: true, status: true },
-    });
+    const user: any = await User.findByIdAndUpdate(
+      req.params.id,
+      { status },
+      { new: true }
+    ).select('id email status');
+
+    if (!user) {
+      throw new ApiError(404, 'User not found');
+    }
 
     res.json({ success: true, data: user });
   });
 }
-

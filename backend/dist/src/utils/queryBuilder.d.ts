@@ -1,7 +1,6 @@
-import { Prisma } from '@prisma/client';
 /**
  * Query Builder Utilities
- * Helper functions for building Prisma queries
+ * Helper functions for building queries
  */
 export interface PaginationParams {
     page?: number | string | undefined;
@@ -23,15 +22,15 @@ export declare const buildPagination: (total: number, params: PaginationParams) 
     take: number;
 };
 /**
- * Build orderBy clause for Prisma queries
+ * Build orderBy clause
  */
 export declare const buildOrderBy: (sortBy?: string, sortOrder?: "asc" | "desc", defaultSort?: string) => Record<string, "asc" | "desc">;
 /**
  * Build date range filter
  */
-export declare const buildDateRange: (dateFrom?: string | Date, dateTo?: string | Date) => Prisma.DateTimeFilter | undefined;
+export declare const buildDateRange: (dateFrom?: string | Date, dateTo?: string | Date) => any;
 /**
  * Build price range filter
  */
-export declare const buildPriceRange: (minPrice?: number | string | undefined, maxPrice?: number | string | undefined) => Prisma.DecimalFilter | undefined;
+export declare const buildPriceRange: (minPrice?: number | string | undefined, maxPrice?: number | string | undefined) => any;
 //# sourceMappingURL=queryBuilder.d.ts.map

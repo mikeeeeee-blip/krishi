@@ -9,7 +9,7 @@ export const buildPagination = (total, params) => {
     return getPagination(total, page, limit);
 };
 /**
- * Build orderBy clause for Prisma queries
+ * Build orderBy clause
  */
 export const buildOrderBy = (sortBy, sortOrder = 'desc', defaultSort = 'createdAt') => {
     const validSortFields = ['createdAt', 'updatedAt', 'name', 'price', 'totalAmount'];
@@ -24,12 +24,12 @@ export const buildDateRange = (dateFrom, dateTo) => {
         return undefined;
     const filter = {};
     if (dateFrom) {
-        filter.gte = dateFrom instanceof Date ? dateFrom : new Date(dateFrom);
+        filter.$gte = dateFrom instanceof Date ? dateFrom : new Date(dateFrom);
     }
     if (dateTo) {
         const endDate = dateTo instanceof Date ? dateTo : new Date(dateTo);
         endDate.setHours(23, 59, 59, 999);
-        filter.lte = endDate;
+        filter.$lte = endDate;
     }
     return filter;
 };
@@ -43,12 +43,12 @@ export const buildPriceRange = (minPrice, maxPrice) => {
     if (minPrice !== undefined) {
         const min = typeof minPrice === 'string' ? Number(minPrice) : minPrice;
         if (!isNaN(min))
-            filter.gte = min;
+            filter.$gte = min;
     }
     if (maxPrice !== undefined) {
         const max = typeof maxPrice === 'string' ? Number(maxPrice) : maxPrice;
         if (!isNaN(max))
-            filter.lte = max;
+            filter.$lte = max;
     }
     return filter;
 };

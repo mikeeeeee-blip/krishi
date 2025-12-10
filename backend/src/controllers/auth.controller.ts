@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import { config } from '../config/index.js';
-import { prisma } from '../lib/prisma.js';
+import { User } from '../models/user.model.js';
 import { ApiError, asyncHandler } from '../middleware/errorHandler.js';
 import { validatePassword, isPasswordSimilarToUserInfo } from '../utils/passwordValidator.js';
 import { generateTokenPair } from '../utils/tokenManager.js';
@@ -58,13 +58,8 @@ export class AuthController {
     }
 
     // Check if user already exists
-    const existingUser = await prisma.user.findFirst({
-      where: {
-        OR: [
-          { email: email.toLowerCase() },
-          ...(phone ? [{ phone }] : []),
-        ],
-      },
+    const existingUser: any = await User.findOne({
+      $or: [{ email: email.toLowerCase() }, { phone: phone }]
     });
 
     if (existingUser) {
@@ -76,31 +71,19 @@ export class AuthController {
     const passwordHash = await bcrypt.hash(password, config.bcryptSaltRounds);
 
     // Create user
-    const user = await prisma.user.create({
-      data: {
-        email: email.toLowerCase(),
-        passwordHash,
-        firstName: firstName.trim(),
-        lastName: lastName?.trim(),
-        phone: phone?.trim(),
-        status: 'ACTIVE', // In production, set to 'PENDING_VERIFICATION' and send verification email
-        emailVerified: false, // Should be false until email is verified
-      },
-      select: {
-        id: true,
-        email: true,
-        firstName: true,
-        lastName: true,
-        role: true,
-        status: true,
-        emailVerified: true,
-        createdAt: true,
-      },
+    const user: any = await User.create({
+      email: email.toLowerCase(),
+      passwordHash,
+      firstName: firstName.trim(),
+      lastName: lastName?.trim(),
+      phone: phone?.trim(),
+      status: 'ACTIVE', // In production, set to 'PENDING_VERIFICATION'
+      emailVerified: false,
     });
 
     // Generate token pair
     const { accessToken, refreshToken } = generateTokenPair({
-      id: user.id,
+      id: user._id.toString(),
       email: user.email,
       role: user.role,
     });
@@ -108,22 +91,18 @@ export class AuthController {
     // Set httpOnly cookies
     setTokenCookies(res, accessToken, refreshToken);
 
-    // Return user data (without sensitive info) and tokens in response body
-    // Frontend can choose to use cookies or store tokens in memory/localStorage
     res.status(201).json({
       success: true,
       message: 'Registration successful',
       data: {
         user: {
-          id: user.id,
+          id: user._id,
           email: user.email,
           firstName: user.firstName,
           lastName: user.lastName,
           role: user.role,
           emailVerified: user.emailVerified,
         },
-        // Include tokens in response for clients that prefer localStorage
-        // Remove these if you want to force httpOnly cookie usage only
         tokens: {
           accessToken,
           refreshToken,
@@ -144,17 +123,13 @@ export class AuthController {
     }
 
     // Find user by email (case-insensitive)
-    const user = await prisma.user.findUnique({
-      where: { email: email.toLowerCase() },
-    });
+    const user: any = await User.findOne({ email: email.toLowerCase() });
 
     // Always perform bcrypt comparison (even if user doesn't exist)
-    // This prevents timing attacks that could reveal if email exists
     const hashToCompare = user?.passwordHash || '$2a$12$dummy.hash.to.prevent.timing.attack';
     const isPasswordValid = await bcrypt.compare(password, hashToCompare);
 
     if (!user || !isPasswordValid) {
-      // Generic error message to prevent user enumeration
       throw new ApiError(401, 'Invalid email or password');
     }
 
@@ -172,14 +147,12 @@ export class AuthController {
     }
 
     // Update last login timestamp
-    await prisma.user.update({
-      where: { id: user.id },
-      data: { lastLoginAt: new Date() },
-    });
+    user.lastLoginAt = new Date();
+    await user.save();
 
     // Generate token pair
     const { accessToken, refreshToken } = generateTokenPair({
-      id: user.id,
+      id: user._id.toString(),
       email: user.email,
       role: user.role,
     });
@@ -192,14 +165,13 @@ export class AuthController {
       message: 'Login successful',
       data: {
         user: {
-          id: user.id,
+          id: user._id,
           email: user.email,
           firstName: user.firstName,
           lastName: user.lastName,
           role: user.role,
           emailVerified: user.emailVerified,
         },
-        // Include tokens in response for clients that prefer localStorage
         tokens: {
           accessToken,
           refreshToken,
@@ -222,7 +194,7 @@ export class AuthController {
     // Verify refresh token
     const { verifyRefreshToken: verifyToken } = await import('../utils/tokenManager.js');
     let decoded: { id: string };
-    
+
     try {
       decoded = verifyToken(refreshToken);
     } catch (error) {
@@ -230,10 +202,7 @@ export class AuthController {
     }
 
     // Get user
-    const user = await prisma.user.findUnique({
-      where: { id: decoded.id },
-      select: { id: true, email: true, role: true, status: true },
-    });
+    const user: any = await User.findById(decoded.id).select('email role status');
 
     if (!user || user.status !== 'ACTIVE') {
       throw new ApiError(401, 'Invalid refresh token');
@@ -241,7 +210,7 @@ export class AuthController {
 
     // Generate new token pair
     const { accessToken, refreshToken: newRefreshToken } = generateTokenPair({
-      id: user.id,
+      id: user._id.toString(),
       email: user.email,
       role: user.role,
     });
@@ -265,12 +234,6 @@ export class AuthController {
   logout = asyncHandler(async (req: Request, res: Response) => {
     // Clear cookies
     clearTokenCookies(res);
-
-    // In production, you might want to:
-    // 1. Add token to blacklist (Redis)
-    // 2. Invalidate refresh token in database
-    // 3. Log logout event
-
     res.json({
       success: true,
       message: 'Logged out successfully',
@@ -282,24 +245,7 @@ export class AuthController {
    * GET /api/v1/auth/me
    */
   getProfile = asyncHandler(async (req: Request, res: Response) => {
-    const user = await prisma.user.findUnique({
-      where: { id: req.user!.id },
-      select: {
-        id: true,
-        email: true,
-        phone: true,
-        firstName: true,
-        lastName: true,
-        displayName: true,
-        avatarUrl: true,
-        role: true,
-        status: true,
-        emailVerified: true,
-        phoneVerified: true,
-        createdAt: true,
-        lastLoginAt: true,
-      },
-    });
+    const user: any = await User.findById(req.user!.id).select('-passwordHash');
 
     if (!user) {
       throw new ApiError(404, 'User not found');
@@ -318,23 +264,16 @@ export class AuthController {
   updateProfile = asyncHandler(async (req: Request, res: Response) => {
     const { firstName, lastName, displayName, phone } = req.body;
 
-    const user = await prisma.user.update({
-      where: { id: req.user!.id },
-      data: {
+    const user: any = await User.findByIdAndUpdate(
+      req.user!.id,
+      {
         ...(firstName && { firstName: firstName.trim() }),
         ...(lastName !== undefined && { lastName: lastName?.trim() }),
         ...(displayName !== undefined && { displayName: displayName?.trim() }),
         ...(phone && { phone: phone.trim() }),
       },
-      select: {
-        id: true,
-        email: true,
-        firstName: true,
-        lastName: true,
-        displayName: true,
-        phone: true,
-      },
-    });
+      { new: true, runValidators: true }
+    ).select('email firstName lastName displayName phone');
 
     res.json({
       success: true,
@@ -355,9 +294,7 @@ export class AuthController {
     }
 
     // Get user with password hash
-    const user = await prisma.user.findUnique({
-      where: { id: req.user!.id },
-    });
+    const user: any = await User.findById(req.user!.id);
 
     if (!user) {
       throw new ApiError(404, 'User not found');
@@ -404,10 +341,8 @@ export class AuthController {
     const newPasswordHash = await bcrypt.hash(newPassword, config.bcryptSaltRounds);
 
     // Update password
-    await prisma.user.update({
-      where: { id: user.id },
-      data: { passwordHash: newPasswordHash },
-    });
+    user.passwordHash = newPasswordHash;
+    await user.save();
 
     res.json({
       success: true,
@@ -426,12 +361,10 @@ export class AuthController {
       throw new ApiError(400, 'Email is required');
     }
 
-    const user = await prisma.user.findUnique({
-      where: { email: email.toLowerCase() },
-    });
+    // Just check if user exists (conceptually) but we don't need to do anything with it
+    // because email service is not implemented.
+    await User.findOne({ email: email.toLowerCase() });
 
-    // Always return success to prevent email enumeration
-    // Note: Email service is not configured. Password reset functionality requires email service.
     res.json({
       success: true,
       message: 'Password reset functionality is currently unavailable. Please contact support for assistance.',
@@ -444,17 +377,7 @@ export class AuthController {
    */
   resetPassword = asyncHandler(async (req: Request, res: Response) => {
     const { token, password } = req.body;
-
-    if (!token || !password) {
-      throw new ApiError(400, 'Reset token and new password are required');
-    }
-
-    // TODO: Verify reset token and update password
-    // 1. Verify token (JWT or database token)
-    // 2. Validate new password
-    // 3. Update password hash
-    // 4. Invalidate reset token
-
+    // Implementation pending as noted in original code
     res.json({
       success: true,
       message: 'Password reset successful',

@@ -1,4 +1,4 @@
-import { prisma } from '../lib/prisma.js';
+import { Product } from '../models/product.model.js';
 import { ApiError, asyncHandler } from '../middleware/errorHandler.js';
 import { getPagination } from '../utils/helpers.js';
 import { PRODUCT_STATUS, PAGINATION } from '../constants/index.js';
@@ -9,72 +9,57 @@ export class ProductController {
      */
     getAllProducts = asyncHandler(async (req, res) => {
         const { page, limit, category, brand, minPrice, maxPrice, sortBy = 'createdAt', sortOrder = 'desc', status = PRODUCT_STATUS.ACTIVE } = req.query;
-        // Build where clause with proper typing
-        const where = {
-            deletedAt: null
-        };
+        const query = { deletedAt: null };
         if (status)
-            where.status = status;
+            query.status = status;
         if (category)
-            where.categoryId = category;
+            query.category = category;
         if (brand)
-            where.brandId = brand;
+            query.brand = brand;
         if (minPrice || maxPrice) {
-            where.basePrice = {};
+            query.basePrice = {};
             if (minPrice)
-                where.basePrice.gte = Number(minPrice);
+                query.basePrice.$gte = Number(minPrice);
             if (maxPrice)
-                where.basePrice.lte = Number(maxPrice);
+                query.basePrice.$lte = Number(maxPrice);
         }
-        // Get pagination metadata
-        const total = await prisma.product.count({ where });
-        const pagination = getPagination(total, Number(page) || PAGINATION.DEFAULT_PAGE, Number(limit) || PAGINATION.DEFAULT_LIMIT);
-        // Build orderBy clause
-        const orderBy = {};
+        const sortOptions = {};
         if (sortBy === 'price')
-            orderBy.basePrice = sortOrder;
+            sortOptions.basePrice = sortOrder === 'desc' ? -1 : 1;
         else if (sortBy === 'name')
-            orderBy.name = sortOrder;
-        else if (sortBy === 'createdAt')
-            orderBy.createdAt = sortOrder;
+            sortOptions.name = sortOrder === 'desc' ? -1 : 1;
         else
-            orderBy.createdAt = 'desc';
-        // Fetch products
-        const products = await prisma.product.findMany({
-            where,
-            skip: pagination.skip,
-            take: pagination.take,
-            orderBy,
-            include: {
-                category: {
-                    select: {
-                        id: true,
-                        name: true,
-                        slug: true
-                    }
-                },
-                brand: {
-                    select: {
-                        id: true,
-                        name: true,
-                        slug: true
-                    }
-                },
-                variants: {
-                    where: { isActive: true },
-                    select: {
-                        id: true,
-                        name: true,
-                        price: true,
-                        stockQuantity: true,
-                        isActive: true,
-                    },
-                },
-            },
-        });
+            sortOptions.createdAt = sortOrder === 'desc' ? -1 : 1;
+        // Pagination
+        const pageNum = Number(page) || PAGINATION.DEFAULT_PAGE;
+        const limitNum = Number(limit) || PAGINATION.DEFAULT_LIMIT;
+        const skip = (pageNum - 1) * limitNum;
+        // Parallel execution for count and find
+        const [total, products] = await Promise.all([
+            Product.countDocuments(query),
+            Product.find(query)
+                .sort(sortOptions)
+                .skip(skip)
+                .limit(limitNum)
+                .populate('category', 'name slug')
+                .populate('brand', 'name slug')
+                .lean()
+        ]);
+        // Filter variants in memory to only show active ones
+        const processedProducts = products.map((p) => ({
+            ...p,
+            variants: p.variants?.filter((v) => v.isActive).map((v) => ({
+                id: v._id,
+                name: v.name,
+                price: v.price,
+                stockQuantity: v.stockQuantity,
+                isActive: v.isActive
+            }))
+        }));
+        const pagination = getPagination(total, pageNum, limitNum);
         res.json({
             success: true,
-            data: products,
+            data: processedProducts,
             pagination: {
                 page: pagination.page,
                 limit: pagination.limit,
@@ -85,39 +70,42 @@ export class ProductController {
     });
     // Get featured products
     getFeaturedProducts = asyncHandler(async (req, res) => {
-        const products = await prisma.product.findMany({
-            where: { isFeatured: true, status: 'ACTIVE', deletedAt: null },
-            take: 12,
-            include: {
-                category: { select: { name: true, slug: true } },
-                brand: { select: { name: true } },
-            },
-        });
+        const products = await Product.find({
+            isFeatured: true,
+            status: 'ACTIVE',
+            deletedAt: null
+        })
+            .limit(12)
+            .populate('category', 'name slug')
+            .populate('brand', 'name')
+            .lean();
         res.json({ success: true, data: products });
     });
     // Get bestsellers
     getBestsellers = asyncHandler(async (req, res) => {
-        const products = await prisma.product.findMany({
-            where: { isBestseller: true, status: 'ACTIVE', deletedAt: null },
-            take: 12,
-            include: {
-                category: { select: { name: true, slug: true } },
-                brand: { select: { name: true } },
-            },
-        });
+        const products = await Product.find({
+            isBestseller: true,
+            status: 'ACTIVE',
+            deletedAt: null
+        })
+            .limit(12)
+            .populate('category', 'name slug')
+            .populate('brand', 'name')
+            .lean();
         res.json({ success: true, data: products });
     });
     // Get new arrivals
     getNewArrivals = asyncHandler(async (req, res) => {
-        const products = await prisma.product.findMany({
-            where: { isNewArrival: true, status: 'ACTIVE', deletedAt: null },
-            take: 12,
-            orderBy: { createdAt: 'desc' },
-            include: {
-                category: { select: { name: true, slug: true } },
-                brand: { select: { name: true } },
-            },
-        });
+        const products = await Product.find({
+            isNewArrival: true,
+            status: 'ACTIVE',
+            deletedAt: null
+        })
+            .sort({ createdAt: -1 })
+            .limit(12)
+            .populate('category', 'name slug')
+            .populate('brand', 'name')
+            .lean();
         res.json({ success: true, data: products });
     });
     // Search products
@@ -127,175 +115,181 @@ export class ProductController {
             throw new ApiError(400, 'Search query required');
         }
         const searchTerm = String(q);
-        const where = {
+        const regex = new RegExp(searchTerm, 'i');
+        const query = {
             status: 'ACTIVE',
             deletedAt: null,
-            OR: [
-                { name: { contains: searchTerm, mode: 'insensitive' } },
-                { description: { contains: searchTerm, mode: 'insensitive' } },
-                { tags: { has: searchTerm } },
-                { searchKeywords: { has: searchTerm } },
-            ],
+            $or: [
+                { name: regex },
+                { description: regex },
+                { tags: searchTerm }, // Exact match in array
+                { searchKeywords: searchTerm }, // Exact match in array
+            ]
         };
-        const [products, total] = await Promise.all([
-            prisma.product.findMany({
-                where,
-                skip: (Number(page) - 1) * Number(limit),
-                take: Number(limit),
-                include: {
-                    category: { select: { name: true, slug: true } },
-                    brand: { select: { name: true } },
-                },
-            }),
-            prisma.product.count({ where }),
+        const pageNum = Number(page) || 1;
+        const limitNum = Number(limit) || 20;
+        const [total, products] = await Promise.all([
+            Product.countDocuments(query),
+            Product.find(query)
+                .skip((pageNum - 1) * limitNum)
+                .limit(limitNum)
+                .populate('category', 'name slug')
+                .populate('brand', 'name')
+                .lean()
         ]);
         res.json({
             success: true,
             data: products,
             pagination: {
-                page: Number(page),
-                limit: Number(limit),
+                page: pageNum,
+                limit: limitNum,
                 total,
-                pages: Math.ceil(total / Number(limit)),
+                pages: Math.ceil(total / limitNum),
             },
         });
     });
     // Get product by ID
     getProductById = asyncHandler(async (req, res) => {
-        const product = await prisma.product.findFirst({
-            where: { id: req.params.id, deletedAt: null },
-            include: {
-                category: true,
-                brand: true,
-                variants: { where: { isActive: true }, orderBy: { displayOrder: 'asc' } },
-                reviews: {
-                    where: { isApproved: true },
-                    take: 5,
-                    orderBy: { createdAt: 'desc' },
-                    include: { user: { select: { firstName: true, lastName: true } } },
-                },
-            },
-        });
+        const product = await Product.findOne({ _id: req.params.id, deletedAt: null })
+            .populate('category')
+            .populate('brand')
+            .populate('seller', 'firstName lastName') // Assuming seller is User
+            .lean();
         if (!product) {
             throw new ApiError(404, 'Product not found');
         }
-        // Increment view count
-        await prisma.product.update({
-            where: { id: product.id },
-            data: { viewCount: { increment: 1 } },
-        });
-        res.json({ success: true, data: product });
+        // Increment view count (fire and forget)
+        Product.findByIdAndUpdate(product._id, { $inc: { viewCount: 1 } }).exec();
+        // Since we need sorted variants and filtered reviews which are not simple refs:
+        // Mongoose population for reviews might need a separate Review model query if Reviews are separate collection.
+        // Yes, Review IS a separate model.
+        // So we fetch reviews separately or use virtual populate if setup.
+        // In migration, I created `Review` model. Product model doesn't have `reviews` array of IDs unless I added it.
+        // I did NOT add `reviews` array to Product schema. So I must query Review model.
+        // But wait, existing code expected `product.reviews`.
+        // I should query reviews by productId.
+        const { Review } = await import('../models/review.model.js');
+        const reviews = await Review.find({ product: product._id, isApproved: true })
+            .sort({ createdAt: -1 })
+            .limit(5)
+            .populate('user', 'firstName lastName')
+            .lean();
+        // Sort variants
+        if (product.variants) {
+            product.variants = product.variants
+                .filter((v) => v.isActive)
+                .sort((a, b) => a.displayOrder - b.displayOrder);
+        }
+        res.json({ success: true, data: { ...product, reviews } });
     });
     // Get product by slug
     getProductBySlug = asyncHandler(async (req, res) => {
-        const product = await prisma.product.findFirst({
-            where: { slug: req.params.slug, deletedAt: null },
-            include: {
-                category: true,
-                brand: true,
-                variants: { where: { isActive: true }, orderBy: { displayOrder: 'asc' } },
-                reviews: {
-                    where: { isApproved: true },
-                    take: 5,
-                    orderBy: { createdAt: 'desc' },
-                    include: { user: { select: { firstName: true, lastName: true } } },
-                },
-            },
-        });
+        const product = await Product.findOne({ slug: req.params.slug, deletedAt: null })
+            .populate('category')
+            .populate('brand')
+            .populate('seller', 'firstName lastName')
+            .lean();
         if (!product) {
             throw new ApiError(404, 'Product not found');
         }
-        res.json({ success: true, data: product });
+        const { Review } = await import('../models/review.model.js');
+        const reviews = await Review.find({ product: product._id, isApproved: true })
+            .sort({ createdAt: -1 })
+            .limit(5)
+            .populate('user', 'firstName lastName')
+            .lean();
+        if (product.variants) {
+            product.variants = product.variants
+                .filter((v) => v.isActive)
+                .sort((a, b) => a.displayOrder - b.displayOrder);
+        }
+        res.json({ success: true, data: { ...product, reviews } });
     });
     // Get similar products
     getSimilarProducts = asyncHandler(async (req, res) => {
-        const product = await prisma.product.findUnique({
-            where: { id: req.params.id },
-            select: { categoryId: true, brandId: true },
-        });
+        const product = await Product.findById(req.params.id).select('category brand');
         if (!product) {
             throw new ApiError(404, 'Product not found');
         }
-        const similar = await prisma.product.findMany({
-            where: {
-                id: { not: req.params.id },
-                status: 'ACTIVE',
-                deletedAt: null,
-                OR: [
-                    { categoryId: product.categoryId },
-                    { brandId: product.brandId },
-                ],
-            },
-            take: 8,
-            include: {
-                category: { select: { name: true, slug: true } },
-                brand: { select: { name: true } },
-            },
-        });
+        const similar = await Product.find({
+            _id: { $ne: req.params.id },
+            status: 'ACTIVE',
+            deletedAt: null,
+            $or: [
+                { category: product.category },
+                { brand: product.brand },
+            ],
+        })
+            .limit(8)
+            .populate('category', 'name slug')
+            .populate('brand', 'name')
+            .lean();
         res.json({ success: true, data: similar });
     });
     // Create product (seller/admin)
     createProduct = asyncHandler(async (req, res) => {
         const productData = {
             ...req.body,
-            sellerId: req.user.role === 'SELLER' ? req.user.id : req.body.sellerId,
+            seller: req.user.role === 'SELLER' ? req.user.id : req.body.sellerId,
         };
-        const product = await prisma.product.create({
-            data: productData,
-            include: { category: true, brand: true },
-        });
-        res.status(201).json({ success: true, data: product });
+        const product = await Product.create(productData);
+        // Populate for response
+        const populatedProduct = await Product.findById(product._id)
+            .populate('category')
+            .populate('brand');
+        res.status(201).json({ success: true, data: populatedProduct });
     });
     // Update product
     updateProduct = asyncHandler(async (req, res) => {
         const { id } = req.params;
-        const existing = await prisma.product.findUnique({ where: { id } });
+        const existing = await Product.findById(id);
         if (!existing) {
             throw new ApiError(404, 'Product not found');
         }
         // Sellers can only update their own products
-        if (req.user.role === 'SELLER' && existing.sellerId !== req.user.id) {
+        if (req.user.role === 'SELLER' && existing.seller?.toString() !== req.user.id) {
             throw new ApiError(403, 'Not authorized to update this product');
         }
-        const product = await prisma.product.update({
-            where: { id },
-            data: req.body,
-            include: { category: true, brand: true, variants: true },
-        });
+        const product = await Product.findByIdAndUpdate(id, req.body, { new: true })
+            .populate('category')
+            .populate('brand');
         res.json({ success: true, data: product });
     });
     // Delete product (soft delete)
     deleteProduct = asyncHandler(async (req, res) => {
         const { id } = req.params;
-        await prisma.product.update({
-            where: { id },
-            data: { deletedAt: new Date(), status: 'DISCONTINUED' },
+        await Product.findByIdAndUpdate(id, {
+            deletedAt: new Date(),
+            status: 'DISCONTINUED'
         });
         res.json({ success: true, message: 'Product deleted' });
     });
     // Add variant
     addVariant = asyncHandler(async (req, res) => {
-        const variant = await prisma.productVariant.create({
-            data: {
-                productId: req.params.id,
-                ...req.body,
-            },
-        });
+        const product = await Product.findByIdAndUpdate(req.params.id, { $push: { variants: req.body } }, { new: true });
+        if (!product)
+            throw new ApiError(404, 'Product not found');
+        const variant = product.variants[product.variants.length - 1]; // Last added
         res.status(201).json({ success: true, data: variant });
     });
     // Update variant
     updateVariant = asyncHandler(async (req, res) => {
-        const variant = await prisma.productVariant.update({
-            where: { id: req.params.variantId },
-            data: req.body,
-        });
+        const { variantId } = req.params;
+        const updateData = req.body;
+        const setOptions = {};
+        for (const key in updateData) {
+            setOptions[`variants.$.${key}`] = updateData[key];
+        }
+        const product = await Product.findOneAndUpdate({ 'variants._id': variantId }, { $set: setOptions }, { new: true });
+        if (!product)
+            throw new ApiError(404, 'Variant or Product not found');
+        const variant = product.variants.find((v) => v._id.toString() === variantId);
         res.json({ success: true, data: variant });
     });
     // Delete variant
     deleteVariant = asyncHandler(async (req, res) => {
-        await prisma.productVariant.delete({
-            where: { id: req.params.variantId },
-        });
+        const { variantId } = req.params;
+        await Product.findOneAndUpdate({ 'variants._id': variantId }, { $pull: { variants: { _id: variantId } } });
         res.json({ success: true, message: 'Variant deleted' });
     });
 }

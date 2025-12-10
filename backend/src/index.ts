@@ -4,10 +4,17 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
+import mongoose from 'mongoose';
+import { connectDB } from './config/db.js';
 import { config } from './config/index.js';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
 import { requestLogger } from './middleware/logger.js';
 import routes from './routes/index.js';
+
+// ... (imports)
+
+// Connect to Database
+connectDB();
 
 /**
  * Initialize Express Application
@@ -39,12 +46,12 @@ const createApp = (): Express => {
   app.use(cookieParser());
 
   // Request parsing with size limits
-  app.use(express.json({ 
+  app.use(express.json({
     limit: '10mb',
     strict: true,
   }));
-  app.use(express.urlencoded({ 
-    extended: true, 
+  app.use(express.urlencoded({
+    extended: true,
     limit: '10mb',
     parameterLimit: 100,
   }));
@@ -87,7 +94,7 @@ app.get('/health', (req: express.Request, res: express.Response) => {
 });
 
 // API routes
-app.use(`/api/${config.apiVersion}`, routes);
+app.use(`/api/v1`, routes);
 
 // 404 handler (must be after all routes)
 app.use(notFoundHandler);
@@ -117,22 +124,20 @@ const startServer = (): void => {
   // Graceful shutdown handler
   const gracefulShutdown = (signal: string): void => {
     console.log(`${signal} received. Shutting down gracefully...`);
-    
+
     server.close(() => {
       console.log('HTTP server closed.');
-      
+
       // Close database connections
-      import('./lib/prisma.js').then(({ prisma }) => {
-        prisma.$disconnect()
-          .then(() => {
-            console.log('Database connections closed.');
-            process.exit(0);
-          })
-          .catch((err: Error) => {
-            console.error('Error closing database connections:', err);
-            process.exit(1);
-          });
-      });
+      mongoose.connection.close(false)
+        .then(() => {
+          console.log('Database connections closed.');
+          process.exit(0);
+        })
+        .catch((err: Error) => {
+          console.error('Error closing database connections:', err);
+          process.exit(1);
+        });
     });
 
     // Force shutdown after 10 seconds

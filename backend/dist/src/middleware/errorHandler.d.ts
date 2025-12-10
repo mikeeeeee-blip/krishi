@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from 'express';
-import { Prisma } from '@prisma/client';
 /**
  * Custom API Error Class
  * Extends Error with additional properties for API error handling
@@ -23,6 +22,6 @@ export declare const notFoundHandler: (req: Request, res: Response) => void;
  * Global Error Handler
  * Handles all errors and returns appropriate responses
  */
-export declare const errorHandler: (err: ApiError | Error | Prisma.PrismaClientKnownRequestError | Prisma.PrismaClientValidationError, req: Request, res: Response, _next: NextFunction) => void;
+export declare const errorHandler: (err: any, req: Request, res: Response, _next: NextFunction) => void;
 export declare const asyncHandler: (fn: Function) => (req: Request, res: Response, next: NextFunction) => void;
 //# sourceMappingURL=errorHandler.d.ts.map

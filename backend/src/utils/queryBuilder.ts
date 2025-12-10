@@ -1,10 +1,9 @@
-import { Prisma } from '@prisma/client';
 import { PAGINATION } from '../constants/index.js';
 import { getPagination } from './helpers.js';
 
 /**
  * Query Builder Utilities
- * Helper functions for building Prisma queries
+ * Helper functions for building queries
  */
 
 export interface PaginationParams {
@@ -37,7 +36,7 @@ export const buildPagination = (
 };
 
 /**
- * Build orderBy clause for Prisma queries
+ * Build orderBy clause
  */
 export const buildOrderBy = (
   sortBy?: string,
@@ -55,17 +54,17 @@ export const buildOrderBy = (
 export const buildDateRange = (
   dateFrom?: string | Date,
   dateTo?: string | Date
-): Prisma.DateTimeFilter | undefined => {
+): any => {
   if (!dateFrom && !dateTo) return undefined;
 
-  const filter: Prisma.DateTimeFilter = {};
+  const filter: any = {};
   if (dateFrom) {
-    filter.gte = dateFrom instanceof Date ? dateFrom : new Date(dateFrom);
+    filter.$gte = dateFrom instanceof Date ? dateFrom : new Date(dateFrom);
   }
   if (dateTo) {
     const endDate = dateTo instanceof Date ? dateTo : new Date(dateTo);
     endDate.setHours(23, 59, 59, 999);
-    filter.lte = endDate;
+    filter.$lte = endDate;
   }
   return filter;
 };
@@ -76,18 +75,17 @@ export const buildDateRange = (
 export const buildPriceRange = (
   minPrice?: number | string | undefined,
   maxPrice?: number | string | undefined
-): Prisma.DecimalFilter | undefined => {
+): any => {
   if (!minPrice && !maxPrice) return undefined;
 
-  const filter: Prisma.DecimalFilter = {};
+  const filter: any = {};
   if (minPrice !== undefined) {
     const min = typeof minPrice === 'string' ? Number(minPrice) : minPrice;
-    if (!isNaN(min)) filter.gte = min;
+    if (!isNaN(min)) filter.$gte = min;
   }
   if (maxPrice !== undefined) {
     const max = typeof maxPrice === 'string' ? Number(maxPrice) : maxPrice;
-    if (!isNaN(max)) filter.lte = max;
+    if (!isNaN(max)) filter.$lte = max;
   }
   return filter;
 };
-

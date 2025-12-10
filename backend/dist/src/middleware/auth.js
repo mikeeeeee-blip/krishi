@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import { config } from '../config/index.js';
 import { ApiError } from './errorHandler.js';
-import { prisma } from '../lib/prisma.js';
+import { User } from '../models/user.model.js';
 /**
  * Extract JWT token from request
  * Supports both Authorization header (Bearer token) and httpOnly cookies
@@ -43,16 +43,7 @@ export const authenticate = async (req, res, next) => {
             throw error;
         }
         // Verify user still exists and is active
-        const user = await prisma.user.findUnique({
-            where: { id: decoded.id },
-            select: {
-                id: true,
-                email: true,
-                role: true,
-                status: true,
-                deletedAt: true,
-            },
-        });
+        const user = await User.findById(decoded.id).select('id email role status deletedAt');
         if (!user) {
             throw new ApiError(401, 'User not found');
         }
@@ -86,16 +77,7 @@ export const optionalAuth = async (req, res, next) => {
         }
         try {
             const decoded = jwt.verify(token, config.jwt.secret);
-            const user = await prisma.user.findUnique({
-                where: { id: decoded.id },
-                select: {
-                    id: true,
-                    email: true,
-                    role: true,
-                    status: true,
-                    deletedAt: true,
-                },
-            });
+            const user = await User.findById(decoded.id).select('id email role status deletedAt');
             // Only attach if user exists, is active, and not deleted
             if (user && !user.deletedAt && user.status === 'ACTIVE') {
                 req.user = {
@@ -151,10 +133,7 @@ export const verifyRefreshToken = async (req, res, next) => {
             throw new ApiError(401, 'Invalid token type');
         }
         // Verify user exists
-        const user = await prisma.user.findUnique({
-            where: { id: decoded.id },
-            select: { id: true, email: true, role: true, status: true },
-        });
+        const user = await User.findById(decoded.id).select('id email role status');
         if (!user || user.status !== 'ACTIVE') {
             throw new ApiError(401, 'Invalid refresh token');
         }
