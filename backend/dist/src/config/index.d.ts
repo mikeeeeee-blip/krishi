@@ -2,7 +2,7 @@ export declare const config: {
     nodeEnv: string;
     port: number;
     apiVersion: string;
-    databaseUrl: string;
+    mongoUri: string;
     jwt: {
         secret: string;
         expiresIn: string;

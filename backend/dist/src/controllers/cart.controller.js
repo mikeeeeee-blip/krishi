@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import { Cart } from '../models/cart.model.js';
 import { Product } from '../models/product.model.js';
 import { ApiError, asyncHandler } from '../middleware/errorHandler.js';
@@ -35,9 +36,13 @@ export class CartController {
     });
     // Add to cart
     addToCart = asyncHandler(async (req, res) => {
-        const { productId, variantId, quantity = 1 } = req.body;
+        const { productId, variantId, variantName, quantity = 1 } = req.body;
         if (!req.user) {
             throw new ApiError(HTTP_STATUS.UNAUTHORIZED, 'Please login to add items to cart');
+        }
+        // Validate productId is a valid MongoDB ObjectId
+        if (!productId || !mongoose.Types.ObjectId.isValid(productId)) {
+            throw new ApiError(HTTP_STATUS.BAD_REQUEST, 'Invalid product ID. Product ID must be a valid MongoDB ObjectId.', undefined, true, false, 'INVALID_PRODUCT_ID');
         }
         // Get or create cart
         let cart = await Cart.findOne({ user: req.user.id });
@@ -53,6 +58,8 @@ export class CartController {
             throw new ApiError(400, 'Product is not available');
         }
         let unitPrice = Number(product.salePrice || product.basePrice);
+        let resolvedVariantId = variantId;
+        // If variantId is provided, use it; otherwise try to find by variantName
         if (variantId) {
             const variant = product.variants?.find((v) => v._id.toString() === variantId);
             if (!variant) {
@@ -60,9 +67,17 @@ export class CartController {
             }
             unitPrice = Number(variant.price);
         }
+        else if (variantName && product.variants && product.variants.length > 0) {
+            // Find variant by name
+            const variant = product.variants.find((v) => v.name === variantName);
+            if (variant) {
+                resolvedVariantId = variant._id.toString();
+                unitPrice = Number(variant.price);
+            }
+        }
         // Check if item exists in cart
         const existingItemIndex = cart.items.findIndex((item) => item.product.toString() === productId &&
-            ((!item.variantId && !variantId) || item.variantId === variantId));
+            ((!item.variantId && !resolvedVariantId) || item.variantId === resolvedVariantId));
         if (existingItemIndex > -1) {
             // Update quantity
             cart.items[existingItemIndex].quantity += quantity;
@@ -71,7 +86,7 @@ export class CartController {
             // Add new item
             cart.items.push({
                 product: productId,
-                variantId,
+                variantId: resolvedVariantId,
                 quantity,
                 unitPrice,
             });

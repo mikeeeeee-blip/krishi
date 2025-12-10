@@ -10,9 +10,23 @@ import { config } from './config/index.js';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
 import { requestLogger } from './middleware/logger.js';
 import routes from './routes/index.js';
-// ... (imports)
-// Connect to Database
-connectDB();
+/**
+ * Initialize application
+ * Connects to database first, then starts the server
+ */
+const initializeApp = async () => {
+    try {
+        // Connect to database first
+        console.log('🔄 Connecting to MongoDB...');
+        await connectDB();
+        // Start server after database connection is established
+        startServer();
+    }
+    catch (error) {
+        console.error('❌ Failed to initialize application:', error);
+        process.exit(1);
+    }
+};
 /**
  * Initialize Express Application
  * Sets up all middleware and routes
@@ -27,10 +41,14 @@ const createApp = () => {
         crossOriginEmbedderPolicy: false,
     }));
     // CORS configuration
+    // Allow specific origin: http://localhost:3000 (React frontend)
+    const corsOrigins = process.env.CORS_ORIGIN
+        ? process.env.CORS_ORIGIN.split(',').map(origin => origin.trim())
+        : ['http://localhost:3000'];
     const corsOptions = {
-        origin: config.corsOrigin.split(',').map(origin => origin.trim()),
-        credentials: true,
-        methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+        origin: corsOrigins,
+        credentials: true, // Allow credentials (cookies, authorization headers)
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allowed HTTP methods
         allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
         maxAge: 86400, // 24 hours
     };
@@ -80,7 +98,7 @@ app.get('/health', (req, res) => {
     });
 });
 // API routes
-app.use(`/api/`, routes);
+app.use(`/api/v1`, routes);
 // 404 handler (must be after all routes)
 app.use(notFoundHandler);
 // Global error handler (must be last)
@@ -90,7 +108,14 @@ app.use(errorHandler);
  * Initializes the Express server with graceful shutdown handling
  */
 const startServer = () => {
+    // Verify database is connected before starting server
+    if (mongoose.connection.readyState !== 1) {
+        console.error('❌ ERROR: Database is not connected. Cannot start server.');
+        console.error('   Connection state:', mongoose.connection.readyState);
+        process.exit(1);
+    }
     const server = app.listen(config.port, () => {
+        const dbName = mongoose.connection.name || 'N/A';
         console.log(`
   ╔═══════════════════════════════════════════════════════════╗
   ║                                                           ║
@@ -99,6 +124,7 @@ const startServer = () => {
   ║   Environment: ${config.nodeEnv.padEnd(40)}║
   ║   Server running on: http://localhost:${String(config.port).padEnd(20)}║
   ║   API Version: ${config.apiVersion.padEnd(42)}║
+  ║   Database: ${dbName.padEnd(40)}║
   ║                                                           ║
   ╚═══════════════════════════════════════════════════════════╝
     `);
@@ -140,12 +166,29 @@ const startServer = () => {
     });
 };
 // Vercel serverless function handler
-export default app;
+// For Vercel, we need to ensure DB connection on first invocation
+let dbConnected = false;
+const vercelHandler = async (req, res) => {
+    // Ensure database connection on first invocation
+    if (!dbConnected && mongoose.connection.readyState !== 1) {
+        try {
+            await connectDB();
+            dbConnected = true;
+        }
+        catch (error) {
+            console.error('Failed to connect to database:', error);
+            return res.status(500).json({ success: false, message: 'Database connection failed' });
+        }
+    }
+    // Handle Express app
+    return app(req, res);
+};
+export default vercelHandler;
 // Export handler for Vercel serverless functions
-export const handler = app;
+export const handler = vercelHandler;
 // Start the server only if not running on Vercel
 // Vercel sets VERCEL environment variable
 if (!process.env.VERCEL) {
-    startServer();
+    initializeApp();
 }
 //# sourceMappingURL=index.js.map

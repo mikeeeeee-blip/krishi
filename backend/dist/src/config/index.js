@@ -6,7 +6,7 @@ export const config = {
     port: parseInt(process.env.PORT || '5000', 10),
     apiVersion: process.env.API_VERSION || 'v1',
     // Database
-    databaseUrl: process.env.DATABASE_URL || '',
+    mongoUri: process.env.MONGODB_URI || '',
     // JWT
     jwt: {
         secret: process.env.JWT_SECRET || 'default-secret-change-me',
@@ -17,7 +17,7 @@ export const config = {
     // Bcrypt
     bcryptSaltRounds: parseInt(process.env.BCRYPT_SALT_ROUNDS || '12', 10),
     // CORS
-    corsOrigin: process.env.CORS_ORIGIN || 'http://localhost:3000',
+    corsOrigin: process.env.CORS_ORIGIN || 'http://localhost:3000,http://localhost:5173,http://127.0.0.1:3000',
 };
 export default config;
 //# sourceMappingURL=index.js.map
