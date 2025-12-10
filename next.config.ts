@@ -30,12 +30,9 @@ const nextConfig: NextConfig = {
     };
     return config;
   },
-  // Exclude backend from build output
-  experimental: {
-    outputFileTracingExcludes: {
-      '*': ['./backend/**/*'],
-    },
-  },
+  // Turbopack configuration for Next.js 16
+  // Empty config to silence the warning about webpack/turbopack conflict
+  turbopack: {},
 };
 
 export default nextConfig;
