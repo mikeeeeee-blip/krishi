@@ -1,6 +1,8 @@
 import express, { Express } from 'express';
 import cors from 'cors';
-import helmet from 'helmet';
+import helmetModule from 'helmet';
+// Helmet v8+ ES module compatibility
+const helmet = (helmetModule as any).default || helmetModule;
 import morgan from 'morgan';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
@@ -41,7 +43,7 @@ const createApp = (): Express => {
 
   // Security middleware
   app.use(helmet({
-    contentSecurityPolicy: config.nodeEnv === 'production',
+    contentSecurityPolicy: config.nodeEnv === 'production' ? {} : false,
     crossOriginEmbedderPolicy: false,
   }));
 
