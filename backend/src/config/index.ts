@@ -23,7 +23,7 @@ export const config = {
   bcryptSaltRounds: parseInt(process.env.BCRYPT_SALT_ROUNDS || '12', 10),
 
   // CORS
-  corsOrigin: process.env.CORS_ORIGIN || 'http://localhost:3000,http://localhost:5173,http://127.0.0.1:3000',
+  corsOrigin: process.env.CORS_ORIGIN || 'http://localhost:3000,https://krishi-three.vercel.app',
 };
 
 export default config;

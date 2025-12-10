@@ -48,10 +48,11 @@ const createApp = (): Express => {
   }));
 
   // CORS configuration
-  // Allow specific origin: http://localhost:3000 (React frontend)
-  const corsOrigins = process.env.CORS_ORIGIN
-    ? process.env.CORS_ORIGIN.split(',').map(origin => origin.trim())
-    : ['http://localhost:3000'];
+  // Allow specific origins: localhost for development and Vercel deployment for production
+  const corsOrigins = config.corsOrigin
+    .split(',')
+    .map(origin => origin.trim())
+    .filter(origin => origin.length > 0);
 
   const corsOptions = {
     origin: corsOrigins,
