@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Search, ShoppingCart, User, Truck, Menu, X, LogOut, Package } from 'lucide-react';
+import { Search, ShoppingCart, User, Truck, Menu, X, LogOut, Package, LayoutDashboard } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/contexts/CartContext';
@@ -44,8 +44,8 @@ export default function Header({ onMenuToggle, isMenuOpen = false }: HeaderProps
   };
 
   return (
-    <header className="bg-white shadow-md border-b border-gray-200 relative z-30 w-full">
-      <div className="w-full px-3 sm:px-4 md:px-6 max-w-7xl mx-auto">
+    <header className="bg-white shadow-sm border-b border-gray-100 relative z-[1001] w-full sticky top-0 backdrop-blur-sm bg-white/95">
+      <div className="w-full px-4 sm:px-6 md:px-8 max-w-7xl mx-auto">
         {/* Mobile Layout */}
         <div className="lg:hidden">
           {/* Top Row: Menu, Logo, Icons */}
@@ -53,7 +53,7 @@ export default function Header({ onMenuToggle, isMenuOpen = false }: HeaderProps
             {/* Menu Button */}
             <button
               onClick={onMenuToggle}
-              className="flex-shrink-0 p-2 text-gray-700 hover:text-green-600 transition-colors"
+              className="flex-shrink-0 p-2.5 text-gray-700 hover:text-green-600 hover:bg-gray-50 rounded-lg transition-all duration-200 active:scale-95"
               aria-label="Toggle menu"
             >
               {isMenuOpen ? (
@@ -69,21 +69,21 @@ export default function Header({ onMenuToggle, isMenuOpen = false }: HeaderProps
             </Link>
 
             {/* Right Icons: Delivery Truck, Shopping Cart, User */}
-            <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
-              <button className="text-gray-700 hover:text-green-600 transition-colors p-1.5 flex items-center justify-center">
-                <Truck size={18} className="sm:w-5 sm:h-5" />
+            <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+              <button className="text-gray-700 hover:text-green-600 hover:bg-gray-50 rounded-lg transition-all duration-200 p-2 active:scale-95">
+                <Truck size={20} className="sm:w-5 sm:h-5" />
               </button>
-              <Link href="/cart" className="relative text-gray-700 hover:text-green-600 transition-colors p-1.5 flex items-center justify-center">
-                <ShoppingCart size={18} className="sm:w-5 sm:h-5" />
+              <Link href="/cart" className="relative text-gray-700 hover:text-green-600 hover:bg-gray-50 rounded-lg transition-all duration-200 p-2 active:scale-95">
+                <ShoppingCart size={20} className="sm:w-5 sm:h-5" />
                 {cartCount > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center font-semibold">
+                  <span className="absolute -top-1 -right-1 bg-gradient-to-br from-red-500 to-red-600 text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center shadow-lg border-2 border-white">
                     {cartCount > 9 ? '9+' : cartCount}
                   </span>
                 )}
               </Link>
               {isAuthenticated ? (
                 <Link
-                  href="/my-orders"
+                  href={user?.role === 'ADMIN' ? '/admin/orders' : '/my-orders'}
                   className="text-gray-700 hover:text-green-600 transition-colors p-1.5 flex items-center justify-center"
                 >
                   <User size={18} className="sm:w-5 sm:h-5" />
@@ -106,93 +106,142 @@ export default function Header({ onMenuToggle, isMenuOpen = false }: HeaderProps
               <input
                 type="text"
                 placeholder="Search for products..."
-                className="w-full pl-10 pr-4 py-2.5 sm:py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 text-sm sm:text-base"
+                className="w-full pl-10 pr-4 py-2.5 sm:py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm sm:text-base transition-all duration-200 bg-gray-50 focus:bg-white"
               />
             </div>
           </div>
         </div>
 
         {/* Desktop/Tablet Layout */}
-        <div className="hidden lg:flex items-center justify-between py-4 md:py-5 gap-4 md:gap-6">
+        <div className="hidden lg:flex items-center justify-between py-3 md:py-4 gap-6 md:gap-8">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 flex-shrink-0">
-           <Image src='/logo.png' alt='logo' className='object-cover' height={100} width={200}></Image>
+          <Link href="/" className="flex items-center gap-2 flex-shrink-0 hover:opacity-90 transition-opacity duration-200">
+           <Image src='/logo.png' alt='logo' className='object-cover h-auto' height={100} width={200} priority></Image>
           </Link>
 
           {/* Search Bar */}
-          <div className="flex-1 max-w-2xl flex items-center gap-2 mx-2 md:mx-4">
-            <div className="flex-1 relative">
+          <div className="flex-1 max-w-2xl flex items-center gap-3 mx-4 md:mx-6">
+            <div className="flex-1 relative group">
+              <Search size={18} className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-green-600 transition-colors" />
               <input
                 type="text"
                 placeholder="Search for products..."
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-green-500 text-sm md:text-base h-[42px] md:h-[44px]"
+                className="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm md:text-base h-[46px] bg-gray-50 focus:bg-white transition-all duration-200"
               />
             </div>
-            <button className="bg-[#2563eb] text-white px-4 md:px-5 py-0 rounded-r-md hover:bg-[#1d4ed8] flex items-center justify-center transition-colors h-[42px] md:h-[44px] min-w-[42px] md:min-w-[44px] flex-shrink-0">
+            <button className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-5 py-0 rounded-r-lg hover:from-blue-700 hover:to-blue-800 flex items-center justify-center transition-all duration-200 h-[46px] min-w-[46px] flex-shrink-0 shadow-md hover:shadow-lg active:scale-95">
               <Search size={18} className="md:w-5 md:h-5" />
             </button>
-            <button className="bg-[#16a34a] text-white px-4 md:px-5 py-2.5 rounded-md hover:bg-[#15803d] flex items-center gap-1.5 text-xs md:text-sm whitespace-nowrap hidden xl:flex transition-colors font-semibold h-[42px] md:h-[44px] shadow-sm">
+            <button className="bg-gradient-to-r from-green-600 to-green-700 text-white px-5 py-3 rounded-lg hover:from-green-700 hover:to-green-800 flex items-center gap-2 text-xs md:text-sm whitespace-nowrap hidden xl:flex transition-all duration-200 font-semibold h-[46px] shadow-md hover:shadow-lg active:scale-95">
               <Search size={16} />
               <span>Search by Technical Name</span>
             </button>
           </div>
 
           {/* User Actions */}
-          <div className="flex items-center gap-3 md:gap-4 lg:gap-5 flex-shrink-0">
-            <button className="flex flex-col items-center gap-0.5 text-gray-700 hover:text-green-600 transition-colors text-xs md:text-sm px-2 py-1.5">
-              <Truck size={20} className="md:w-6 md:h-6" />
-              <span className="whitespace-nowrap font-medium">Track Order</span>
+          <div className="flex items-center gap-2 md:gap-3 flex-shrink-0">
+            <button className="flex flex-col items-center gap-1 text-gray-700 hover:text-green-600 hover:bg-gray-50 rounded-lg transition-all duration-200 text-xs md:text-sm px-3 py-2 group">
+              <Truck size={20} className="md:w-5 md:h-5 group-hover:scale-110 transition-transform" />
+              <span className="whitespace-nowrap font-medium text-[11px] md:text-xs">Track Order</span>
             </button>
-            <Link href="/cart" className="relative flex flex-col items-center gap-0.5 text-gray-700 hover:text-green-600 transition-colors text-xs md:text-sm px-2 py-1.5">
-              <ShoppingCart size={20} className="md:w-6 md:h-6" />
-              <span className="whitespace-nowrap font-medium">Cart</span>
+            <Link href="/cart" className="relative flex flex-col items-center gap-1 text-gray-700 hover:text-green-600 hover:bg-gray-50 rounded-lg transition-all duration-200 text-xs md:text-sm px-3 py-2 group">
+              <ShoppingCart size={20} className="md:w-5 md:h-5 group-hover:scale-110 transition-transform" />
+              <span className="whitespace-nowrap font-medium text-[11px] md:text-xs">Cart</span>
               {cartCount > 0 && (
-                <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-semibold">
-                  {cartCount}
+                <span className="absolute -top-1 -right-1 bg-gradient-to-br from-red-500 to-red-600 text-white text-[10px] font-bold rounded-full min-w-[20px] h-5 flex items-center justify-center shadow-lg border-2 border-white px-1">
+                  {cartCount > 9 ? '9+' : cartCount}
                 </span>
               )}
             </Link>
-            <div className="relative">
+            <div className="relative z-[1002]">
               {isAuthenticated ? (
                 <div className="relative" ref={userMenuRef}>
                   <button
                     onClick={() => setShowUserMenu(!showUserMenu)}
-                    className="flex flex-col items-center gap-0.5 text-gray-700 hover:text-green-600 transition-colors text-xs md:text-sm px-2 py-1.5"
+                    className={`flex flex-col items-center gap-1 text-gray-700 transition-all duration-200 text-xs md:text-sm px-3 py-2 rounded-lg ${
+                      showUserMenu 
+                        ? 'text-green-600 bg-green-50 shadow-sm ring-2 ring-green-200' 
+                        : 'hover:text-green-600 hover:bg-gray-50'
+                    }`}
+                    aria-label="My Account"
+                    aria-expanded={showUserMenu}
                   >
-                    <User size={20} className="md:w-6 md:h-6" />
-                    <span className="whitespace-nowrap font-medium">My Account</span>
+                    <User size={20} className="md:w-5 md:h-5" />
+                    <span className="whitespace-nowrap font-medium text-[11px] md:text-xs">My Account</span>
                   </button>
                   {showUserMenu && (
-                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
-                      <div className="px-4 py-2 border-b border-gray-200">
-                        <p className="text-sm font-semibold text-gray-900">{user?.firstName}</p>
-                        <p className="text-xs text-gray-600 truncate">{user?.email}</p>
+                    <div className="absolute right-0 mt-3 w-64 bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden z-[1002] transform transition-all duration-300 ease-out origin-top-right">
+                      {/* User Info Section */}
+                      <div className="px-5 py-4 bg-gradient-to-br from-green-50 via-emerald-50 to-blue-50 border-b border-gray-100">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex items-center gap-3 flex-1 min-w-0">
+                            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow-md">
+                              <User size={18} className="text-white" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-bold text-gray-900 truncate">
+                                {user?.firstName} {user?.lastName || ''}
+                              </p>
+                              <p className="text-xs text-gray-600 truncate mt-0.5">{user?.email}</p>
+                            </div>
+                          </div>
+                          {user?.role === 'ADMIN' && (
+                            <span className="flex-shrink-0 inline-flex items-center px-2.5 py-1 text-xs font-bold bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-full whitespace-nowrap shadow-sm">
+                              Admin
+                            </span>
+                          )}
+                        </div>
                       </div>
-                      <Link
-                        href="/my-orders"
-                        onClick={() => setShowUserMenu(false)}
-                        className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                      >
-                        <Package className="h-4 w-4" />
-                        My Orders
-                      </Link>
-                      <button
-                        onClick={handleLogout}
-                        className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50"
-                      >
-                        <LogOut className="h-4 w-4" />
-                        Logout
-                      </button>
+                      
+                      {/* Menu Items */}
+                      <div className="py-2">
+                        {user?.role === 'ADMIN' ? (
+                          <Link
+                            href="/admin/orders"
+                            onClick={() => setShowUserMenu(false)}
+                            className="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-gradient-to-r hover:from-green-50 hover:to-emerald-50 hover:text-green-700 transition-all duration-200 group mx-2 rounded-lg"
+                          >
+                            <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-gray-100 group-hover:bg-green-100 flex items-center justify-center transition-colors">
+                              <LayoutDashboard className="h-4 w-4 text-gray-600 group-hover:text-green-600 transition-colors" />
+                            </div>
+                            <span className="font-semibold">Admin Dashboard</span>
+                          </Link>
+                        ) : (
+                          <Link
+                            href="/my-orders"
+                            onClick={() => setShowUserMenu(false)}
+                            className="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-gradient-to-r hover:from-green-50 hover:to-emerald-50 hover:text-green-700 transition-all duration-200 group mx-2 rounded-lg"
+                          >
+                            <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-gray-100 group-hover:bg-green-100 flex items-center justify-center transition-colors">
+                              <Package className="h-4 w-4 text-gray-600 group-hover:text-green-600 transition-colors" />
+                            </div>
+                            <span className="font-semibold">My Orders</span>
+                          </Link>
+                        )}
+                        
+                        {/* Divider */}
+                        <div className="my-2 mx-2 border-t border-gray-100"></div>
+                        
+                        <button
+                          onClick={handleLogout}
+                          className="w-full flex items-center gap-3 px-5 py-3 text-sm text-red-600 hover:bg-gradient-to-r hover:from-red-50 hover:to-pink-50 hover:text-red-700 transition-all duration-200 group mx-2 rounded-lg"
+                        >
+                          <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-red-50 group-hover:bg-red-100 flex items-center justify-center transition-colors">
+                            <LogOut className="h-4 w-4 text-red-500 group-hover:text-red-600 transition-colors" />
+                          </div>
+                          <span className="font-semibold">Logout</span>
+                        </button>
+                      </div>
                     </div>
                   )}
                 </div>
               ) : (
                 <Link
                   href="/login"
-                  className="flex flex-col items-center gap-0.5 text-gray-700 hover:text-green-600 transition-colors text-xs md:text-sm px-2 py-1.5"
+                  className="flex flex-col items-center gap-1 text-gray-700 hover:text-green-600 hover:bg-gray-50 rounded-lg transition-all duration-200 text-xs md:text-sm px-3 py-2 group"
                 >
-                  <User size={20} className="md:w-6 md:h-6" />
-                  <span className="whitespace-nowrap font-medium">Login</span>
+                  <User size={20} className="md:w-5 md:h-5 group-hover:scale-110 transition-transform" />
+                  <span className="whitespace-nowrap font-medium text-[11px] md:text-xs">Login</span>
                 </Link>
               )}
             </div>

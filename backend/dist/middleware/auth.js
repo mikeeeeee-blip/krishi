@@ -114,7 +114,7 @@ export const authorize = (...roles) => {
 /**
  * Admin only middleware
  */
-export const adminOnly = authorize('ADMIN', 'SUPER_ADMIN');
+export const adminOnly = authorize('ADMIN');
 /**
  * Seller middleware (sellers, admins, super admins)
  */

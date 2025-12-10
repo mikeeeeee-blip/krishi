@@ -181,23 +181,20 @@ const categories: Category[] = [
 ];
 
 export default function Navigation({ isMobileMenuOpen = false, onCloseMobileMenu }: NavigationProps) {
-  const [hoveredCategory, setHoveredCategory] = useState<string | null>(null);
+  const [clickedCategory, setClickedCategory] = useState<string | null>(null);
   const [expandedMobileCategory, setExpandedMobileCategory] = useState<string | null>(null);
   const buttonRefs = useRef<{ [key: string]: HTMLButtonElement | null }>({});
   const [dropdownPosition, setDropdownPosition] = useState<{ top: number; left: number; width: number; height: number } | null>(null);
   const [mounted, setMounted] = useState(false);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const navScrollRef = useRef<HTMLDivElement | null>(null);
   const mobileMenuRef = useRef<HTMLDivElement | null>(null);
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     // Set mounted state - this is safe to call in useEffect for hydration detection
     const timer = setTimeout(() => setMounted(true), 0);
     return () => {
       clearTimeout(timer);
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
     };
   }, []);
 
@@ -226,9 +223,32 @@ export default function Navigation({ isMobileMenuOpen = false, onCloseMobileMenu
     };
   }, [isMobileMenuOpen, onCloseMobileMenu]);
 
+  // Close dropdown when clicking outside (desktop)
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        clickedCategory &&
+        buttonRefs.current[clickedCategory] &&
+        !buttonRefs.current[clickedCategory]?.contains(event.target as Node) &&
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setClickedCategory(null);
+      }
+    };
+
+    if (clickedCategory) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [clickedCategory]);
+
   const updateDropdownPosition = useCallback(() => {
-    if (hoveredCategory && buttonRefs.current[hoveredCategory]) {
-      const button = buttonRefs.current[hoveredCategory];
+    if (clickedCategory && buttonRefs.current[clickedCategory]) {
+      const button = buttonRefs.current[clickedCategory];
       if (button) {
         const rect = button.getBoundingClientRect();
         
@@ -256,12 +276,12 @@ export default function Navigation({ isMobileMenuOpen = false, onCloseMobileMenu
     } else {
       setDropdownPosition(null);
     }
-  }, [hoveredCategory]);
+  }, [clickedCategory]);
 
   useEffect(() => {
     updateDropdownPosition();
     
-    if (hoveredCategory) {
+    if (clickedCategory) {
       const handleScroll = () => updateDropdownPosition();
       const handleResize = () => {
         // Update position on resize to maintain full width
@@ -285,14 +305,15 @@ export default function Navigation({ isMobileMenuOpen = false, onCloseMobileMenu
         }
       };
     }
-  }, [hoveredCategory, updateDropdownPosition]);
+  }, [clickedCategory, updateDropdownPosition]);
 
-  const currentCategory = categories.find(cat => cat.name === hoveredCategory);
+  const currentCategory = categories.find(cat => cat.name === clickedCategory);
   const hasItems = currentCategory?.items && currentCategory.items.length > 0;
 
   // Dropdown content rendered inline to avoid creating components during render
-  const dropdownContent = hoveredCategory && hasItems && dropdownPosition ? (
+  const dropdownContent = clickedCategory && hasItems && dropdownPosition ? (
     <div 
+      ref={dropdownRef}
       className="bg-white text-gray-900 shadow-xl border border-gray-300 w-screen"
       style={{ 
         position: 'fixed',
@@ -305,18 +326,6 @@ export default function Navigation({ isMobileMenuOpen = false, onCloseMobileMenu
         overflow: 'hidden',
         display: 'flex',
         flexDirection: 'column',
-      }}
-      onMouseEnter={(e) => {
-        e.stopPropagation();
-        if (timeoutRef.current) {
-          clearTimeout(timeoutRef.current);
-          timeoutRef.current = null;
-        }
-        setHoveredCategory(hoveredCategory);
-      }}
-      onMouseLeave={(e) => {
-        e.stopPropagation();
-        setHoveredCategory(null);
       }}
     >
       <div className="flex flex-col md:flex-row h-full w-full">
@@ -363,7 +372,7 @@ export default function Navigation({ isMobileMenuOpen = false, onCloseMobileMenu
               </svg>
             </div>
             <p className="text-gray-700 font-medium text-xs mb-1">
-              Hover over a category to see subcategories
+              Click on a category to see subcategories
             </p>
             <p className="text-gray-500 text-xs">
               Browse through our extensive product range
@@ -394,48 +403,40 @@ export default function Navigation({ isMobileMenuOpen = false, onCloseMobileMenu
             }}
           >
             {categories.map((category) => {
-              const isHovered = hoveredCategory === category.name;
+              const isClicked = clickedCategory === category.name;
               const hasItems = category.items && category.items.length > 0;
               
               return (
                 <div
                   key={category.name}
                   className="relative flex-shrink-0"
-                  onMouseEnter={() => {
-                    if (timeoutRef.current) {
-                      clearTimeout(timeoutRef.current);
-                      timeoutRef.current = null;
-                    }
-                    if (hasItems) {
-                      setHoveredCategory(category.name);
-                    }
-                  }}
-                  onMouseLeave={() => {
-                    // Small delay to allow moving to dropdown
-                    timeoutRef.current = setTimeout(() => {
-                      if (hoveredCategory === category.name) {
-                        setHoveredCategory(null);
-                      }
-                    }, 100);
-                  }}
                 >
-                  <Link
-                    href={`/categories/${categorySlugs[category.name as CategoryType] || category.name.toLowerCase().replace(/\s+/g, '-')}`}
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      if (hasItems) {
+                        // Toggle dropdown: if already open, close it; otherwise open it
+                        setClickedCategory(isClicked ? null : category.name);
+                      } else {
+                        // If no items, navigate directly
+                        window.location.href = `/categories/${categorySlugs[category.name as CategoryType] || category.name.toLowerCase().replace(/\s+/g, '-')}`;
+                      }
+                    }}
                     ref={(el) => { buttonRefs.current[category.name] = el as HTMLButtonElement | null; }}
                     className={`px-2 sm:px-2.5 md:px-3 lg:px-4 py-0 transition-colors flex items-center gap-0.5 sm:gap-1 whitespace-nowrap text-xs sm:text-sm md:text-base font-medium ${
-                      isHovered ? 'bg-[#15803d]' : 'hover:bg-[#15803d]'
+                      isClicked ? 'bg-[#15803d]' : 'hover:bg-[#15803d]'
                     }`}
                     style={{ height: '44px', lineHeight: '44px', display: 'flex', alignItems: 'center' }}
                   >
                     <span className="truncate max-w-[120px] sm:max-w-none">{category.name}</span>
                     {hasItems && (
-                      isHovered ? (
+                      isClicked ? (
                         <ChevronUp size={12} className="sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 flex-shrink-0" />
                       ) : (
                         <ChevronDown size={12} className="sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 flex-shrink-0" />
                       )
                     )}
-                  </Link>
+                  </button>
                 </div>
               );
             })}
@@ -569,7 +570,7 @@ export default function Navigation({ isMobileMenuOpen = false, onCloseMobileMenu
       )}
       
       {/* Render dropdown outside navbar using portal (Desktop only) */}
-      {mounted && hoveredCategory && hasItems && typeof window !== 'undefined' && createPortal(
+      {mounted && clickedCategory && hasItems && typeof window !== 'undefined' && createPortal(
         dropdownContent,
         document.body
       )}

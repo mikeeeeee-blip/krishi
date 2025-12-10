@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 export declare const Cart: mongoose.Model<{
     isActive: boolean;
+    user: mongoose.Types.ObjectId;
     items: mongoose.Types.DocumentArray<{
         product: mongoose.Types.ObjectId;
         quantity: number;
@@ -17,13 +18,16 @@ export declare const Cart: mongoose.Model<{
         unitPrice: number;
         variantId?: string | null | undefined;
     } & mongoose.DefaultTimestampProps>;
-    user?: mongoose.Types.ObjectId | null | undefined;
+    userId: string;
+    userName?: string | null | undefined;
+    userEmail?: string | null | undefined;
     sessionId?: string | null | undefined;
     expiresAt?: NativeDate | null | undefined;
 } & mongoose.DefaultTimestampProps, {}, {}, {
     id: string;
 }, mongoose.Document<unknown, {}, {
     isActive: boolean;
+    user: mongoose.Types.ObjectId;
     items: mongoose.Types.DocumentArray<{
         product: mongoose.Types.ObjectId;
         quantity: number;
@@ -40,7 +44,9 @@ export declare const Cart: mongoose.Model<{
         unitPrice: number;
         variantId?: string | null | undefined;
     } & mongoose.DefaultTimestampProps>;
-    user?: mongoose.Types.ObjectId | null | undefined;
+    userId: string;
+    userName?: string | null | undefined;
+    userEmail?: string | null | undefined;
     sessionId?: string | null | undefined;
     expiresAt?: NativeDate | null | undefined;
 } & mongoose.DefaultTimestampProps, {
@@ -49,6 +55,7 @@ export declare const Cart: mongoose.Model<{
     timestamps: true;
 }> & Omit<{
     isActive: boolean;
+    user: mongoose.Types.ObjectId;
     items: mongoose.Types.DocumentArray<{
         product: mongoose.Types.ObjectId;
         quantity: number;
@@ -65,7 +72,9 @@ export declare const Cart: mongoose.Model<{
         unitPrice: number;
         variantId?: string | null | undefined;
     } & mongoose.DefaultTimestampProps>;
-    user?: mongoose.Types.ObjectId | null | undefined;
+    userId: string;
+    userName?: string | null | undefined;
+    userEmail?: string | null | undefined;
     sessionId?: string | null | undefined;
     expiresAt?: NativeDate | null | undefined;
 } & mongoose.DefaultTimestampProps & {
@@ -78,6 +87,7 @@ export declare const Cart: mongoose.Model<{
     timestamps: true;
 }, {
     isActive: boolean;
+    user: mongoose.Types.ObjectId;
     items: mongoose.Types.DocumentArray<{
         product: mongoose.Types.ObjectId;
         quantity: number;
@@ -94,11 +104,14 @@ export declare const Cart: mongoose.Model<{
         unitPrice: number;
         variantId?: string | null | undefined;
     } & mongoose.DefaultTimestampProps>;
-    user?: mongoose.Types.ObjectId | null | undefined;
+    userId: string;
+    userName?: string | null | undefined;
+    userEmail?: string | null | undefined;
     sessionId?: string | null | undefined;
     expiresAt?: NativeDate | null | undefined;
 } & mongoose.DefaultTimestampProps, mongoose.Document<unknown, {}, {
     isActive: boolean;
+    user: mongoose.Types.ObjectId;
     items: mongoose.Types.DocumentArray<{
         product: mongoose.Types.ObjectId;
         quantity: number;
@@ -115,7 +128,9 @@ export declare const Cart: mongoose.Model<{
         unitPrice: number;
         variantId?: string | null | undefined;
     } & mongoose.DefaultTimestampProps>;
-    user?: mongoose.Types.ObjectId | null | undefined;
+    userId: string;
+    userName?: string | null | undefined;
+    userEmail?: string | null | undefined;
     sessionId?: string | null | undefined;
     expiresAt?: NativeDate | null | undefined;
 } & mongoose.DefaultTimestampProps, {
@@ -124,6 +139,7 @@ export declare const Cart: mongoose.Model<{
     timestamps: true;
 }>> & Omit<{
     isActive: boolean;
+    user: mongoose.Types.ObjectId;
     items: mongoose.Types.DocumentArray<{
         product: mongoose.Types.ObjectId;
         quantity: number;
@@ -140,7 +156,9 @@ export declare const Cart: mongoose.Model<{
         unitPrice: number;
         variantId?: string | null | undefined;
     } & mongoose.DefaultTimestampProps>;
-    user?: mongoose.Types.ObjectId | null | undefined;
+    userId: string;
+    userName?: string | null | undefined;
+    userEmail?: string | null | undefined;
     sessionId?: string | null | undefined;
     expiresAt?: NativeDate | null | undefined;
 } & mongoose.DefaultTimestampProps & {
@@ -154,6 +172,7 @@ export declare const Cart: mongoose.Model<{
 } | {
     [x: string]: mongoose.SchemaDefinitionProperty<any, any, mongoose.Document<unknown, {}, {
         isActive: boolean;
+        user: mongoose.Types.ObjectId;
         items: mongoose.Types.DocumentArray<{
             product: mongoose.Types.ObjectId;
             quantity: number;
@@ -170,7 +189,9 @@ export declare const Cart: mongoose.Model<{
             unitPrice: number;
             variantId?: string | null | undefined;
         } & mongoose.DefaultTimestampProps>;
-        user?: mongoose.Types.ObjectId | null | undefined;
+        userId: string;
+        userName?: string | null | undefined;
+        userEmail?: string | null | undefined;
         sessionId?: string | null | undefined;
         expiresAt?: NativeDate | null | undefined;
     } & mongoose.DefaultTimestampProps, {
@@ -179,6 +200,7 @@ export declare const Cart: mongoose.Model<{
         timestamps: true;
     }>> & Omit<{
         isActive: boolean;
+        user: mongoose.Types.ObjectId;
         items: mongoose.Types.DocumentArray<{
             product: mongoose.Types.ObjectId;
             quantity: number;
@@ -195,7 +217,9 @@ export declare const Cart: mongoose.Model<{
             unitPrice: number;
             variantId?: string | null | undefined;
         } & mongoose.DefaultTimestampProps>;
-        user?: mongoose.Types.ObjectId | null | undefined;
+        userId: string;
+        userName?: string | null | undefined;
+        userEmail?: string | null | undefined;
         sessionId?: string | null | undefined;
         expiresAt?: NativeDate | null | undefined;
     } & mongoose.DefaultTimestampProps & {
@@ -207,6 +231,7 @@ export declare const Cart: mongoose.Model<{
     }> | undefined;
 }, {
     isActive: boolean;
+    user: mongoose.Types.ObjectId;
     items: mongoose.Types.DocumentArray<{
         product: mongoose.Types.ObjectId;
         quantity: number;
@@ -253,7 +278,9 @@ export declare const Cart: mongoose.Model<{
         updatedAt: NativeDate;
         _id: string;
     })>;
-    user?: mongoose.Types.ObjectId | null | undefined;
+    userId: string;
+    userName?: string | null | undefined;
+    userEmail?: string | null | undefined;
     sessionId?: string | null | undefined;
     expiresAt?: NativeDate | null | undefined;
     createdAt: NativeDate;
@@ -264,6 +291,7 @@ export declare const Cart: mongoose.Model<{
     __v: number;
 }>, {
     isActive: boolean;
+    user: mongoose.Types.ObjectId;
     items: mongoose.Types.DocumentArray<{
         product: mongoose.Types.ObjectId;
         quantity: number;
@@ -310,7 +338,9 @@ export declare const Cart: mongoose.Model<{
         updatedAt: NativeDate;
         _id: string;
     })>;
-    user?: mongoose.Types.ObjectId | null | undefined;
+    userId: string;
+    userName?: string | null | undefined;
+    userEmail?: string | null | undefined;
     sessionId?: string | null | undefined;
     expiresAt?: NativeDate | null | undefined;
     createdAt: NativeDate;

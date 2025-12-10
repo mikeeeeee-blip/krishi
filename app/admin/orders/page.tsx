@@ -7,6 +7,7 @@ import TopBar from '@/components/TopBar';
 import Header from '@/components/Header';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
+import AdminRouteGuard from '@/components/AdminRouteGuard';
 import OrderCard from '@/components/orders/OrderCard';
 import { getAllOrders, getOrderStats } from '@/lib/api/orders';
 import {
@@ -26,8 +27,10 @@ import OrderSummaryCard from '@/components/admin/OrderSummaryCard';
 const ORDER_STATUSES = [
   'ALL',
   'PENDING',
+  'CONFIRMED',
   'PROCESSING',
   'SHIPPED',
+  'OUT_FOR_DELIVERY',
   'DELIVERED',
   'CANCELLED',
 ];
@@ -133,10 +136,11 @@ export default function AdminOrdersPage() {
   };
 
   return (
-    <div className="min-h-screen w-screen overflow-x-hidden bg-gray-50">
-      <TopBar />
-      <Header onMenuToggle={toggleMobileMenu} isMenuOpen={isMobileMenuOpen} />
-      <Navigation isMobileMenuOpen={isMobileMenuOpen} onCloseMobileMenu={closeMobileMenu} />
+    <AdminRouteGuard>
+      <div className="min-h-screen w-screen overflow-x-hidden bg-gray-50">
+        <TopBar />
+        <Header onMenuToggle={toggleMobileMenu} isMenuOpen={isMobileMenuOpen} />
+        <Navigation isMobileMenuOpen={isMobileMenuOpen} onCloseMobileMenu={closeMobileMenu} />
 
       <main className="container mx-auto px-4 py-8 max-w-7xl">
         {/* Header */}
@@ -358,9 +362,10 @@ export default function AdminOrdersPage() {
             )}
           </>
         )}
-      </main>
+        </main>
 
-      <Footer />
-    </div>
+        <Footer />
+      </div>
+    </AdminRouteGuard>
   );
 }

@@ -2,10 +2,25 @@ import { Request, Response } from 'express';
 import mongoose from 'mongoose';
 import { Cart } from '../models/cart.model.js';
 import { Product } from '../models/product.model.js';
+import { userModel } from '../models/user.model.js';
 import { ApiError, asyncHandler } from '../middleware/errorHandler.js';
 import { HTTP_STATUS } from '../constants/index.js';
 
 export class CartController {
+  // Helper function to get user information
+  private async getUserInfo(userId: string) {
+    const user = await userModel.findById(userId).select('id email firstName lastName displayName');
+    if (!user) {
+      return { userId: '', userName: '', userEmail: '' };
+    }
+    const userName = user.displayName || `${user.firstName} ${user.lastName || ''}`.trim() || user.email;
+    return {
+      userId: user.id,
+      userName,
+      userEmail: user.email,
+    };
+  }
+
   // Get cart
   getCart = asyncHandler(async (req: Request, res: Response) => {
     let cart: any = null;
@@ -13,12 +28,31 @@ export class CartController {
     if (req.user) {
       cart = await Cart.findOne({ user: req.user.id })
         .populate('items.product', 'name slug images basePrice salePrice stockQuantity status');
+
+      // If cart exists, ensure user information is up-to-date
+      if (cart) {
+        const userInfo = await this.getUserInfo(req.user.id);
+        if (!cart.userId || !cart.userName || cart.userId !== userInfo.userId) {
+          cart.userId = userInfo.userId;
+          cart.userName = userInfo.userName;
+          cart.userEmail = userInfo.userEmail;
+          await cart.save();
+        }
+      }
     }
 
     if (!cart) {
       return res.json({
         success: true,
-        data: { items: [], subtotal: 0, itemCount: 0, id: null },
+        data: {
+          items: [],
+          subtotal: 0,
+          itemCount: 0,
+          id: null,
+          userId: req.user?.id || null,
+          userName: null,
+          userEmail: null,
+        },
       });
     }
 
@@ -35,9 +69,14 @@ export class CartController {
       success: true,
       data: {
         id: cart._id,
+        userId: cart.userId || cart.user?.toString() || req.user?.id || null,
+        userName: cart.userName || null,
+        userEmail: cart.userEmail || null,
         items: cart.items,
         subtotal,
         itemCount: cart.items.reduce((sum: number, item: any) => sum + item.quantity, 0),
+        createdAt: cart.createdAt,
+        updatedAt: cart.updatedAt,
       },
     });
   });
@@ -62,11 +101,28 @@ export class CartController {
       );
     }
 
+    // Get user information
+    const userInfo = await this.getUserInfo(req.user.id);
+
     // Get or create cart
     let cart: any = await Cart.findOne({ user: req.user.id });
 
     if (!cart) {
-      cart = await Cart.create({ user: req.user.id, items: [] });
+      // Create new cart with user information
+      cart = await Cart.create({
+        user: req.user.id,
+        userId: userInfo.userId,
+        userName: userInfo.userName,
+        userEmail: userInfo.userEmail,
+        items: [],
+      });
+    } else {
+      // Update user information if cart exists but user info is missing or outdated
+      if (!cart.userId || !cart.userName || cart.userId !== userInfo.userId) {
+        cart.userId = userInfo.userId;
+        cart.userName = userInfo.userName;
+        cart.userEmail = userInfo.userEmail;
+      }
     }
 
     // Get product
@@ -132,10 +188,20 @@ export class CartController {
       throw new ApiError(401, 'Please login');
     }
 
+    // Get user information
+    const userInfo = await this.getUserInfo(req.user.id);
+
     const cart: any = await Cart.findOne({ user: req.user.id });
 
     if (!cart) {
       throw new ApiError(404, 'Cart not found');
+    }
+
+    // Update user information if missing or outdated
+    if (!cart.userId || !cart.userName || cart.userId !== userInfo.userId) {
+      cart.userId = userInfo.userId;
+      cart.userName = userInfo.userName;
+      cart.userEmail = userInfo.userEmail;
     }
 
     if (quantity <= 0) {
@@ -170,10 +236,20 @@ export class CartController {
       throw new ApiError(401, 'Please login');
     }
 
+    // Get user information
+    const userInfo = await this.getUserInfo(req.user.id);
+
     const cart: any = await Cart.findOne({ user: req.user.id });
 
     if (!cart) {
       throw new ApiError(404, 'Cart not found');
+    }
+
+    // Update user information if missing or outdated
+    if (!cart.userId || !cart.userName || cart.userId !== userInfo.userId) {
+      cart.userId = userInfo.userId;
+      cart.userName = userInfo.userName;
+      cart.userEmail = userInfo.userEmail;
     }
 
     cart.items = cart.items.filter((item: any) =>
@@ -192,9 +268,20 @@ export class CartController {
       throw new ApiError(401, 'Please login');
     }
 
+    // Get user information
+    const userInfo = await this.getUserInfo(req.user.id);
+
+    // Update cart - clear items and ensure user info is saved
     await Cart.findOneAndUpdate(
       { user: req.user.id },
-      { $set: { items: [] } }
+      {
+        $set: {
+          items: [],
+          userId: userInfo.userId,
+          userName: userInfo.userName,
+          userEmail: userInfo.userEmail,
+        },
+      }
     );
 
     res.json({ success: true, message: 'Cart cleared' });
@@ -208,11 +295,28 @@ export class CartController {
       return res.json({ success: true, message: 'No items to merge' });
     }
 
+    // Get user information
+    const userInfo = await this.getUserInfo(req.user!.id);
+
     // Get or create user cart
     let cart: any = await Cart.findOne({ user: req.user!.id });
 
     if (!cart) {
-      cart = await Cart.create({ user: req.user!.id, items: [] });
+      // Create new cart with user information
+      cart = await Cart.create({
+        user: req.user!.id,
+        userId: userInfo.userId,
+        userName: userInfo.userName,
+        userEmail: userInfo.userEmail,
+        items: [],
+      });
+    } else {
+      // Update user information if cart exists but user info is missing or outdated
+      if (!cart.userId || !cart.userName || cart.userId !== userInfo.userId) {
+        cart.userId = userInfo.userId;
+        cart.userName = userInfo.userName;
+        cart.userEmail = userInfo.userEmail;
+      }
     }
 
     // Merge items

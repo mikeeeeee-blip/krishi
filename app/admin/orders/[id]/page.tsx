@@ -8,6 +8,7 @@ import TopBar from '@/components/TopBar';
 import Header from '@/components/Header';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
+import AdminRouteGuard from '@/components/AdminRouteGuard';
 import OrderStatusBadge from '@/components/orders/OrderStatusBadge';
 import PaymentStatusBadge from '@/components/orders/PaymentStatusBadge';
 import {
@@ -191,10 +192,11 @@ export default function AdminOrderDetailPage() {
   const user = order.user || {};
 
   return (
-    <div className="min-h-screen w-screen overflow-x-hidden bg-gray-50">
-      <TopBar />
-      <Header onMenuToggle={toggleMobileMenu} isMenuOpen={isMobileMenuOpen} />
-      <Navigation isMobileMenuOpen={isMobileMenuOpen} onCloseMobileMenu={closeMobileMenu} />
+    <AdminRouteGuard>
+      <div className="min-h-screen w-screen overflow-x-hidden bg-gray-50">
+        <TopBar />
+        <Header onMenuToggle={toggleMobileMenu} isMenuOpen={isMobileMenuOpen} />
+        <Navigation isMobileMenuOpen={isMobileMenuOpen} onCloseMobileMenu={closeMobileMenu} />
 
       <main className="container mx-auto px-4 py-8 max-w-7xl">
         {/* Header */}
@@ -565,8 +567,9 @@ export default function AdminOrderDetailPage() {
         </div>
       </main>
 
-      <Footer />
-    </div>
+        <Footer />
+      </div>
+    </AdminRouteGuard>
   );
 }
 

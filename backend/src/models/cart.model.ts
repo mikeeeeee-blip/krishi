@@ -8,11 +8,14 @@ const cartItemSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 const cartSchema = new mongoose.Schema({
-    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    userId: { type: String, required: true }, // Store user_id as string for easy access
+    userName: { type: String }, // Store user's display name or full name
+    userEmail: { type: String }, // Store user's email for reference
     sessionId: { type: String },
     isActive: { type: Boolean, default: true },
     expiresAt: { type: Date },
     items: [cartItemSchema]
 }, { timestamps: true });
 
-export const Cart = mongoose.model('Cart', cartSchema);
+export const Cart = mongoose.model('cart', cartSchema);
