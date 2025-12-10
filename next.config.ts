@@ -13,6 +13,29 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  // Exclude backend folder from webpack build
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        net: false,
+        tls: false,
+      };
+    }
+    // Ignore backend folder
+    config.watchOptions = {
+      ...config.watchOptions,
+      ignored: ['**/backend/**', '**/node_modules/**'],
+    };
+    return config;
+  },
+  // Exclude backend from build output
+  experimental: {
+    outputFileTracingExcludes: {
+      '*': ['./backend/**/*'],
+    },
+  },
 };
 
 export default nextConfig;

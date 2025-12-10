@@ -75,7 +75,7 @@ const app = createApp();
  * Health Check Endpoint
  * Returns API status and basic information
  */
-app.get('/health', (req, res) => {
+app.get('/health', (req: express.Request, res: express.Response) => {
   res.status(200).json({
     success: true,
     message: 'KRISHANSHECLAT AGROXGLOBAL API is running',
@@ -159,8 +159,15 @@ const startServer = (): void => {
   });
 };
 
-// Start the server
-startServer();
-
+// Vercel serverless function handler
 export default app;
+
+// Export handler for Vercel serverless functions
+export const handler = app;
+
+// Start the server only if not running on Vercel
+// Vercel sets VERCEL environment variable
+if (!process.env.VERCEL) {
+  startServer();
+}
 

@@ -196,6 +196,54 @@ npm run seed              # Seed database
 - SQL injection protection (via Prisma)
 - XSS protection
 
+## 🚀 Deployment
+
+### Vercel Deployment
+
+The backend is configured for Vercel serverless deployment. The setup includes:
+
+- **Vercel Configuration**: `vercel.json` configures the serverless function
+- **Serverless Entry Point**: `api/index.ts` serves as the Vercel serverless function handler
+- **Automatic Detection**: The app automatically detects Vercel environment and runs as a serverless function
+
+#### Deploying to Vercel
+
+1. **Install Vercel CLI** (if not already installed)
+   ```bash
+   npm i -g vercel
+   ```
+
+2. **Navigate to backend directory**
+   ```bash
+   cd backend
+   ```
+
+3. **Deploy to Vercel**
+   ```bash
+   vercel
+   ```
+
+4. **Set Environment Variables**
+   - Go to your Vercel project dashboard
+   - Navigate to Settings → Environment Variables
+   - Add all required environment variables from the `.env` file
+
+5. **Build Configuration**
+   - Vercel will automatically detect the `vercel.json` configuration
+   - The build process will compile TypeScript and deploy the serverless function
+
+#### Important Notes
+
+- The backend runs as a serverless function on Vercel, not as a traditional server
+- Make sure to set all required environment variables in Vercel dashboard
+- Database connections should use connection pooling for serverless environments
+- The `VERCEL` environment variable is automatically set by Vercel
+
+#### Local Development vs Production
+
+- **Local**: Runs as a traditional Express server on the configured port
+- **Vercel**: Runs as a serverless function (no port binding needed)
+
 ## 📝 License
 
 ISC
