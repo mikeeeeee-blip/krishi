@@ -7,6 +7,7 @@ import { login as loginApi, register as registerApi, logout as logoutApi, getPro
 interface User {
   id: string;
   email: string;
+  username?: string;
   firstName: string;
   lastName?: string;
   role: string;
@@ -26,6 +27,7 @@ interface AuthContextType {
 interface RegisterData {
   email: string;
   password: string;
+  username?: string;
   firstName: string;
   lastName?: string;
   phone?: string;

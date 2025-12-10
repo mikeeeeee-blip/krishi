@@ -20,6 +20,13 @@ const registerValidation = [
     .withMessage('Password is required')
     .isLength({ min: 8, max: 128 })
     .withMessage('Password must be between 8 and 128 characters'),
+  body('username')
+    .trim()
+    .optional()
+    .isLength({ min: 3, max: 50 })
+    .withMessage('Username must be between 3 and 50 characters')
+    .matches(/^[a-zA-Z0-9_]+$/)
+    .withMessage('Username can only contain letters, numbers, and underscores'),
   body('firstName')
     .trim()
     .notEmpty()
@@ -32,8 +39,18 @@ const registerValidation = [
     .isLength({ max: 100 })
     .withMessage('Last name must be less than 100 characters'),
   body('phone')
-    .optional()
-    .isMobilePhone('any')
+    .optional({ values: 'falsy' }) // Allow empty strings, null, undefined
+    .custom((value) => {
+      // If phone is provided, validate it; otherwise allow empty
+      if (value && value.trim() !== '') {
+        // Use a more lenient phone validation
+        const phoneRegex = /^[\+]?[(]?[0-9]{1,4}[)]?[-\s\.]?[(]?[0-9]{1,4}[)]?[-\s\.]?[0-9]{1,9}$/;
+        if (!phoneRegex.test(value.trim())) {
+          throw new Error('Valid phone number required');
+        }
+      }
+      return true;
+    })
     .withMessage('Valid phone number required'),
 ];
 

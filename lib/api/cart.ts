@@ -4,7 +4,9 @@
 
 import axios from 'axios';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3003/api/v1';
+// Backend API base URL - Update this to match your backend port
+// Default: http://localhost:5000 (matches backend default port)
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
 
 const getAuthHeaders = () => {
   const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
@@ -28,9 +30,14 @@ export const getCart = async () => {
 };
 
 // Add to cart
-export const addToCart = async (productId: string, variantId: string | null, quantity: number = 1) => {
+export const addToCart = async (
+  productId: string, 
+  variantId: string | null, 
+  quantity: number = 1,
+  variantName?: string
+) => {
   const response = await axios.post(`${API_BASE_URL}/cart/items`,
-    { productId, variantId, quantity },
+    { productId, variantId, variantName, quantity },
     { headers: getAuthHeaders() }
   );
   return response.data;

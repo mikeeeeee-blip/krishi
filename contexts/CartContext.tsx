@@ -107,14 +107,25 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
   }, [isAuthenticated]);
 
+  // Helper function to check if a string is a valid MongoDB ObjectId
+  const isValidObjectId = (id: string): boolean => {
+    // MongoDB ObjectId is 24 hex characters
+    return /^[0-9a-fA-F]{24}$/.test(id);
+  };
+
   const syncCartToBackend = async () => {
     if (!isAuthenticated) return;
 
     try {
-      // Sync each item to backend
+      // Sync each item to backend (only if productId is a valid ObjectId)
       for (const item of items) {
+        // Skip items with invalid ObjectIds (mock data)
+        if (!isValidObjectId(item.productId)) {
+          console.warn(`Skipping sync for product ${item.productId} - not a valid MongoDB ObjectId`);
+          continue;
+        }
         try {
-          await addToCartApi(item.productId, item.variant || null, item.count);
+          await addToCartApi(item.productId, null, item.count, item.variant || undefined);
         } catch (error) {
           console.error('Error syncing cart item:', error);
         }
@@ -169,10 +180,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
       return [...prevItems, { ...item, count: 1 }];
     });
 
-    // Sync with backend if authenticated
-    if (isAuthenticated) {
+    // Sync with backend if authenticated AND productId is a valid MongoDB ObjectId
+    // Mock data uses numeric IDs which won't work with backend
+    if (isAuthenticated && isValidObjectId(item.productId)) {
       try {
-        await addToCartApi(item.productId, item.variant || null, 1);
+        // Pass variantName instead of variantId if variantId is not available
+        // Backend will find variant by name if variantId is not provided
+        await addToCartApi(item.productId, null, 1, item.variant || undefined);
       } catch (error) {
         console.error('Error adding to cart:', error);
         // Revert local state on error

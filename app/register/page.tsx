@@ -9,13 +9,13 @@ import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import { useAuth } from '@/contexts/AuthContext';
 import { Mail, Lock, Eye, EyeOff, User, Phone, UserPlus } from 'lucide-react';
-import axios from 'axios';
 
 export default function RegisterPage() {
   const router = useRouter();
   const { register, isAuthenticated, loading: authLoading } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [formData, setFormData] = useState({
+    username: '',
     firstName: '',
     lastName: '',
     email: '',
@@ -54,19 +54,28 @@ export default function RegisterPage() {
     }
 
     try {
-      const response = await axios.post(' http://localhost:3001/api/v1/auth/register', {
-        email: formData.email,
+      // Prepare registration data - convert empty strings to undefined
+      const registrationData = {
+        email: formData.email.trim(),
         password: formData.password,
-        firstName: formData.firstName,
-        lastName: formData.lastName || undefined,
-        phone: formData.phone || undefined,
-      },
-        {
-          withCredentials: true,
-        });
+        firstName: formData.firstName.trim(),
+        username: formData.username?.trim() || undefined,
+        lastName: formData.lastName?.trim() || undefined,
+        phone: formData.phone?.trim() || undefined, // Convert empty string to undefined
+      };
+
+      await register(registrationData);
+      // Redirect will be handled by useEffect or AuthContext
       router.push('/');
     } catch (err: any) {
-      setError(err.message || 'Registration failed. Please try again.');
+      // Handle API error response with detailed validation errors
+      if (err.response?.data?.errors && Array.isArray(err.response.data.errors)) {
+        // Show all validation errors
+        const errorMessages = err.response.data.errors.map((e: any) => e.message).join(', ');
+        setError(errorMessages || err.response?.data?.message || 'Validation failed');
+      } else {
+        setError(err.response?.data?.message || err.message || 'Registration failed. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
@@ -105,6 +114,29 @@ export default function RegisterPage() {
           )}
 
           <form onSubmit={handleSubmit}>
+            {/* Username (Optional) */}
+            <div className="form-group">
+              <label htmlFor="username" className="form-label">
+                Username
+              </label>
+              <div className="form-input-container">
+                <User className="form-input-icon" />
+                <input
+                  id="username"
+                  type="text"
+                  value={formData.username}
+                  onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                  className="form-input"
+                  placeholder="Choose a username (optional)"
+                  pattern="[a-zA-Z0-9_]+"
+                  title="Username can only contain letters, numbers, and underscores"
+                />
+              </div>
+              <p className="form-help-text">
+                Optional: 3-50 characters, letters, numbers, and underscores only
+              </p>
+            </div>
+
             {/* First Name */}
             <div className="form-group">
               <label htmlFor="firstName" className="form-label">

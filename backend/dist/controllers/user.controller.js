@@ -1,11 +1,11 @@
-import { User } from '../models/user.model.js';
+import { userModel } from '../models/user.model.js';
 import { ApiError, asyncHandler } from '../middleware/errorHandler.js';
 export class UserController {
     /**
      * Get user addresses
      */
     getAddresses = asyncHandler(async (req, res) => {
-        const user = await User.findById(req.user.id).select('addresses');
+        const user = await userModel.findById(req.user.id).select('addresses');
         // Sort addresses: default first, then by creation date descending
         const sortedAddresses = user?.addresses.sort((a, b) => {
             if (a.isDefault && !b.isDefault)
@@ -23,7 +23,7 @@ export class UserController {
         const { fullName, phone, addressLine1, addressLine2, landmark, city, state, pincode, isDefault } = req.body;
         // If setting as default, unset other defaults
         if (isDefault) {
-            await User.updateOne({ _id: req.user.id, 'addresses.isDefault': true }, { $set: { 'addresses.$.isDefault': false } });
+            await userModel.updateOne({ _id: req.user.id, 'addresses.isDefault': true }, { $set: { 'addresses.$.isDefault': false } });
         }
         const newAddress = {
             fullName,
@@ -36,7 +36,7 @@ export class UserController {
             pincode,
             isDefault: isDefault || false,
         };
-        const user = await User.findByIdAndUpdate(req.user.id, { $push: { addresses: newAddress } }, { new: true, runValidators: true });
+        const user = await userModel.findByIdAndUpdate(req.user.id, { $push: { addresses: newAddress } }, { new: true, runValidators: true });
         // Get the added address (last one)
         const addedAddress = user?.addresses[user.addresses.length - 1];
         res.status(201).json({ success: true, data: addedAddress });
@@ -48,21 +48,21 @@ export class UserController {
         const { id } = req.params; // address id
         const updateData = req.body;
         // Check if address exists
-        const user = await User.findOne({ _id: req.user.id, 'addresses._id': id });
+        const user = await userModel.findOne({ _id: req.user.id, 'addresses._id': id });
         if (!user) {
             throw new ApiError(404, 'Address not found');
         }
         // If setting as default, unset other defaults
         if (updateData.isDefault) {
-            await User.updateOne({ _id: req.user.id, 'addresses.isDefault': true }, { $set: { 'addresses.$.isDefault': false } });
+            await userModel.updateOne({ _id: req.user.id, 'addresses.isDefault': true }, { $set: { 'addresses.$.isDefault': false } });
         }
         // Construct update object
         const setOptions = {};
         for (const key in updateData) {
             setOptions[`addresses.$.${key}`] = updateData[key];
         }
-        const updatedUser = await User.findOneAndUpdate({ _id: req.user.id, 'addresses._id': id }, { $set: setOptions }, { new: true, runValidators: true });
-        const updatedAddress = updatedUser?.addresses.find((addr) => addr._id.toString() === id);
+        const updateduserModel = await userModel.findOneAndUpdate({ _id: req.user.id, 'addresses._id': id }, { $set: setOptions }, { new: true, runValidators: true });
+        const updatedAddress = updateduserModel?.addresses.find((addr) => addr._id.toString() === id);
         res.json({ success: true, data: updatedAddress });
     });
     /**
@@ -70,7 +70,7 @@ export class UserController {
      */
     deleteAddress = asyncHandler(async (req, res) => {
         const { id } = req.params;
-        const user = await User.findOneAndUpdate({ _id: req.user.id, 'addresses._id': id }, { $pull: { addresses: { _id: id } } }, { new: true });
+        const user = await userModel.findOneAndUpdate({ _id: req.user.id, 'addresses._id': id }, { $pull: { addresses: { _id: id } } }, { new: true });
         if (!user) {
             throw new ApiError(404, 'Address not found');
         }
@@ -82,9 +82,9 @@ export class UserController {
     setDefaultAddress = asyncHandler(async (req, res) => {
         const { id } = req.params;
         // Unset current default
-        await User.updateOne({ _id: req.user.id, 'addresses.isDefault': true }, { $set: { 'addresses.$.isDefault': false } });
+        await userModel.updateOne({ _id: req.user.id, 'addresses.isDefault': true }, { $set: { 'addresses.$.isDefault': false } });
         // Set new default
-        const user = await User.findOneAndUpdate({ _id: req.user.id, 'addresses._id': id }, { $set: { 'addresses.$.isDefault': true } }, { new: true });
+        const user = await userModel.findOneAndUpdate({ _id: req.user.id, 'addresses._id': id }, { $set: { 'addresses.$.isDefault': true } }, { new: true });
         if (!user) {
             throw new ApiError(404, 'Address not found');
         }
@@ -102,12 +102,12 @@ export class UserController {
             query.status = status;
         const skip = (Number(page) - 1) * Number(limit);
         const [users, total] = await Promise.all([
-            User.find(query)
+            userModel.find(query)
                 .select('id email phone firstName lastName role status createdAt')
                 .sort({ createdAt: -1 })
                 .skip(skip)
                 .limit(Number(limit)),
-            User.countDocuments(query),
+            userModel.countDocuments(query),
         ]);
         res.json({
             success: true,
@@ -124,7 +124,7 @@ export class UserController {
      * Admin: Get user by ID
      */
     getUserById = asyncHandler(async (req, res) => {
-        const user = await User.findById(req.params.id);
+        const user = await userModel.findById(req.params.id);
         if (!user) {
             throw new ApiError(404, 'User not found');
         }
@@ -135,7 +135,7 @@ export class UserController {
      */
     updateUserStatus = asyncHandler(async (req, res) => {
         const { status } = req.body;
-        const user = await User.findByIdAndUpdate(req.params.id, { status }, { new: true }).select('id email status');
+        const user = await userModel.findByIdAndUpdate(req.params.id, { status }, { new: true }).select('id email status');
         if (!user) {
             throw new ApiError(404, 'User not found');
         }

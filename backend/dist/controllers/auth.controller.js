@@ -1,25 +1,29 @@
 import bcrypt from 'bcryptjs';
 import { config } from '../config/index.js';
-import { User } from '../models/user.model.js';
+import { userModel } from '../models/user.model.js';
 import { ApiError, asyncHandler } from '../middleware/errorHandler.js';
 import { validatePassword, isPasswordSimilarToUserInfo } from '../utils/passwordValidator.js';
-import { generateTokenPair } from '../utils/tokenManager.js';
+import { generateTokenPair, verifyRefreshToken } from '../utils/tokenManager.js';
+// Constants
+const COOKIE_OPTIONS = {
+    httpOnly: true,
+    secure: config.nodeEnv === 'production',
+    sameSite: 'strict',
+    path: '/',
+};
+const ACCESS_TOKEN_MAX_AGE = 7 * 24 * 60 * 60 * 1000; // 7 days
+const REFRESH_TOKEN_MAX_AGE = 30 * 24 * 60 * 60 * 1000; // 30 days
 /**
  * Set httpOnly cookies for tokens
  */
 const setTokenCookies = (res, accessToken, refreshToken) => {
-    const isProduction = config.nodeEnv === 'production';
-    const cookieOptions = {
-        httpOnly: true, // Prevents JavaScript access (XSS protection)
-        secure: isProduction, // Only send over HTTPS in production
-        sameSite: 'strict', // CSRF protection
-        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-        path: '/',
-    };
-    res.cookie('accessToken', accessToken, cookieOptions);
+    res.cookie('accessToken', accessToken, {
+        ...COOKIE_OPTIONS,
+        maxAge: ACCESS_TOKEN_MAX_AGE,
+    });
     res.cookie('refreshToken', refreshToken, {
-        ...cookieOptions,
-        maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days for refresh token
+        ...COOKIE_OPTIONS,
+        maxAge: REFRESH_TOKEN_MAX_AGE,
     });
 };
 /**
@@ -29,19 +33,49 @@ const clearTokenCookies = (res) => {
     res.clearCookie('accessToken', { path: '/' });
     res.clearCookie('refreshToken', { path: '/' });
 };
+/**
+ * Format user data for response (excludes sensitive information)
+ */
+const formatUserResponse = (user) => ({
+    id: user._id,
+    email: user.email,
+    username: user.displayName,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    role: user.role,
+    emailVerified: user.emailVerified,
+});
+/**
+ * Sanitize phone number - convert empty strings to undefined
+ */
+const sanitizePhone = (phone) => {
+    return phone && phone.trim() !== '' ? phone.trim() : undefined;
+};
+/**
+ * Check if user account is active and not deleted
+ */
+const validateUserAccount = (user) => {
+    if (!user) {
+        throw new ApiError(404, 'User not found');
+    }
+    if (user.status !== 'ACTIVE') {
+        throw new ApiError(403, `Account is ${user.status.toLowerCase()}. Please contact support.`);
+    }
+    if (user.deletedAt) {
+        throw new ApiError(403, 'This account has been deleted');
+    }
+};
 export class AuthController {
     /**
      * Register new user
      * POST /api/v1/auth/register
      */
     register = asyncHandler(async (req, res) => {
-        const { email, password, firstName, lastName, phone } = req.body;
-        // Sanitize phone: empty string should be undefined to avoid unique index violation (sparse index)
-        const sanitizedPhone = phone && phone.trim() !== '' ? phone.trim() : undefined;
+        const { email, password, username, firstName, lastName, phone } = req.body;
         // Validate password strength
         const passwordValidation = validatePassword(password);
         if (!passwordValidation.isValid) {
-            const formattedErrors = passwordValidation.errors.map(err => ({ message: err }));
+            const formattedErrors = passwordValidation.errors.map((err) => ({ message: err }));
             throw new ApiError(400, 'Password validation failed', formattedErrors);
         }
         // Check if password is similar to user info
@@ -49,58 +83,46 @@ export class AuthController {
             throw new ApiError(400, 'Password is too similar to your personal information. Please choose a different password.');
         }
         // Check if user already exists
-        const existingUserQuery = { email: email.toLowerCase() };
-        if (sanitizedPhone) {
-            existingUserQuery.$or = [{ email: email.toLowerCase() }, { phone: sanitizedPhone }];
-            // Note: The above logic is slightly flawed for $or.
-            // Correct logic:
-            // existingUser = await User.findOne({ $or: [{ email }, { phone }] })
-        }
-        // Better query construction
-        const query = sanitizedPhone
-            ? { $or: [{ email: email.toLowerCase() }, { phone: sanitizedPhone }] }
-            : { email: email.toLowerCase() };
-        const existingUser = await User.findOne(query);
+        const sanitizedPhone = sanitizePhone(phone);
+        const normalizedEmail = email.toLowerCase();
+        const existingUserQuery = sanitizedPhone
+            ? { $or: [{ email: normalizedEmail }, { phone: sanitizedPhone }] }
+            : { email: normalizedEmail };
+        const existingUser = await userModel.findOne(existingUserQuery);
         if (existingUser) {
-            // Don't reveal which field already exists (security best practice)
             throw new ApiError(409, 'An account with this email or phone already exists');
         }
-        // Hash password with bcrypt
+        // Hash password
         const passwordHash = await bcrypt.hash(password, config.bcryptSaltRounds);
         // Create user
-        const user = await User.create({
-            email: email.toLowerCase(),
+        const user = await userModel.create({
+            email: normalizedEmail,
             passwordHash,
             firstName: firstName.trim(),
             lastName: lastName?.trim(),
+            displayName: username?.trim() || firstName.trim(),
             phone: sanitizedPhone,
             status: 'ACTIVE', // In production, set to 'PENDING_VERIFICATION'
             emailVerified: false,
         });
-        // Generate token pair
+        // Verify user was created
+        if (!user || !user._id) {
+            throw new ApiError(500, 'Failed to create user account');
+        }
+        // Generate tokens
         const { accessToken, refreshToken } = generateTokenPair({
             id: user._id.toString(),
             email: user.email,
             role: user.role,
         });
-        // Set httpOnly cookies
+        // Set cookies
         setTokenCookies(res, accessToken, refreshToken);
         res.status(201).json({
             success: true,
             message: 'Registration successful',
             data: {
-                user: {
-                    id: user._id,
-                    email: user.email,
-                    firstName: user.firstName,
-                    lastName: user.lastName,
-                    role: user.role,
-                    emailVerified: user.emailVerified,
-                },
-                tokens: {
-                    accessToken,
-                    refreshToken,
-                },
+                user: formatUserResponse(user),
+                tokens: { accessToken, refreshToken },
             },
         });
     });
@@ -114,48 +136,32 @@ export class AuthController {
             throw new ApiError(400, 'Email and password are required');
         }
         // Find user by email (case-insensitive)
-        const user = await User.findOne({ email: email.toLowerCase() });
-        // Always perform bcrypt comparison (even if user doesn't exist)
+        const user = await userModel.findOne({ email: email.toLowerCase() });
+        // Always perform bcrypt comparison (even if user doesn't exist) to prevent timing attacks
         const hashToCompare = user?.passwordHash || '$2a$12$dummy.hash.to.prevent.timing.attack';
         const isPasswordValid = await bcrypt.compare(password, hashToCompare);
         if (!user || !isPasswordValid) {
             throw new ApiError(401, 'Invalid email or password');
         }
-        // Check account status
-        if (user.status !== 'ACTIVE') {
-            throw new ApiError(403, `Account is ${user.status.toLowerCase()}. Please contact support.`);
-        }
-        // Check if account is deleted
-        if (user.deletedAt) {
-            throw new ApiError(403, 'This account has been deleted');
-        }
+        // Validate account status
+        validateUserAccount(user);
         // Update last login timestamp
         user.lastLoginAt = new Date();
         await user.save();
-        // Generate token pair
+        // Generate tokens
         const { accessToken, refreshToken } = generateTokenPair({
             id: user._id.toString(),
             email: user.email,
             role: user.role,
         });
-        // Set httpOnly cookies
+        // Set cookies
         setTokenCookies(res, accessToken, refreshToken);
         res.json({
             success: true,
             message: 'Login successful',
             data: {
-                user: {
-                    id: user._id,
-                    email: user.email,
-                    firstName: user.firstName,
-                    lastName: user.lastName,
-                    role: user.role,
-                    emailVerified: user.emailVerified,
-                },
-                tokens: {
-                    accessToken,
-                    refreshToken,
-                },
+                user: formatUserResponse(user),
+                tokens: { accessToken, refreshToken },
             },
         });
     });
@@ -169,16 +175,15 @@ export class AuthController {
             throw new ApiError(401, 'Refresh token required');
         }
         // Verify refresh token
-        const { verifyRefreshToken: verifyToken } = await import('../utils/tokenManager.js');
         let decoded;
         try {
-            decoded = verifyToken(refreshToken);
+            decoded = verifyRefreshToken(refreshToken);
         }
         catch (error) {
             throw new ApiError(401, error instanceof Error ? error.message : 'Invalid refresh token');
         }
-        // Get user
-        const user = await User.findById(decoded.id).select('email role status');
+        // Get user and validate account
+        const user = await userModel.findById(decoded.id).select('email role status');
         if (!user || user.status !== 'ACTIVE') {
             throw new ApiError(401, 'Invalid refresh token');
         }
@@ -203,7 +208,6 @@ export class AuthController {
      * POST /api/v1/auth/logout
      */
     logout = asyncHandler(async (req, res) => {
-        // Clear cookies
         clearTokenCookies(res);
         res.json({
             success: true,
@@ -215,7 +219,7 @@ export class AuthController {
      * GET /api/v1/auth/me
      */
     getProfile = asyncHandler(async (req, res) => {
-        const user = await User.findById(req.user.id).select('-passwordHash');
+        const user = await userModel.findById(req.user.id).select('-passwordHash');
         if (!user) {
             throw new ApiError(404, 'User not found');
         }
@@ -230,12 +234,21 @@ export class AuthController {
      */
     updateProfile = asyncHandler(async (req, res) => {
         const { firstName, lastName, displayName, phone } = req.body;
-        const user = await User.findByIdAndUpdate(req.user.id, {
-            ...(firstName && { firstName: firstName.trim() }),
-            ...(lastName !== undefined && { lastName: lastName?.trim() }),
-            ...(displayName !== undefined && { displayName: displayName?.trim() }),
-            ...(phone && { phone: phone.trim() }),
-        }, { new: true, runValidators: true }).select('email firstName lastName displayName phone');
+        const updateData = {};
+        if (firstName)
+            updateData.firstName = firstName.trim();
+        if (lastName !== undefined)
+            updateData.lastName = lastName?.trim();
+        if (displayName !== undefined)
+            updateData.displayName = displayName.trim();
+        if (phone)
+            updateData.phone = phone.trim();
+        const user = await userModel
+            .findByIdAndUpdate(req.user.id, updateData, {
+            new: true,
+            runValidators: true,
+        })
+            .select('email firstName lastName displayName phone');
         res.json({
             success: true,
             message: 'Profile updated successfully',
@@ -252,7 +265,7 @@ export class AuthController {
             throw new ApiError(400, 'Current password and new password are required');
         }
         // Get user with password hash
-        const user = await User.findById(req.user.id);
+        const user = await userModel.findById(req.user.id);
         if (!user) {
             throw new ApiError(404, 'User not found');
         }
@@ -264,7 +277,7 @@ export class AuthController {
         // Validate new password
         const passwordValidation = validatePassword(newPassword);
         if (!passwordValidation.isValid) {
-            const formattedErrors = passwordValidation.errors.map(err => ({ message: err }));
+            const formattedErrors = passwordValidation.errors.map((err) => ({ message: err }));
             throw new ApiError(400, 'New password validation failed', formattedErrors);
         }
         // Check if new password is same as current
@@ -280,10 +293,8 @@ export class AuthController {
         })) {
             throw new ApiError(400, 'Password is too similar to your personal information');
         }
-        // Hash new password
-        const newPasswordHash = await bcrypt.hash(newPassword, config.bcryptSaltRounds);
-        // Update password
-        user.passwordHash = newPasswordHash;
+        // Hash and update password
+        user.passwordHash = await bcrypt.hash(newPassword, config.bcryptSaltRounds);
         await user.save();
         res.json({
             success: true,
@@ -299,9 +310,8 @@ export class AuthController {
         if (!email) {
             throw new ApiError(400, 'Email is required');
         }
-        // Just check if user exists (conceptually) but we don't need to do anything with it
-        // because email service is not implemented.
-        await User.findOne({ email: email.toLowerCase() });
+        // Check if user exists (don't reveal if user exists for security)
+        await userModel.findOne({ email: email.toLowerCase() });
         res.json({
             success: true,
             message: 'Password reset functionality is currently unavailable. Please contact support for assistance.',
@@ -313,7 +323,8 @@ export class AuthController {
      */
     resetPassword = asyncHandler(async (req, res) => {
         const { token, password } = req.body;
-        // Implementation pending as noted in original code
+        // TODO: Implement password reset with token validation
+        // This should verify the reset token, check expiration, and update password
         res.json({
             success: true,
             message: 'Password reset successful',

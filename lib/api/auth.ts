@@ -4,7 +4,9 @@
 
 import axios from 'axios';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3003/api/v1';
+// Backend API base URL - Update this to match your backend port
+// Default: http://localhost:5000 (matches backend default port)
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
 
 interface LoginRequest {
   email: string;
@@ -14,6 +16,7 @@ interface LoginRequest {
 interface RegisterRequest {
   email: string;
   password: string;
+  username?: string;
   firstName: string;
   lastName?: string;
   phone?: string;
@@ -29,6 +32,7 @@ interface AuthResponse {
   user: {
     id: string;
     email: string;
+    username?: string;
     firstName: string;
     lastName?: string;
     role: string;
@@ -42,8 +46,28 @@ interface AuthResponse {
 
 // Register new user
 export const register = async (data: RegisterRequest): Promise<ApiResponse<AuthResponse>> => {
-  const response = await axios.post(`${API_BASE_URL}/auth/register`, data);
-  return response.data;
+  try {
+    const response = await axios.post(`${API_BASE_URL}/auth/register`, data, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    return response.data;
+  } catch (error: any) {
+    // Re-throw with better error information
+    if (error.response) {
+      // Server responded with error
+      const apiError = new Error(error.response.data?.message || 'Registration failed');
+      (apiError as any).response = error.response;
+      throw apiError;
+    } else if (error.request) {
+      // Request made but no response
+      throw new Error('Network error. Please check your connection.');
+    } else {
+      // Something else happened
+      throw error;
+    }
+  }
 };
 
 // Login user

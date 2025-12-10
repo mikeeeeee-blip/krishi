@@ -11,10 +11,23 @@ import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
 import { requestLogger } from './middleware/logger.js';
 import routes from './routes/index.js';
 
-// ... (imports)
+/**
+ * Initialize application
+ * Connects to database first, then starts the server
+ */
+const initializeApp = async (): Promise<void> => {
+  try {
+    // Connect to database first
+    console.log('🔄 Connecting to MongoDB...');
+    await connectDB();
 
-// Connect to Database
-connectDB();
+    // Start server after database connection is established
+    startServer();
+  } catch (error) {
+    console.error('❌ Failed to initialize application:', error);
+    process.exit(1);
+  }
+};
 
 /**
  * Initialize Express Application
@@ -33,14 +46,15 @@ const createApp = (): Express => {
   }));
 
   // CORS configuration
+  // Allow specific origin: http://localhost:3000 (React frontend)
   const corsOrigins = process.env.CORS_ORIGIN
     ? process.env.CORS_ORIGIN.split(',').map(origin => origin.trim())
-    : ['http://localhost:3000', 'http://localhost:5173'];
+    : ['http://localhost:3000'];
 
   const corsOptions = {
     origin: corsOrigins,
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    credentials: true, // Allow credentials (cookies, authorization headers)
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allowed HTTP methods
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
     maxAge: 86400, // 24 hours
   };
@@ -112,7 +126,15 @@ app.use(errorHandler);
  * Initializes the Express server with graceful shutdown handling
  */
 const startServer = (): void => {
+  // Verify database is connected before starting server
+  if (mongoose.connection.readyState !== 1) {
+    console.error('❌ ERROR: Database is not connected. Cannot start server.');
+    console.error('   Connection state:', mongoose.connection.readyState);
+    process.exit(1);
+  }
+
   const server = app.listen(config.port, () => {
+    const dbName = mongoose.connection.name || 'N/A';
     console.log(`
   ╔═══════════════════════════════════════════════════════════╗
   ║                                                           ║
@@ -121,6 +143,7 @@ const startServer = (): void => {
   ║   Environment: ${config.nodeEnv.padEnd(40)}║
   ║   Server running on: http://localhost:${String(config.port).padEnd(20)}║
   ║   API Version: ${config.apiVersion.padEnd(42)}║
+  ║   Database: ${dbName.padEnd(40)}║
   ║                                                           ║
   ╚═══════════════════════════════════════════════════════════╝
     `);
@@ -178,6 +201,6 @@ export const handler = app;
 // Start the server only if not running on Vercel
 // Vercel sets VERCEL environment variable
 if (!process.env.VERCEL) {
-  startServer();
+  initializeApp();
 }
 

@@ -233,6 +233,10 @@ export class ProductController {
             seller: req.user.role === 'SELLER' ? req.user.id : req.body.sellerId,
         };
         const product = await Product.create(productData);
+        // Verify product was created
+        if (!product || !product._id) {
+            throw new ApiError(500, 'Failed to create product');
+        }
         // Populate for response
         const populatedProduct = await Product.findById(product._id)
             .populate('category')

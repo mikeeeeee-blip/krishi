@@ -278,6 +278,11 @@ export class ProductController {
 
     const product: any = await Product.create(productData);
 
+    // Verify product was created
+    if (!product || !product._id) {
+      throw new ApiError(500, 'Failed to create product');
+    }
+
     // Populate for response
     const populatedProduct: any = await Product.findById(product._id)
       .populate('category')

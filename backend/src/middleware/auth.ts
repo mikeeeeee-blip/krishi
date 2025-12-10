@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { config } from '../config/index.js';
 import { ApiError } from './errorHandler.js';
-import { User } from '../models/user.model.js';
+import { userModel } from '../models/user.model.js';
 
 // Extend Express Request type
 declare global {
@@ -70,7 +70,7 @@ export const authenticate = async (
     }
 
     // Verify user still exists and is active
-    const user = await User.findById(decoded.id).select('id email role status deletedAt');
+    const user = await userModel.findById(decoded.id).select('id email role status deletedAt');
 
     if (!user) {
       throw new ApiError(401, 'User not found');
@@ -120,7 +120,7 @@ export const optionalAuth = async (
         role: string;
       };
 
-      const user = await User.findById(decoded.id).select('id email role status deletedAt');
+      const user = await userModel.findById(decoded.id).select('id email role status deletedAt');
 
       // Only attach if user exists, is active, and not deleted
       if (user && !user.deletedAt && user.status === 'ACTIVE') {
@@ -198,7 +198,7 @@ export const verifyRefreshToken = async (
     }
 
     // Verify user exists
-    const user = await User.findById(decoded.id).select('id email role status');
+    const user = await userModel.findById(decoded.id).select('id email role status');
 
     if (!user || user.status !== 'ACTIVE') {
       throw new ApiError(401, 'Invalid refresh token');

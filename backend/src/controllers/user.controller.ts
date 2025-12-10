@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { User } from '../models/user.model.js';
+import { userModel } from '../models/user.model.js';
 import { ApiError, asyncHandler } from '../middleware/errorHandler.js';
 
 export class UserController {
@@ -7,7 +7,7 @@ export class UserController {
    * Get user addresses
    */
   getAddresses = asyncHandler(async (req: Request, res: Response) => {
-    const user: any = await User.findById(req.user!.id).select('addresses');
+    const user: any = await userModel.findById(req.user!.id).select('addresses');
 
     // Sort addresses: default first, then by creation date descending
     const sortedAddresses = user?.addresses.sort((a: any, b: any) => {
@@ -27,7 +27,7 @@ export class UserController {
 
     // If setting as default, unset other defaults
     if (isDefault) {
-      await User.updateOne(
+      await userModel.updateOne(
         { _id: req.user!.id, 'addresses.isDefault': true },
         { $set: { 'addresses.$.isDefault': false } }
       );
@@ -45,7 +45,7 @@ export class UserController {
       isDefault: isDefault || false,
     };
 
-    const user: any = await User.findByIdAndUpdate(
+    const user: any = await userModel.findByIdAndUpdate(
       req.user!.id,
       { $push: { addresses: newAddress } },
       { new: true, runValidators: true }
@@ -65,14 +65,14 @@ export class UserController {
     const updateData = req.body;
 
     // Check if address exists
-    const user: any = await User.findOne({ _id: req.user!.id, 'addresses._id': id });
+    const user: any = await userModel.findOne({ _id: req.user!.id, 'addresses._id': id });
     if (!user) {
       throw new ApiError(404, 'Address not found');
     }
 
     // If setting as default, unset other defaults
     if (updateData.isDefault) {
-      await User.updateOne(
+      await userModel.updateOne(
         { _id: req.user!.id, 'addresses.isDefault': true },
         { $set: { 'addresses.$.isDefault': false } }
       );
@@ -84,13 +84,13 @@ export class UserController {
       setOptions[`addresses.$.${key}`] = updateData[key];
     }
 
-    const updatedUser: any = await User.findOneAndUpdate(
+    const updateduserModel: any = await userModel.findOneAndUpdate(
       { _id: req.user!.id, 'addresses._id': id },
       { $set: setOptions },
       { new: true, runValidators: true }
     );
 
-    const updatedAddress = updatedUser?.addresses.find((addr: any) => addr._id.toString() === id);
+    const updatedAddress = updateduserModel?.addresses.find((addr: any) => addr._id.toString() === id);
 
     res.json({ success: true, data: updatedAddress });
   });
@@ -101,7 +101,7 @@ export class UserController {
   deleteAddress = asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params;
 
-    const user: any = await User.findOneAndUpdate(
+    const user: any = await userModel.findOneAndUpdate(
       { _id: req.user!.id, 'addresses._id': id },
       { $pull: { addresses: { _id: id } } },
       { new: true }
@@ -121,13 +121,13 @@ export class UserController {
     const { id } = req.params;
 
     // Unset current default
-    await User.updateOne(
+    await userModel.updateOne(
       { _id: req.user!.id, 'addresses.isDefault': true },
       { $set: { 'addresses.$.isDefault': false } }
     );
 
     // Set new default
-    const user: any = await User.findOneAndUpdate(
+    const user: any = await userModel.findOneAndUpdate(
       { _id: req.user!.id, 'addresses._id': id },
       { $set: { 'addresses.$.isDefault': true } },
       { new: true }
@@ -153,12 +153,12 @@ export class UserController {
     const skip = (Number(page) - 1) * Number(limit);
 
     const [users, total] = await Promise.all([
-      User.find(query)
+      userModel.find(query)
         .select('id email phone firstName lastName role status createdAt')
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(Number(limit)),
-      User.countDocuments(query),
+      userModel.countDocuments(query),
     ]);
 
     res.json({
@@ -177,7 +177,7 @@ export class UserController {
    * Admin: Get user by ID
    */
   getUserById = asyncHandler(async (req: Request, res: Response) => {
-    const user = await User.findById(req.params.id);
+    const user = await userModel.findById(req.params.id);
 
     if (!user) {
       throw new ApiError(404, 'User not found');
@@ -192,7 +192,7 @@ export class UserController {
   updateUserStatus = asyncHandler(async (req: Request, res: Response) => {
     const { status } = req.body;
 
-    const user: any = await User.findByIdAndUpdate(
+    const user: any = await userModel.findByIdAndUpdate(
       req.params.id,
       { status },
       { new: true }
