@@ -8,6 +8,14 @@
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
+<<<<<<< HEAD
+=======
+    "vercel:build": "npm run prisma:generate && npm run build",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:studio": "prisma studio",
+    "prisma:push": "prisma db push",
+>>>>>>> 83fd06f4522542f209d633cbaa8ff56ca29147b7
     "seed": "tsx src/seed.ts"
   },
   "keywords": [

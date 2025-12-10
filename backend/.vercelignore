@@ -1,0 +1,13 @@
+# Ignore compiled JavaScript files in api folder
+# Vercel will compile TypeScript directly
+api/*.js
+api/*.js.map
+api/*.d.ts
+api/*.d.ts.map
+
+# Ignore dist folder (not needed for Vercel deployment)
+dist/
+
+# Ignore node_modules (Vercel installs this)
+node_modules/
+
