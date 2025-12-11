@@ -152,6 +152,15 @@ const startServer = (): void => {
     `);
   });
 
+
+  app.get('/', (req: express.Request, res: express.Response) => {
+    res.status(200).json({
+      success: true,
+      message: 'KRISHANSHECLAT AGROXGLOBAL API is running',
+      timestamp: new Date().toISOString(),
+      environment: config.nodeEnv,
+    });
+  });
   // Graceful shutdown handler
   const gracefulShutdown = (signal: string): void => {
     console.log(`${signal} received. Shutting down gracefully...`);
