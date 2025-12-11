@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Search, ShoppingCart, User, Menu, X, LogOut, Package, LayoutDashboard, Home, UserCircle } from 'lucide-react';
+import { Search, ShoppingCart, User, Menu, X, LogOut, Package, LayoutDashboard, Home, UserCircle, MapPin } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/contexts/CartContext';
@@ -227,6 +227,18 @@ export default function Header({ onMenuToggle, isMenuOpen = false }: HeaderProps
                             <UserCircle className="h-4 w-4 text-gray-600 group-hover:text-green-600 transition-colors" />
                           </div>
                           <span className="font-semibold">My Profile</span>
+                        </Link>
+
+                        {/* My Address - For all users */}
+                        <Link
+                          href="/my-addresses"
+                          onClick={() => setShowUserMenu(false)}
+                          className="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-gradient-to-r hover:from-green-50 hover:to-emerald-50 hover:text-green-700 transition-all duration-200 group mx-2 rounded-lg"
+                        >
+                          <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-gray-100 group-hover:bg-green-100 flex items-center justify-center transition-colors">
+                            <MapPin className="h-4 w-4 text-gray-600 group-hover:text-green-600 transition-colors" />
+                          </div>
+                          <span className="font-semibold">My Addresses</span>
                         </Link>
 
                         {user?.role === 'ADMIN' ? (

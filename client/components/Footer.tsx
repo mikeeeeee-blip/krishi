@@ -1,5 +1,8 @@
+'use client';
+
 import React from 'react';
 import Link from 'next/link';
+import { useAuth } from '@/contexts/AuthContext';
 import { 
   Facebook, 
   Linkedin, 
@@ -17,6 +20,7 @@ import {
 } from 'lucide-react';
 
 const Footer = () => {
+  const { isAuthenticated } = useAuth();
   return (
     <footer className="w-full">
       {/* Upper Section - Dark Blue */}
@@ -349,14 +353,16 @@ const Footer = () => {
                     Sell on KRISHANSHECLAT AGROXGLOBAL
                   </Link>
                 </li>
-                <li>
-                  <Link 
-                    href="/customer-login" 
-                    className="text-sm sm:text-base text-gray-200 hover:text-white hover:underline transition-all duration-200 inline-block"
-                  >
-                    Customer Login
-                  </Link>
-                </li>
+                {!isAuthenticated && (
+                  <li>
+                    <Link 
+                      href="/customer-login" 
+                      className="text-sm sm:text-base text-gray-200 hover:text-white hover:underline transition-all duration-200 inline-block"
+                    >
+                      Customer Login
+                    </Link>
+                  </li>
+                )}
               </ul>
             </div>
 

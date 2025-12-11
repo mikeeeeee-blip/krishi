@@ -66,6 +66,21 @@ export default function CartPage() {
     }
   }, [user]);
 
+  // Clear shipping address on page load/refresh (only address fields, keep name and email)
+  useEffect(() => {
+    if (!orderPlaced && isAuthenticated) {
+      setShippingAddress(prev => ({
+        ...prev,
+        phone: '',
+        address: '',
+        city: '',
+        state: '',
+        pincode: ''
+      }));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
@@ -133,6 +148,16 @@ export default function CartPage() {
         setOrderData(response.data);
         setOrderPlaced(true);
         clearCart();
+        // Clear shipping address form after successful order
+        setShippingAddress({
+          fullName: user?.firstName ? `${user.firstName} ${user.lastName || ''}`.trim() : '',
+          phone: '',
+          email: user?.email || '',
+          address: '',
+          city: '',
+          state: '',
+          pincode: ''
+        });
       }
     } catch (err: any) {
       setError(err.message || 'Failed to place order. Please try again.');
@@ -403,96 +428,98 @@ export default function CartPage() {
               
               <form onSubmit={handlePlaceOrder}>
                 {/* Shipping Address */}
-                <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+                <div className="bg-white rounded-2xl border-2 border-gray-200 shadow-lg p-6 md:p-8 mb-6">
                   <div className="flex items-center gap-2 mb-6">
-                    <MapPin className="w-6 h-6 text-green-600" />
+                    <div className="p-2 bg-green-100 rounded-lg">
+                      <MapPin className="w-6 h-6 text-green-600" />
+                    </div>
                     <h2 className="text-xl font-bold text-gray-900">Shipping Address</h2>
                   </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Full Name *</label>
+                      <label className="block text-sm font-semibold text-gray-800 mb-2">Full Name *</label>
                       <div className="relative">
-                        <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                        <User className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500" />
                         <input
                           type="text"
                           required
                           value={shippingAddress.fullName}
                           onChange={(e) => setShippingAddress({...shippingAddress, fullName: e.target.value})}
-                          className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                          className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-gray-50 focus:bg-white text-gray-900 font-medium placeholder:text-gray-400 transition-all shadow-sm"
                           placeholder="Enter full name"
                         />
                       </div>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number *</label>
+                      <label className="block text-sm font-semibold text-gray-800 mb-2">Phone Number *</label>
                       <div className="relative">
-                        <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                        <Phone className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500" />
                         <input
                           type="tel"
                           required
                           value={shippingAddress.phone}
                           onChange={(e) => setShippingAddress({...shippingAddress, phone: e.target.value})}
-                          className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                          className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-gray-50 focus:bg-white text-gray-900 font-medium placeholder:text-gray-400 transition-all shadow-sm"
                           placeholder="Enter phone number"
                         />
                       </div>
                     </div>
                     <div className="md:col-span-2">
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Email Address *</label>
+                      <label className="block text-sm font-semibold text-gray-800 mb-2">Email Address *</label>
                       <div className="relative">
-                        <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                        <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500" />
                         <input
                           type="email"
                           required
                           value={shippingAddress.email}
                           onChange={(e) => setShippingAddress({...shippingAddress, email: e.target.value})}
-                          className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                          className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-gray-50 focus:bg-white text-gray-900 font-medium placeholder:text-gray-400 transition-all shadow-sm"
                           placeholder="Enter email address"
                         />
                       </div>
                     </div>
                     <div className="md:col-span-2">
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Complete Address *</label>
+                      <label className="block text-sm font-semibold text-gray-800 mb-2">Complete Address *</label>
                       <textarea
                         required
                         value={shippingAddress.address}
                         onChange={(e) => setShippingAddress({...shippingAddress, address: e.target.value})}
                         rows={3}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-gray-50 focus:bg-white text-gray-900 font-medium placeholder:text-gray-400 transition-all shadow-sm resize-none"
                         placeholder="House No., Building, Street, Area"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">City *</label>
+                      <label className="block text-sm font-semibold text-gray-800 mb-2">City *</label>
                       <input
                         type="text"
                         required
                         value={shippingAddress.city}
                         onChange={(e) => setShippingAddress({...shippingAddress, city: e.target.value})}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-gray-50 focus:bg-white text-gray-900 font-medium placeholder:text-gray-400 transition-all shadow-sm"
                         placeholder="Enter city"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">State *</label>
+                      <label className="block text-sm font-semibold text-gray-800 mb-2">State *</label>
                       <input
                         type="text"
                         required
                         value={shippingAddress.state}
                         onChange={(e) => setShippingAddress({...shippingAddress, state: e.target.value})}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-gray-50 focus:bg-white text-gray-900 font-medium placeholder:text-gray-400 transition-all shadow-sm"
                         placeholder="Enter state"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">PIN Code *</label>
+                      <label className="block text-sm font-semibold text-gray-800 mb-2">PIN Code *</label>
                       <input
                         type="text"
                         required
                         value={shippingAddress.pincode}
                         onChange={(e) => setShippingAddress({...shippingAddress, pincode: e.target.value})}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-gray-50 focus:bg-white text-gray-900 font-medium placeholder:text-gray-400 transition-all shadow-sm"
                         placeholder="Enter PIN code"
                       />
                     </div>

@@ -1,19 +1,33 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import TopBar from '@/components/TopBar';
 import Header from '@/components/Header';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
-import { User, Mail, Lock, Phone, Eye, EyeOff, LogIn, UserPlus } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { User, Mail, Lock, Phone, Eye, EyeOff, LogIn, UserPlus, CheckCircle, Home, Package } from 'lucide-react';
 
 export default function CustomerLoginPage() {
+  const router = useRouter();
+  const { isAuthenticated, user, loading: authLoading } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'login' | 'register'>('login');
   const [showPassword, setShowPassword] = useState(false);
   const [loginData, setLoginData] = useState({ email: '', password: '' });
   const [registerData, setRegisterData] = useState({ name: '', email: '', phone: '', password: '', confirmPassword: '' });
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (!authLoading && isAuthenticated) {
+      // User is already logged in, redirect to home or their account
+      const params = new URLSearchParams(window.location.search);
+      const redirect = params.get('redirect') || '/';
+      router.push(redirect);
+    }
+  }, [isAuthenticated, authLoading, router]);
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -25,7 +39,8 @@ export default function CustomerLoginPage() {
 
   const handleLoginSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    alert('Login functionality coming soon!');
+    // Redirect to main login page
+    router.push('/login');
   };
 
   const handleRegisterSubmit = (e: React.FormEvent) => {
@@ -34,8 +49,78 @@ export default function CustomerLoginPage() {
       alert('Passwords do not match!');
       return;
     }
-    alert('Registration functionality coming soon!');
+    // Redirect to main register page
+    router.push('/register');
   };
+
+  // Show loading state while checking authentication
+  if (authLoading) {
+    return (
+      <div className="min-h-screen w-screen overflow-x-hidden bg-gray-50">
+        <TopBar />
+        <Header onMenuToggle={toggleMobileMenu} isMenuOpen={isMobileMenuOpen} />
+        <Navigation isMobileMenuOpen={isMobileMenuOpen} onCloseMobileMenu={closeMobileMenu} />
+        <main className="container mx-auto px-4 py-8 flex items-center justify-center min-h-[calc(100vh-300px)]">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-4 border-green-200 border-t-green-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading...</p>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  // If already authenticated, show message (though they should be redirected)
+  if (isAuthenticated) {
+    return (
+      <div className="min-h-screen w-screen overflow-x-hidden bg-gray-50">
+        <TopBar />
+        <Header onMenuToggle={toggleMobileMenu} isMenuOpen={isMobileMenuOpen} />
+        <Navigation isMobileMenuOpen={isMobileMenuOpen} onCloseMobileMenu={closeMobileMenu} />
+        <main className="container mx-auto px-4 py-8 flex items-center justify-center min-h-[calc(100vh-300px)]">
+          <div className="max-w-md w-full bg-white rounded-2xl shadow-lg border-2 border-green-200 p-8 text-center">
+            <div className="mb-6">
+              <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <CheckCircle className="w-12 h-12 text-green-600" />
+              </div>
+              <h1 className="text-2xl font-bold text-gray-900 mb-2">You're Already Logged In</h1>
+              <p className="text-gray-600 mb-1">
+                Welcome back, <span className="font-semibold text-gray-900">{user?.firstName || user?.email}</span>!
+              </p>
+              <p className="text-sm text-gray-500">You are already signed in to your account.</p>
+            </div>
+            <div className="space-y-3">
+              <Link
+                href={user?.role === 'ADMIN' ? '/admin/orders' : '/my-orders'}
+                className="block w-full px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl hover:from-green-700 hover:to-emerald-700 transition-all shadow-md hover:shadow-lg font-semibold flex items-center justify-center gap-2"
+              >
+                {user?.role === 'ADMIN' ? (
+                  <>
+                    <Package size={20} />
+                    Go to Admin Dashboard
+                  </>
+                ) : (
+                  <>
+                    <Package size={20} />
+                    Go to My Orders
+                  </>
+                )}
+              </Link>
+              <Link
+                href="/"
+                className="block w-full px-6 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-all font-semibold flex items-center justify-center gap-2"
+              >
+                <Home size={20} />
+                Go to Homepage
+              </Link>
+            </div>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen w-screen overflow-x-hidden bg-white">

@@ -237,6 +237,39 @@ export class OrderController {
         }
         // 7. Clear Cart
         await Cart.findOneAndDelete({ user: userId });
+        // 8. Save shipping address to user's saved addresses (if not already exists)
+        try {
+            const { userModel } = await import('../models/user.model.js');
+            const user = await userModel.findById(userId);
+            if (user) {
+                // Check if address already exists
+                const addressExists = user.addresses?.some((addr) => addr.addressLine1 === shippingAddress.addressLine1 &&
+                    addr.city === shippingAddress.city &&
+                    addr.state === shippingAddress.state &&
+                    addr.pincode === shippingAddress.pincode &&
+                    addr.phone === shippingAddress.phone);
+                // If address doesn't exist, add it
+                if (!addressExists) {
+                    const newAddress = {
+                        fullName: shippingAddress.fullName,
+                        phone: shippingAddress.phone,
+                        addressLine1: shippingAddress.addressLine1,
+                        addressLine2: shippingAddress.addressLine2 || '',
+                        landmark: shippingAddress.landmark || '',
+                        city: shippingAddress.city,
+                        state: shippingAddress.state,
+                        pincode: shippingAddress.pincode,
+                        country: shippingAddress.country || 'India',
+                        isDefault: user.addresses?.length === 0, // Set as default if it's the first address
+                    };
+                    await userModel.findByIdAndUpdate(userId, { $push: { addresses: newAddress } }, { new: true, runValidators: true });
+                }
+            }
+        }
+        catch (error) {
+            // Log error but don't fail the order creation
+            console.error('Error saving address to user profile:', error);
+        }
         // Populate for response
         const populatedOrder = await Order.findById(order._id).populate('items.product');
         res.status(201).json({

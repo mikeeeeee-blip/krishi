@@ -42,14 +42,9 @@ const createApp = () => {
         contentSecurityPolicy: config.nodeEnv === 'production' ? {} : false,
         crossOriginEmbedderPolicy: false,
     }));
-    // CORS configuration
-    // Allow specific origins: localhost for development and Vercel deployment for production
-    const corsOrigins = config.corsOrigin
-        .split(',')
-        .map(origin => origin.trim())
-        .filter(origin => origin.length > 0);
+    // CORS configuration - Allow all origins
     const corsOptions = {
-        origin: corsOrigins,
+        origin: true, // Allow all origins
         credentials: true, // Allow credentials (cookies, authorization headers)
         methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allowed HTTP methods
         allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
@@ -86,6 +81,144 @@ const createApp = () => {
 };
 // Initialize Express app
 const app = createApp();
+/**
+ * API Landing Page
+ * Simple landing page for the API
+ */
+app.get('/', (req, res) => {
+    res.status(200).send(`
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>KRISHANSHECLAT AGROXGLOBAL API</title>
+      <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          min-height: 100vh;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 20px;
+        }
+        .container {
+          background: white;
+          border-radius: 16px;
+          padding: 40px;
+          max-width: 600px;
+          width: 100%;
+          box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+          text-align: center;
+        }
+        h1 {
+          color: #2d3748;
+          font-size: 28px;
+          margin-bottom: 10px;
+          font-weight: 700;
+        }
+        .subtitle {
+          color: #718096;
+          font-size: 16px;
+          margin-bottom: 30px;
+        }
+        .status {
+          display: inline-block;
+          background: #48bb78;
+          color: white;
+          padding: 8px 16px;
+          border-radius: 20px;
+          font-size: 14px;
+          font-weight: 600;
+          margin-bottom: 30px;
+        }
+        .info {
+          background: #f7fafc;
+          border-radius: 12px;
+          padding: 20px;
+          margin-bottom: 20px;
+          text-align: left;
+        }
+        .info-item {
+          display: flex;
+          justify-content: space-between;
+          padding: 8px 0;
+          border-bottom: 1px solid #e2e8f0;
+        }
+        .info-item:last-child {
+          border-bottom: none;
+        }
+        .label {
+          color: #718096;
+          font-weight: 600;
+          font-size: 14px;
+        }
+        .value {
+          color: #2d3748;
+          font-weight: 500;
+          font-size: 14px;
+        }
+        .links {
+          display: flex;
+          gap: 12px;
+          justify-content: center;
+          flex-wrap: wrap;
+          margin-top: 30px;
+        }
+        .link {
+          color: #667eea;
+          text-decoration: none;
+          font-weight: 600;
+          font-size: 14px;
+          padding: 10px 20px;
+          border: 2px solid #667eea;
+          border-radius: 8px;
+          transition: all 0.3s;
+        }
+        .link:hover {
+          background: #667eea;
+          color: white;
+        }
+        @media (max-width: 480px) {
+          .container { padding: 30px 20px; }
+          h1 { font-size: 24px; }
+        }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <h1>🌱 KRISHANSHECLAT AGROXGLOBAL API</h1>
+        <p class="subtitle">Agricultural E-Commerce Platform API</p>
+        <div class="status">● API Running</div>
+        <div class="info">
+          <div class="info-item">
+            <span class="label">Status:</span>
+            <span class="value">Online</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Environment:</span>
+            <span class="value">${config.nodeEnv}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">API Version:</span>
+            <span class="value">${config.apiVersion}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Base URL:</span>
+            <span class="value">/api/v1</span>
+          </div>
+        </div>
+        <div class="links">
+          <a href="/health" class="link">Health Check</a>
+          <a href="/api/v1" class="link">API Docs</a>
+        </div>
+      </div>
+    </body>
+    </html>
+  `);
+});
 /**
  * Health Check Endpoint
  * Returns API status and basic information

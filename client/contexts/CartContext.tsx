@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect, useRef, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useAuth } from './AuthContext';
 import { getCart, addToCart as addToCartApi, updateCartItem, removeFromCart as removeFromCartApi, clearCart as clearCartApi } from '@/lib/api/cart';
 
@@ -35,7 +35,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [isLoaded, setIsLoaded] = useState(false);
   const [loading, setLoading] = useState(false);
   const { isAuthenticated, loading: authLoading } = useAuth();
-  const hasSyncedRef = useRef(false); // Prevent multiple syncs on login
 
   // Helper function to check if a string is a valid MongoDB ObjectId
   const isValidObjectId = (id: string): boolean => {
@@ -114,23 +113,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
                 })
                 .filter((item: CartItem) => item.productId); // Filter out invalid items
 
-              // Merge backend cart with localStorage cart (backend takes priority)
-              // Keep localStorage items that aren't in backend (for mock data)
-              const mergedCart = [...backendCartItems];
-              localCart.forEach((localItem: CartItem) => {
-                const existsInBackend = backendCartItems.some(
-                  (backendItem: CartItem) => 
-                    backendItem.productId === localItem.productId && 
-                    backendItem.variant === localItem.variant
-                );
-                // Only add local items if they're not in backend (mock data support)
-                if (!existsInBackend) {
-                  mergedCart.push(localItem);
-                }
-              });
-
-              setItems(mergedCart);
-              saveCartToLocalStorage(mergedCart);
+              // Use backend cart as source of truth - don't merge with localStorage
+              // This prevents duplicate items when refreshing
+              setItems(backendCartItems);
+              saveCartToLocalStorage(backendCartItems);
             } else {
               // Backend cart is empty, use localStorage cart if available
               if (localCart.length > 0) {
@@ -183,43 +169,21 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, [items, isLoaded]);
 
   // Sync cart to backend when user logs in (only once)
-  useEffect(() => {
-    if (isAuthenticated && isLoaded && items.length > 0 && !authLoading && !hasSyncedRef.current) {
-      // Only sync if we have items and user just logged in (prevent multiple syncs)
-      hasSyncedRef.current = true;
-      const syncOnce = async () => {
-        await syncCartToBackend();
-      };
-      syncOnce();
-    }
-    
-    // Reset sync flag when user logs out
-    if (!isAuthenticated) {
-      hasSyncedRef.current = false;
-    }
-  }, [isAuthenticated, isLoaded, items.length, authLoading]);
-
-  const syncCartToBackend = async () => {
-    if (!isAuthenticated) return;
-
-    try {
-      // Sync each item to backend (only if productId is a valid ObjectId)
-      for (const item of items) {
-        // Skip items with invalid ObjectIds (mock data)
-        if (!isValidObjectId(item.productId)) {
-          console.warn(`Skipping sync for product ${item.productId} - not a valid MongoDB ObjectId`);
-          continue;
-        }
-        try {
-          await addToCartApi(item.productId, null, item.count, item.variant || undefined);
-        } catch (error) {
-          console.error('Error syncing cart item:', error);
-        }
-      }
-    } catch (error) {
-      console.error('Error syncing cart:', error);
-    }
-  };
+  // REMOVED: This was causing duplicate items on refresh
+  // The cart is already loaded from backend on mount, so no need to sync localStorage items
+  // useEffect(() => {
+  //   if (isAuthenticated && isLoaded && items.length > 0 && !authLoading && !hasSyncedRef.current) {
+  //     hasSyncedRef.current = true;
+  //     const syncOnce = async () => {
+  //       await syncCartToBackend();
+  //     };
+  //     syncOnce();
+  //   }
+  //   
+  //   if (!isAuthenticated) {
+  //     hasSyncedRef.current = false;
+  //   }
+  // }, [isAuthenticated, isLoaded, items.length, authLoading]);
 
   const syncCart = async () => {
     if (!isAuthenticated) return;
