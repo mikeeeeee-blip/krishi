@@ -10,7 +10,10 @@ import {
   CheckCircle2,
   Truck,
   Shield,
-  HandCoins
+  HandCoins,
+  MapPin,
+  Mail,
+  Phone
 } from 'lucide-react';
 
 const Footer = () => {
@@ -56,7 +59,7 @@ const Footer = () => {
           </div>
 
           {/* Footer Navigation Links */}
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 md:gap-10 lg:gap-12 mb-6 sm:mb-8 md:mb-10">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-5 gap-6 sm:gap-8 md:gap-10 lg:gap-12 mb-6 sm:mb-8 md:mb-10">
             {/* Categories */}
             <div>
               <h3 className="font-bold text-base sm:text-lg md:text-xl mb-3 sm:mb-4 md:mb-5 text-white">Categories</h3>
@@ -355,6 +358,45 @@ const Footer = () => {
                   </Link>
                 </li>
               </ul>
+            </div>
+
+            {/* Contact Information */}
+            <div>
+              <h3 className="font-bold text-base sm:text-lg md:text-xl mb-3 sm:mb-4 md:mb-5 text-white">Contact Us</h3>
+              <ul className="space-y-3 sm:space-y-3.5 md:space-y-4">
+                <li className="flex items-start gap-2 sm:gap-3">
+                  <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-gray-300 mt-1 flex-shrink-0" />
+                  <p className="text-sm sm:text-base text-gray-200 leading-relaxed">
+                    353 MR 3 ROAD<br />
+                    MAHALAKSHMI NAGAR<br />
+                    INDORE, 452010
+                  </p>
+                </li>
+                <li className="flex items-center gap-2 sm:gap-3">
+                  <Mail className="w-4 h-4 sm:w-5 sm:h-5 text-gray-300 flex-shrink-0" />
+                  <a 
+                    href="mailto:Sales@krishansheclataagro.shop" 
+                    className="text-sm sm:text-base text-gray-200 hover:text-white hover:underline transition-all duration-200"
+                  >
+                    Sales@krishansheclataagro.shop
+                  </a>
+                </li>
+                <li className="flex items-center gap-2 sm:gap-3">
+                  <Phone className="w-4 h-4 sm:w-5 sm:h-5 text-gray-300 flex-shrink-0" />
+                  <a 
+                    href="tel:+917049407951" 
+                    className="text-sm sm:text-base text-gray-200 hover:text-white hover:underline transition-all duration-200"
+                  >
+                    +91 7049407951
+                  </a>
+                </li>
+              </ul>
+              <div className="mt-4 sm:mt-5 pt-3 sm:pt-4 border-t border-gray-600">
+                <p className="text-xs sm:text-sm text-gray-300 italic">
+                  Owner and Managed by<br />
+                  <span className="font-semibold text-white">KRISHANSHECLAT AGROXGLOBAL</span>
+                </p>
+              </div>
             </div>
           </div>
 
