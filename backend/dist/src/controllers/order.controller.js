@@ -294,6 +294,37 @@ export class OrderController {
         await order.save();
         res.json({ success: true, data: order });
     });
+    // Customer: Update shipping address and phone (only before shipping)
+    updateCustomerOrderAddress = asyncHandler(async (req, res) => {
+        const { shippingAddress } = req.body;
+        const orderId = req.params.id;
+        const userId = req.user.id;
+        if (!shippingAddress) {
+            throw new ApiError(HTTP_STATUS.BAD_REQUEST, 'Shipping address is required');
+        }
+        // Validate required fields
+        if (!shippingAddress.fullName || !shippingAddress.phone || !shippingAddress.addressLine1 ||
+            !shippingAddress.city || !shippingAddress.state || !shippingAddress.pincode) {
+            throw new ApiError(HTTP_STATUS.BAD_REQUEST, 'All required address fields must be provided');
+        }
+        // Find order and verify ownership
+        const order = await Order.findOne({ _id: orderId, user: userId });
+        if (!order) {
+            throw new ApiError(HTTP_STATUS.NOT_FOUND, 'Order not found');
+        }
+        // Only allow update if order hasn't been shipped
+        if ([ORDER_STATUS.SHIPPED, ORDER_STATUS.DELIVERED].includes(order.status)) {
+            throw new ApiError(HTTP_STATUS.BAD_REQUEST, 'Cannot update address after order has been shipped');
+        }
+        // Update shipping address
+        order.shippingAddress = shippingAddress;
+        await order.save();
+        res.json({
+            success: true,
+            data: order,
+            message: 'Shipping address updated successfully'
+        });
+    });
     // Admin: Get all orders
     getAllOrders = asyncHandler(async (req, res) => {
         const { page, limit, status, paymentStatus, paymentMethod, search, dateFrom, dateTo, minAmount, maxAmount, userId, sortBy = 'createdAt', sortOrder = 'desc', } = req.query;
@@ -438,7 +469,7 @@ export class OrderController {
     });
     // Admin: Update order status
     updateOrderStatus = asyncHandler(async (req, res) => {
-        const { status, trackingNumber, carrierName } = req.body;
+        const { status, trackingNumber, carrierName, cancellationReason } = req.body;
         const updateData = { status };
         if (status === 'SHIPPED') {
             updateData.shippedAt = new Date();
@@ -449,6 +480,12 @@ export class OrderController {
         }
         else if (status === 'DELIVERED') {
             updateData.deliveredAt = new Date();
+        }
+        else if (status === 'CANCELLED') {
+            updateData.cancelledAt = new Date();
+            if (cancellationReason) {
+                updateData.cancellationReason = cancellationReason;
+            }
         }
         const order = await Order.findByIdAndUpdate(req.params.id, updateData, { new: true });
         res.json({ success: true, data: order });
@@ -463,6 +500,27 @@ export class OrderController {
             updateData.paidAt = new Date();
         const order = await Order.findByIdAndUpdate(req.params.id, updateData, { new: true });
         res.json({ success: true, data: order });
+    });
+    // Admin: Update shipping address
+    updateShippingAddress = asyncHandler(async (req, res) => {
+        const { shippingAddress } = req.body;
+        if (!shippingAddress) {
+            throw new ApiError(HTTP_STATUS.BAD_REQUEST, 'Shipping address is required');
+        }
+        const order = await Order.findByIdAndUpdate(req.params.id, { shippingAddress }, { new: true });
+        if (!order) {
+            throw new ApiError(HTTP_STATUS.NOT_FOUND, 'Order not found');
+        }
+        res.json({ success: true, data: order, message: 'Shipping address updated successfully' });
+    });
+    // Admin: Update internal notes
+    updateInternalNotes = asyncHandler(async (req, res) => {
+        const { internalNotes } = req.body;
+        const order = await Order.findByIdAndUpdate(req.params.id, { internalNotes }, { new: true });
+        if (!order) {
+            throw new ApiError(HTTP_STATUS.NOT_FOUND, 'Order not found');
+        }
+        res.json({ success: true, data: order, message: 'Internal notes updated successfully' });
     });
     // Track order by order number (public endpoint)
     trackOrder = asyncHandler(async (req, res) => {

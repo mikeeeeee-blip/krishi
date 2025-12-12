@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ShoppingCart, Plus, Minus, Trash2, ChevronRight, ArrowLeft, CreditCard, Banknote, Smartphone, X, CheckCircle, Truck, MapPin, User, Phone, Mail } from 'lucide-react';
+import { ShoppingCart, Plus, Minus, Trash2, ChevronRight, ArrowLeft, CreditCard, Banknote, Smartphone, X, CheckCircle, Truck, MapPin, User, Phone, Mail, Package } from 'lucide-react';
 import TopBar from '@/components/TopBar';
 import Header from '@/components/Header';
 import Navigation from '@/components/Navigation';
@@ -12,6 +12,7 @@ import Footer from '@/components/Footer';
 import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { createOrder } from '@/lib/api/orders';
+import { getAddresses, type Address } from '@/lib/api/addresses';
 
 type PaymentMethod = 'cod' | 'online' | 'upi';
 
@@ -36,6 +37,10 @@ export default function CartPage() {
   const [orderPlaced, setOrderPlaced] = useState(false);
   const [orderData, setOrderData] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
+  const [savedAddresses, setSavedAddresses] = useState<Address[]>([]);
+  const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
+  const [useNewAddress, setUseNewAddress] = useState(false);
+  const [loadingAddresses, setLoadingAddresses] = useState(false);
   const [shippingAddress, setShippingAddress] = useState<ShippingAddress>({
     fullName: user?.firstName ? `${user.firstName} ${user.lastName || ''}`.trim() : '',
     phone: '',
@@ -73,20 +78,47 @@ export default function CartPage() {
     }
   }, [user]);
 
-  // Clear shipping address on page load/refresh (only address fields, keep name and email)
+  // Load saved addresses when checkout is shown
   useEffect(() => {
-    if (!orderPlaced && isAuthenticated) {
-      setShippingAddress(prev => ({
-        ...prev,
-        phone: '',
-        address: '',
-        city: '',
-        state: '',
-        pincode: ''
-      }));
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    const loadSavedAddresses = async () => {
+      if (showCheckout && isAuthenticated && !orderPlaced) {
+        try {
+          setLoadingAddresses(true);
+          const response = await getAddresses();
+          if (response.success && response.data) {
+            setSavedAddresses(response.data);
+            
+            // Auto-select default address
+            const defaultAddress = response.data.find((addr: Address) => addr.isDefault);
+            if (defaultAddress && defaultAddress._id) {
+              setSelectedAddressId(defaultAddress._id);
+              setUseNewAddress(false);
+              // Auto-fill the form with default address
+              setShippingAddress({
+                fullName: defaultAddress.fullName,
+                phone: defaultAddress.phone,
+                email: user?.email || '',
+                address: defaultAddress.addressLine1 + (defaultAddress.addressLine2 ? ', ' + defaultAddress.addressLine2 : ''),
+                city: defaultAddress.city,
+                state: defaultAddress.state,
+                pincode: defaultAddress.pincode
+              });
+            } else if (response.data.length === 0) {
+              // No saved addresses, show new address form
+              setUseNewAddress(true);
+            }
+          }
+        } catch (err) {
+          console.error('Error loading addresses:', err);
+          setUseNewAddress(true); // Fallback to new address form
+        } finally {
+          setLoadingAddresses(false);
+        }
+      }
+    };
+
+    loadSavedAddresses();
+  }, [showCheckout, isAuthenticated, orderPlaced, user?.email]);
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -102,6 +134,37 @@ export default function CartPage() {
       return;
     }
     setShowCheckout(true);
+  };
+
+  const handleAddressSelection = (addressId: string) => {
+    setSelectedAddressId(addressId);
+    const selectedAddr = savedAddresses.find(addr => addr._id === addressId);
+    if (selectedAddr) {
+      setShippingAddress({
+        fullName: selectedAddr.fullName,
+        phone: selectedAddr.phone,
+        email: user?.email || '',
+        address: selectedAddr.addressLine1 + (selectedAddr.addressLine2 ? ', ' + selectedAddr.addressLine2 : ''),
+        city: selectedAddr.city,
+        state: selectedAddr.state,
+        pincode: selectedAddr.pincode
+      });
+    }
+  };
+
+  const handleNewAddressToggle = () => {
+    setUseNewAddress(true);
+    setSelectedAddressId(null);
+    // Clear form for new address
+    setShippingAddress({
+      fullName: user?.firstName ? `${user.firstName} ${user.lastName || ''}`.trim() : '',
+      phone: '',
+      email: user?.email || '',
+      address: '',
+      city: '',
+      state: '',
+      pincode: ''
+    });
   };
 
   const handlePlaceOrder = async (e: React.FormEvent) => {
@@ -216,50 +279,113 @@ export default function CartPage() {
   // Order Success Modal
   if (orderPlaced) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50">
         <TopBar />
         <Header onMenuToggle={toggleMobileMenu} isMenuOpen={isMobileMenuOpen} />
         <Navigation isMobileMenuOpen={isMobileMenuOpen} onCloseMobileMenu={closeMobileMenu} />
         
-        <div className="container mx-auto px-4 py-16">
-          <div className="max-w-lg mx-auto bg-white rounded-2xl p-8 shadow-lg text-center">
-            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <CheckCircle size={48} className="text-green-600" />
-            </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Order Placed Successfully!</h2>
-            <p className="text-gray-600 mb-6">
-              {paymentMethod === 'cod' 
-                ? 'Your order has been placed. Please keep the exact amount ready for payment upon delivery.'
-                : 'Your order has been placed and payment received. Thank you for shopping with us!'}
-            </p>
-            
-            <div className="bg-gray-50 rounded-lg p-4 mb-6 text-left">
-              <h3 className="font-semibold text-gray-900 mb-2">Order Details:</h3>
-              {orderData && (
-                <>
-                  <p className="text-sm text-gray-600">Order Number: {orderData.orderNumber}</p>
-                  <p className="text-sm text-gray-600">Payment Method: {orderData.paymentMethod}</p>
-                  <p className="text-sm text-gray-600">Total Amount: ₹{Number(orderData.totalAmount).toFixed(2)}</p>
-                  <p className="text-sm text-gray-600 mt-2">Delivery: 5-7 business days</p>
-                </>
-              )}
-            </div>
+        <div className="container mx-auto px-4 py-12 md:py-20">
+          <div className="max-w-2xl mx-auto">
+            {/* Success Card */}
+            <div className="bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100">
+              {/* Success Header with Gradient */}
+              <div className="bg-gradient-to-r from-green-500 to-emerald-600 px-8 py-10 text-center relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-32 -mt-32"></div>
+                <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/10 rounded-full -ml-24 -mb-24"></div>
+                
+                <div className="relative z-10">
+                  <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg animate-bounce">
+                    <CheckCircle size={56} className="text-green-600" strokeWidth={2.5} />
+                  </div>
+                  <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">
+                    Order Placed Successfully!
+                  </h2>
+                  <p className="text-green-50 text-base md:text-lg max-w-md mx-auto leading-relaxed">
+                    {paymentMethod === 'cod' 
+                      ? 'Your order has been placed. Please keep the exact amount ready for payment upon delivery.'
+                      : 'Your order has been placed and payment received. Thank you for shopping with us!'}
+                  </p>
+                </div>
+              </div>
 
-            <div className="flex flex-col gap-3">
-              <Link
-                href="/my-orders"
-                className="w-full bg-primary hover:bg-primary-dark text-white font-semibold py-3 px-6 rounded-lg transition-colors text-center"
-                onClick={handleCloseOrderSuccess}
-              >
-                View My Orders
-              </Link>
-              <Link
-                href="/"
-                className="w-full bg-gray-100 hover:bg-gray-200 text-gray-900 font-semibold py-3 px-6 rounded-lg transition-colors text-center"
-                onClick={handleCloseOrderSuccess}
-              >
-                Continue Shopping
-              </Link>
+              {/* Order Details Section */}
+              <div className="px-6 md:px-10 py-8">
+                <div className="bg-gradient-to-br from-gray-50 to-gray-100/50 rounded-2xl p-6 md:p-8 mb-8 border border-gray-200/50">
+                  <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                    <Package size={24} className="text-green-600" />
+                    Order Details
+                  </h3>
+                  {orderData && (
+                    <div className="space-y-4">
+                      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center pb-4 border-b border-gray-200">
+                        <span className="text-sm font-medium text-gray-500 mb-1 sm:mb-0">Order Number</span>
+                        <span className="text-base font-bold text-gray-900 font-mono tracking-tight break-all">
+                          {orderData.orderNumber}
+                        </span>
+                      </div>
+                      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center pb-4 border-b border-gray-200">
+                        <span className="text-sm font-medium text-gray-500 mb-1 sm:mb-0">Payment Method</span>
+                        <span className="text-base font-semibold text-gray-900 inline-flex items-center gap-2">
+                          {orderData.paymentMethod === 'COD' ? (
+                            <>
+                              <Banknote size={18} className="text-orange-600" />
+                              <span>Cash on Delivery</span>
+                            </>
+                          ) : (
+                            <>
+                              <CreditCard size={18} className="text-blue-600" />
+                              <span>{orderData.paymentMethod}</span>
+                            </>
+                          )}
+                        </span>
+                      </div>
+                      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center pb-4 border-b border-gray-200">
+                        <span className="text-sm font-medium text-gray-500 mb-1 sm:mb-0">Total Amount</span>
+                        <span className="text-2xl font-bold text-green-600">
+                          ₹{Number(orderData.totalAmount).toFixed(2)}
+                        </span>
+                      </div>
+                      <div className="flex items-start gap-3 pt-2 bg-blue-50 rounded-xl p-4 border border-blue-100">
+                        <Truck size={22} className="text-blue-600 flex-shrink-0 mt-0.5" />
+                        <div>
+                          <p className="text-sm font-semibold text-blue-900 mb-1">Expected Delivery</p>
+                          <p className="text-base font-bold text-blue-700">5-7 Business Days</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <Link
+                    href="/my-orders"
+                    className="flex-1 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-bold py-4 px-6 rounded-xl transition-all duration-200 text-center shadow-lg shadow-green-200 hover:shadow-xl hover:shadow-green-300 hover:-translate-y-0.5 flex items-center justify-center gap-2"
+                    onClick={handleCloseOrderSuccess}
+                  >
+                    <Package size={20} />
+                    View My Orders
+                  </Link>
+                  <Link
+                    href="/"
+                    className="flex-1 bg-white hover:bg-gray-50 text-gray-900 font-bold py-4 px-6 rounded-xl transition-all duration-200 text-center border-2 border-gray-200 hover:border-gray-300 hover:-translate-y-0.5 flex items-center justify-center gap-2"
+                    onClick={handleCloseOrderSuccess}
+                  >
+                    <ShoppingCart size={20} />
+                    Continue Shopping
+                  </Link>
+                </div>
+
+                {/* Additional Info */}
+                <div className="mt-8 pt-6 border-t border-gray-200 text-center">
+                  <p className="text-sm text-gray-500 mb-2">
+                    We&apos;ve sent a confirmation email to <span className="font-semibold text-gray-700">{user?.email}</span>
+                  </p>
+                  <p className="text-xs text-gray-400">
+                    Need help? Contact our support team
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -436,12 +562,105 @@ export default function CartPage() {
               <form onSubmit={handlePlaceOrder}>
                 {/* Shipping Address */}
                 <div className="bg-white rounded-2xl border-2 border-gray-200 shadow-lg p-6 md:p-8 mb-6">
-                  <div className="flex items-center gap-2 mb-6">
-                    <div className="p-2 bg-green-100 rounded-lg">
-                      <MapPin className="w-6 h-6 text-green-600" />
+                  <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center gap-2">
+                      <div className="p-2 bg-green-100 rounded-lg">
+                        <MapPin className="w-6 h-6 text-green-600" />
+                      </div>
+                      <h2 className="text-xl font-bold text-gray-900">Shipping Address</h2>
                     </div>
-                    <h2 className="text-xl font-bold text-gray-900">Shipping Address</h2>
+                    {savedAddresses.length > 0 && !useNewAddress && (
+                      <button
+                        type="button"
+                        onClick={handleNewAddressToggle}
+                        className="text-sm text-green-600 hover:text-green-700 font-semibold flex items-center gap-1"
+                      >
+                        <Plus size={16} />
+                        Add New Address
+                      </button>
+                    )}
                   </div>
+
+                  {/* Saved Addresses Selection */}
+                  {loadingAddresses ? (
+                    <div className="text-center py-8">
+                      <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
+                      <p className="mt-2 text-gray-600">Loading addresses...</p>
+                    </div>
+                  ) : savedAddresses.length > 0 && !useNewAddress ? (
+                    <div className="mb-6">
+                      <div className="space-y-3 mb-4">
+                        {savedAddresses.map((address) => (
+                          <div
+                            key={address._id}
+                            onClick={() => handleAddressSelection(address._id!)}
+                            className={`relative border-2 rounded-xl p-4 cursor-pointer transition-all ${
+                              selectedAddressId === address._id
+                                ? 'border-green-600 bg-green-50'
+                                : 'border-gray-200 hover:border-green-300 bg-white'
+                            }`}
+                          >
+                            <div className="flex items-start gap-3">
+                              <input
+                                type="radio"
+                                name="savedAddress"
+                                checked={selectedAddressId === address._id}
+                                onChange={() => handleAddressSelection(address._id!)}
+                                className="mt-1 w-4 h-4 text-green-600 focus:ring-green-500"
+                              />
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-1">
+                                  <span className="font-semibold text-gray-900">{address.fullName}</span>
+                                  {address.isDefault && (
+                                    <span className="px-2 py-0.5 bg-green-100 text-green-700 text-xs font-semibold rounded">
+                                      Default
+                                    </span>
+                                  )}
+                                </div>
+                                <p className="text-sm text-gray-700 mb-1">
+                                  {address.addressLine1}
+                                  {address.addressLine2 && `, ${address.addressLine2}`}
+                                </p>
+                                <p className="text-sm text-gray-700 mb-1">
+                                  {address.city}, {address.state} - {address.pincode}
+                                </p>
+                                <p className="text-sm text-gray-600">Phone: {address.phone}</p>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleNewAddressToggle}
+                        className="w-full py-3 border-2 border-dashed border-gray-300 rounded-xl text-gray-600 hover:border-green-500 hover:text-green-600 font-medium transition-all flex items-center justify-center gap-2"
+                      >
+                        <Plus size={20} />
+                        Use a Different Address
+                      </button>
+                    </div>
+                  ) : null}
+
+                  {/* Address Form (shown when using new address or no saved addresses) */}
+                  {(useNewAddress || savedAddresses.length === 0) && (
+                    <>
+                      {savedAddresses.length > 0 && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setUseNewAddress(false);
+                            // Re-select default address if available
+                            const defaultAddr = savedAddresses.find(addr => addr.isDefault);
+                            if (defaultAddr && defaultAddr._id) {
+                              handleAddressSelection(defaultAddr._id);
+                            }
+                          }}
+                          className="mb-4 text-sm text-green-600 hover:text-green-700 font-semibold flex items-center gap-1"
+                        >
+                          <ArrowLeft size={16} />
+                          Back to Saved Addresses
+                        </button>
+                      )}
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                     <div>
@@ -531,6 +750,8 @@ export default function CartPage() {
                       />
                     </div>
                   </div>
+                    </>
+                  )}
                 </div>
 
                 {/* Payment Method */}

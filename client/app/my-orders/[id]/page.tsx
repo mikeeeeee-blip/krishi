@@ -11,7 +11,7 @@ import Footer from '@/components/Footer';
 import OrderStatusBadge from '@/components/orders/OrderStatusBadge';
 import PaymentStatusBadge from '@/components/orders/PaymentStatusBadge';
 import OrderTrackingTimeline from '@/components/orders/OrderTrackingTimeline';
-import { getUserOrderById, cancelOrder } from '@/lib/api/orders';
+import { getUserOrderById, cancelOrder, updateCustomerOrderAddress } from '@/lib/api/orders';
 import { format } from 'date-fns';
 import {
   ArrowLeft,
@@ -22,6 +22,9 @@ import {
   Calendar,
   IndianRupee,
   XCircle,
+  Edit,
+  X,
+  Save,
 } from 'lucide-react';
 
 export default function OrderDetailPage() {
@@ -35,6 +38,19 @@ export default function OrderDetailPage() {
   const [cancelling, setCancelling] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [cancelReason, setCancelReason] = useState('');
+  const [showEditAddress, setShowEditAddress] = useState(false);
+  const [savingAddress, setSavingAddress] = useState(false);
+  const [addressForm, setAddressForm] = useState({
+    fullName: '',
+    phone: '',
+    addressLine1: '',
+    addressLine2: '',
+    landmark: '',
+    city: '',
+    state: '',
+    pincode: '',
+    country: 'India',
+  });
 
   useEffect(() => {
     const fetchOrder = async () => {
@@ -42,6 +58,22 @@ export default function OrderDetailPage() {
         setLoading(true);
         const response = await getUserOrderById(orderId);
         setOrder(response.data);
+        
+        // Initialize address form with current shipping address
+        if (response.data.shippingAddress) {
+          const addr = response.data.shippingAddress;
+          setAddressForm({
+            fullName: addr.fullName || '',
+            phone: addr.phone || '',
+            addressLine1: addr.addressLine1 || '',
+            addressLine2: addr.addressLine2 || '',
+            landmark: addr.landmark || '',
+            city: addr.city || '',
+            state: addr.state || '',
+            pincode: addr.pincode || '',
+            country: addr.country || 'India',
+          });
+        }
       } catch (err: any) {
         setError(err.message || 'Failed to load order');
       } finally {
@@ -85,6 +117,47 @@ export default function OrderDetailPage() {
   // Can only cancel before shipping
   const canCancel = order && ['PENDING', 'CONFIRMED', 'PROCESSING'].includes(order.status) && 
     !['SHIPPED', 'OUT_FOR_DELIVERY', 'DELIVERED'].includes(order.status);
+
+  // Can only edit address before shipping
+  const canEditAddress = order && ['PENDING', 'CONFIRMED', 'PROCESSING'].includes(order.status) && 
+    !['SHIPPED', 'OUT_FOR_DELIVERY', 'DELIVERED'].includes(order.status);
+
+  const handleSaveAddress = async () => {
+    // Validate required fields
+    if (!addressForm.fullName || !addressForm.phone || !addressForm.addressLine1 ||
+        !addressForm.city || !addressForm.state || !addressForm.pincode) {
+      alert('Please fill in all required fields');
+      return;
+    }
+
+    // Validate phone number (basic validation)
+    const phoneRegex = /^[+]?[(]?[0-9]{1,4}[)]?[-\s.]?[(]?[0-9]{1,4}[)]?[-\s.]?[0-9]{1,9}$/;
+    if (!phoneRegex.test(addressForm.phone.replace(/\s/g, ''))) {
+      alert('Please enter a valid phone number');
+      return;
+    }
+
+    // Validate pincode (6 digits for India)
+    if (addressForm.pincode.length !== 6 || !/^\d+$/.test(addressForm.pincode)) {
+      alert('Please enter a valid 6-digit pincode');
+      return;
+    }
+
+    try {
+      setSavingAddress(true);
+      await updateCustomerOrderAddress(orderId, addressForm);
+      setShowEditAddress(false);
+      alert('Address updated successfully');
+      
+      // Refresh order data
+      const response = await getUserOrderById(orderId);
+      setOrder(response.data);
+    } catch (err: any) {
+      alert(err.message || 'Failed to update address');
+    } finally {
+      setSavingAddress(false);
+    }
+  };
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -213,20 +286,192 @@ export default function OrderDetailPage() {
 
             {/* Shipping Address */}
             <div className="bg-white rounded-lg border border-gray-200 p-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                <MapPin className="h-5 w-5" />
-                Shipping Address
-              </h2>
-              <div className="text-gray-600 space-y-1">
-                <p className="font-medium text-gray-900">{shippingAddress.fullName}</p>
-                <p>{shippingAddress.addressLine1}</p>
-                {shippingAddress.addressLine2 && <p>{shippingAddress.addressLine2}</p>}
-                <p>
-                  {shippingAddress.city}, {shippingAddress.state} {shippingAddress.pincode}
-                </p>
-                <p>{shippingAddress.country || 'India'}</p>
-                {shippingAddress.phone && <p className="mt-2">Phone: {shippingAddress.phone}</p>}
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
+                  <MapPin className="h-5 w-5" />
+                  Shipping Address
+                </h2>
+                {canEditAddress && (
+                  <button
+                    onClick={() => setShowEditAddress(true)}
+                    className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-green-600 bg-green-50 hover:bg-green-100 rounded-lg transition-colors"
+                  >
+                    <Edit className="h-4 w-4" />
+                    Edit Address
+                  </button>
+                )}
               </div>
+              {!showEditAddress ? (
+                <div className="text-gray-600 space-y-1">
+                  <p className="font-medium text-gray-900">{shippingAddress.fullName}</p>
+                  <p>{shippingAddress.addressLine1}</p>
+                  {shippingAddress.addressLine2 && <p>{shippingAddress.addressLine2}</p>}
+                  {shippingAddress.landmark && <p>Landmark: {shippingAddress.landmark}</p>}
+                  <p>
+                    {shippingAddress.city}, {shippingAddress.state} {shippingAddress.pincode}
+                  </p>
+                  <p>{shippingAddress.country || 'India'}</p>
+                  {shippingAddress.phone && <p className="mt-2 font-medium">Phone: {shippingAddress.phone}</p>}
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-1">
+                        Full Name *
+                      </label>
+                      <input
+                        type="text"
+                        value={addressForm.fullName}
+                        onChange={(e) => setAddressForm({ ...addressForm, fullName: e.target.value })}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-1">
+                        Phone Number *
+                      </label>
+                      <input
+                        type="tel"
+                        value={addressForm.phone}
+                        onChange={(e) => setAddressForm({ ...addressForm, phone: e.target.value })}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                        placeholder="+91 9876543210"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-1">
+                      Address Line 1 *
+                    </label>
+                    <input
+                      type="text"
+                      value={addressForm.addressLine1}
+                      onChange={(e) => setAddressForm({ ...addressForm, addressLine1: e.target.value })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-1">
+                      Address Line 2
+                    </label>
+                    <input
+                      type="text"
+                      value={addressForm.addressLine2}
+                      onChange={(e) => setAddressForm({ ...addressForm, addressLine2: e.target.value })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-1">
+                      Landmark
+                    </label>
+                    <input
+                      type="text"
+                      value={addressForm.landmark}
+                      onChange={(e) => setAddressForm({ ...addressForm, landmark: e.target.value })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                      placeholder="Near City Mall"
+                    />
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-1">
+                        City *
+                      </label>
+                      <input
+                        type="text"
+                        value={addressForm.city}
+                        onChange={(e) => setAddressForm({ ...addressForm, city: e.target.value })}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-1">
+                        State *
+                      </label>
+                      <input
+                        type="text"
+                        value={addressForm.state}
+                        onChange={(e) => setAddressForm({ ...addressForm, state: e.target.value })}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-1">
+                        Pincode *
+                      </label>
+                      <input
+                        type="text"
+                        value={addressForm.pincode}
+                        onChange={(e) => setAddressForm({ ...addressForm, pincode: e.target.value.replace(/\D/g, '').slice(0, 6) })}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                        maxLength={6}
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-1">
+                      Country
+                    </label>
+                    <input
+                      type="text"
+                      value={addressForm.country}
+                      onChange={(e) => setAddressForm({ ...addressForm, country: e.target.value })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                    />
+                  </div>
+                  <div className="flex gap-3 pt-2">
+                    <button
+                      onClick={() => {
+                        setShowEditAddress(false);
+                        // Reset form to original values
+                        if (order?.shippingAddress) {
+                          const addr = order.shippingAddress;
+                          setAddressForm({
+                            fullName: addr.fullName || '',
+                            phone: addr.phone || '',
+                            addressLine1: addr.addressLine1 || '',
+                            addressLine2: addr.addressLine2 || '',
+                            landmark: addr.landmark || '',
+                            city: addr.city || '',
+                            state: addr.state || '',
+                            pincode: addr.pincode || '',
+                            country: addr.country || 'India',
+                          });
+                        }
+                      }}
+                      className="flex-1 px-4 py-2 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-semibold transition-colors"
+                      disabled={savingAddress}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleSaveAddress}
+                      disabled={savingAddress}
+                      className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    >
+                      {savingAddress ? (
+                        <>
+                          <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                          Saving...
+                        </>
+                      ) : (
+                        <>
+                          <Save className="h-4 w-4" />
+                          Save Address
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Order Tracking Timeline */}

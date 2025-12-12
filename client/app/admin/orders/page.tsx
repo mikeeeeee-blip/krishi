@@ -9,7 +9,7 @@ import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import AdminRouteGuard from '@/components/AdminRouteGuard';
 import OrderCard from '@/components/orders/OrderCard';
-import { getAllOrders, getOrderStats } from '@/lib/api/orders';
+import { getAllOrders, getOrderStats, updateOrderStatus } from '@/lib/api/orders';
 import {
   Search,
   Filter,
@@ -21,6 +21,8 @@ import {
   CreditCard,
   Banknote,
   Clock,
+  X,
+  AlertTriangle,
 } from 'lucide-react';
 import OrderSummaryCard from '@/components/admin/OrderSummaryCard';
 
@@ -60,6 +62,16 @@ export default function AdminOrdersPage() {
     pages: 0,
   });
   const [showFilters, setShowFilters] = useState(false);
+  const [confirmModal, setConfirmModal] = useState<{ show: boolean; orderId: string | null }>({
+    show: false,
+    orderId: null,
+  });
+  const [cancelModal, setCancelModal] = useState<{ show: boolean; orderId: string | null; reason: string }>({
+    show: false,
+    orderId: null,
+    reason: '',
+  });
+  const [actionLoading, setActionLoading] = useState(false);
 
   const fetchOrders = async () => {
     try {
@@ -90,7 +102,12 @@ export default function AdminOrdersPage() {
         getOrderStats(filters.dateFrom, filters.dateTo),
       ]);
 
-      setOrders(ordersResponse.data || []);
+      // Map orders to ensure 'id' field exists
+      const ordersWithId = (ordersResponse.data || []).map((order: any) => ({
+        ...order,
+        id: order._id || order.id,
+      }));
+      setOrders(ordersWithId);
       if (ordersResponse.pagination) {
         setPagination(ordersResponse.pagination);
       }
@@ -135,6 +152,86 @@ export default function AdminOrdersPage() {
     }).format(amount);
   };
 
+  const handleConfirmOrder = (orderId: string) => {
+    setConfirmModal({ show: true, orderId });
+  };
+
+  const handleCancelOrder = (orderId: string) => {
+    setCancelModal({ show: true, orderId, reason: '' });
+  };
+
+  const confirmOrderAction = async () => {
+    if (!confirmModal.orderId) return;
+    
+    try {
+      setActionLoading(true);
+      await updateOrderStatus(confirmModal.orderId, 'CONFIRMED');
+      setConfirmModal({ show: false, orderId: null });
+      alert('Order confirmed successfully');
+      fetchOrders(); // Refresh orders list
+    } catch (err: any) {
+      alert(err.message || 'Failed to confirm order');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const cancelOrderAction = async () => {
+    if (!cancelModal.orderId) return;
+    
+    if (!cancelModal.reason.trim()) {
+      alert('Please provide a cancellation reason');
+      return;
+    }
+    
+    try {
+      setActionLoading(true);
+      await updateOrderStatus(
+        cancelModal.orderId, 
+        'CANCELLED',
+        undefined,
+        undefined,
+        cancelModal.reason
+      );
+      setCancelModal({ show: false, orderId: null, reason: '' });
+      alert('Order cancelled successfully');
+      fetchOrders(); // Refresh orders list
+    } catch (err: any) {
+      alert(err.message || 'Failed to cancel order');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  // Handler for clicking on summary cards to filter orders
+  const handleCardClick = (filterType: string, filterValue: string) => {
+    const newFilters: any = { ...filters, page: 1 };
+    
+    switch (filterType) {
+      case 'status':
+        newFilters.status = filterValue;
+        newFilters.paymentMethod = 'ALL'; // Reset payment method when filtering by status
+        break;
+      case 'paymentMethod':
+        newFilters.paymentMethod = filterValue;
+        newFilters.status = 'ALL'; // Reset status when filtering by payment method
+        break;
+      case 'all':
+        newFilters.status = 'ALL';
+        newFilters.paymentMethod = 'ALL';
+        break;
+    }
+    
+    setFilters(newFilters);
+    // Scroll to orders list
+    setTimeout(() => {
+      const ordersSection = document.getElementById('orders-list');
+      if (ordersSection) {
+        ordersSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 100);
+  };
+
   return (
     <AdminRouteGuard>
       <div className="min-h-screen w-screen overflow-x-hidden bg-gray-50">
@@ -168,48 +265,64 @@ export default function AdminOrdersPage() {
               value={stats.overview.totalOrders}
               icon={Package}
               iconColor="text-blue-600"
+              onClick={() => handleCardClick('all', 'ALL')}
+              isActive={filters.status === 'ALL' && filters.paymentMethod === 'ALL'}
             />
             <OrderSummaryCard
               title="Total Items"
               value={stats.overview.totalItemsOrdered}
               icon={ShoppingBag}
               iconColor="text-purple-600"
+              onClick={() => handleCardClick('all', 'ALL')}
+              isActive={filters.status === 'ALL' && filters.paymentMethod === 'ALL'}
             />
             <OrderSummaryCard
               title="Delivered"
               value={stats.overview.deliveredOrders}
               icon={CheckCircle}
               iconColor="text-green-600"
+              onClick={() => handleCardClick('status', 'DELIVERED')}
+              isActive={filters.status === 'DELIVERED'}
             />
             <OrderSummaryCard
               title="Cancelled"
               value={stats.overview.cancelledOrders}
               icon={XCircle}
               iconColor="text-red-600"
+              onClick={() => handleCardClick('status', 'CANCELLED')}
+              isActive={filters.status === 'CANCELLED'}
             />
             <OrderSummaryCard
               title="COD Orders"
               value={stats.overview.codOrders}
               icon={Banknote}
               iconColor="text-yellow-600"
+              onClick={() => handleCardClick('paymentMethod', 'COD')}
+              isActive={filters.paymentMethod === 'COD'}
             />
             <OrderSummaryCard
               title="Prepaid Orders"
               value={stats.overview.prepaidOrders}
               icon={CreditCard}
               iconColor="text-indigo-600"
+              onClick={() => handleCardClick('paymentMethod', 'PREPAID')}
+              isActive={filters.paymentMethod === 'PREPAID'}
             />
             <OrderSummaryCard
               title="Pending"
               value={stats.overview.pendingOrders}
               icon={Clock}
               iconColor="text-orange-600"
+              onClick={() => handleCardClick('status', 'PENDING')}
+              isActive={filters.status === 'PENDING'}
             />
             <OrderSummaryCard
               title="Prepaid Revenue"
               value={formatPrice(stats.overview.prepaidRevenue)}
               icon={DollarSign}
               iconColor="text-green-600"
+              onClick={() => handleCardClick('paymentMethod', 'PREPAID')}
+              isActive={filters.paymentMethod === 'PREPAID'}
             />
           </div>
         )}
@@ -324,6 +437,7 @@ export default function AdminOrdersPage() {
         </div>
 
         {/* Orders List */}
+        <div id="orders-list">
         {loading ? (
           <div className="flex items-center justify-center py-20">
             <div className="flex flex-col items-center gap-4">
@@ -359,7 +473,13 @@ export default function AdminOrdersPage() {
           <>
             <div className="space-y-4 mb-6">
               {orders.map((order) => (
-                <OrderCard key={order.id} order={order} isAdmin={true} />
+                <OrderCard 
+                  key={order.id} 
+                  order={order} 
+                  isAdmin={true}
+                  onConfirm={handleConfirmOrder}
+                  onCancel={handleCancelOrder}
+                />
               ))}
             </div>
 
@@ -387,10 +507,113 @@ export default function AdminOrdersPage() {
             )}
           </>
         )}
-        </main>
+        </div>
+      </main>
 
-        <Footer />
-      </div>
+      <Footer />
+
+      {/* Confirm Order Modal */}
+      {confirmModal.show && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-bold text-gray-900">Confirm Order</h3>
+              <button
+                onClick={() => setConfirmModal({ show: false, orderId: null })}
+                className="text-gray-400 hover:text-gray-600"
+                disabled={actionLoading}
+              >
+                <X size={24} />
+              </button>
+            </div>
+            
+            <div className="mb-6">
+              <div className="flex items-center gap-3 mb-4 p-4 bg-blue-50 rounded-lg">
+                <CheckCircle size={24} className="text-blue-600 flex-shrink-0" />
+                <p className="text-sm text-gray-700">
+                  Are you sure you want to confirm this order? The customer will be notified.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setConfirmModal({ show: false, orderId: null })}
+                className="flex-1 px-4 py-2.5 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-semibold transition-colors"
+                disabled={actionLoading}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmOrderAction}
+                className="flex-1 px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={actionLoading}
+              >
+                {actionLoading ? 'Confirming...' : 'Confirm Order'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Cancel Order Modal */}
+      {cancelModal.show && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-bold text-gray-900">Cancel Order</h3>
+              <button
+                onClick={() => setCancelModal({ show: false, orderId: null, reason: '' })}
+                className="text-gray-400 hover:text-gray-600"
+                disabled={actionLoading}
+              >
+                <X size={24} />
+              </button>
+            </div>
+            
+            <div className="mb-6">
+              <div className="flex items-center gap-3 mb-4 p-4 bg-red-50 rounded-lg">
+                <AlertTriangle size={24} className="text-red-600 flex-shrink-0" />
+                <p className="text-sm text-gray-700">
+                  This action cannot be undone. Please provide a reason for cancellation.
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Cancellation Reason *
+                </label>
+                <textarea
+                  value={cancelModal.reason}
+                  onChange={(e) => setCancelModal({ ...cancelModal, reason: e.target.value })}
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 resize-none"
+                  rows={4}
+                  placeholder="Enter reason for cancellation..."
+                  disabled={actionLoading}
+                />
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setCancelModal({ show: false, orderId: null, reason: '' })}
+                className="flex-1 px-4 py-2.5 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-semibold transition-colors"
+                disabled={actionLoading}
+              >
+                Go Back
+              </button>
+              <button
+                onClick={cancelOrderAction}
+                className="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={actionLoading}
+              >
+                {actionLoading ? 'Cancelling...' : 'Cancel Order'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
     </AdminRouteGuard>
   );
 }

@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { format } from 'date-fns';
 import OrderStatusBadge from './OrderStatusBadge';
 import PaymentStatusBadge from './PaymentStatusBadge';
-import { Package, Calendar, IndianRupee, Eye } from 'lucide-react';
+import { Package, Calendar, IndianRupee, Eye, CheckCircle, XCircle, Edit } from 'lucide-react';
 
 interface OrderCardProps {
   order: {
@@ -29,9 +29,11 @@ interface OrderCardProps {
     };
   };
   isAdmin?: boolean;
+  onConfirm?: (orderId: string) => void;
+  onCancel?: (orderId: string) => void;
 }
 
-export default function OrderCard({ order, isAdmin = false }: OrderCardProps) {
+export default function OrderCard({ order, isAdmin = false, onConfirm, onCancel }: OrderCardProps) {
   const formatPrice = (amount: number) => {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
@@ -130,14 +132,38 @@ export default function OrderCard({ order, isAdmin = false }: OrderCardProps) {
         </div>
 
         {/* Right Section - Actions */}
-        <div className="flex flex-col gap-2 md:ml-4">
+        <div className="flex flex-col gap-2 md:ml-4 min-w-[140px]">
           <Link
             href={isAdmin ? `/admin/orders/${order.id}` : `/my-orders/${order.id}`}
-            className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark transition-colors text-sm font-medium"
+            className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors text-sm font-medium"
           >
             <Eye className="h-4 w-4" />
             View Details
           </Link>
+          
+          {isAdmin && (
+            <>
+              {order.status === 'PENDING' && onConfirm && (
+                <button
+                  onClick={() => onConfirm(order.id)}
+                  className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm font-medium"
+                >
+                  <CheckCircle className="h-4 w-4" />
+                  Confirm
+                </button>
+              )}
+              
+              {['PENDING', 'CONFIRMED', 'PROCESSING'].includes(order.status) && onCancel && (
+                <button
+                  onClick={() => onCancel(order.id)}
+                  className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors text-sm font-medium"
+                >
+                  <XCircle className="h-4 w-4" />
+                  Cancel
+                </button>
+              )}
+            </>
+          )}
         </div>
       </div>
     </div>

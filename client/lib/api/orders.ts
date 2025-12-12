@@ -82,6 +82,17 @@ export const cancelOrder = async (orderId: string, reason?: string) => {
   return response.data;
 };
 
+export const updateCustomerOrderAddress = async (
+  orderId: string,
+  shippingAddress: any
+) => {
+  const response = await axios.put(`${API_BASE_URL}/orders/my-orders/${orderId}/address`,
+    { shippingAddress },
+    { headers: getAuthHeaders() }
+  );
+  return response.data;
+};
+
 // Admin Order APIs
 export const getAllOrders = async (filters: OrderFilters = {}) => {
   const params = new URLSearchParams();
@@ -108,10 +119,11 @@ export const updateOrderStatus = async (
   orderId: string,
   status: string,
   trackingNumber?: string,
-  carrierName?: string
+  carrierName?: string,
+  cancellationReason?: string
 ) => {
   const response = await axios.put(`${API_BASE_URL}/orders/${orderId}/status`,
-    { status, trackingNumber, carrierName },
+    { status, trackingNumber, carrierName, cancellationReason },
     { headers: getAuthHeaders() }
   );
   return response.data;
@@ -124,6 +136,28 @@ export const updatePaymentStatus = async (
 ) => {
   const response = await axios.put(`${API_BASE_URL}/orders/${orderId}/payment-status`,
     { paymentStatus, paymentId },
+    { headers: getAuthHeaders() }
+  );
+  return response.data;
+};
+
+export const updateShippingAddress = async (
+  orderId: string,
+  shippingAddress: any
+) => {
+  const response = await axios.put(`${API_BASE_URL}/orders/${orderId}/shipping-address`,
+    { shippingAddress },
+    { headers: getAuthHeaders() }
+  );
+  return response.data;
+};
+
+export const updateInternalNotes = async (
+  orderId: string,
+  internalNotes: string
+) => {
+  const response = await axios.put(`${API_BASE_URL}/orders/${orderId}/internal-notes`,
+    { internalNotes },
     { headers: getAuthHeaders() }
   );
   return response.data;

@@ -8,7 +8,7 @@ const cartItemSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 const cartSchema = new mongoose.Schema({
-    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    user: { type: mongoose.Schema.Types.ObjectId, ref: 'users', required: true },
     userId: { type: String, required: true }, // Store user_id as string for easy access
     userName: { type: String }, // Store user's display name or full name
     userEmail: { type: String }, // Store user's email for reference

@@ -12,11 +12,14 @@ export declare class OrderController {
      */
     createOrder: (req: Request, res: Response, next: import("express").NextFunction) => void;
     cancelOrder: (req: Request, res: Response, next: import("express").NextFunction) => void;
+    updateCustomerOrderAddress: (req: Request, res: Response, next: import("express").NextFunction) => void;
     getAllOrders: (req: Request, res: Response, next: import("express").NextFunction) => void;
     getOrderStats: (req: Request, res: Response, next: import("express").NextFunction) => void;
     getOrderByIdAdmin: (req: Request, res: Response, next: import("express").NextFunction) => void;
     updateOrderStatus: (req: Request, res: Response, next: import("express").NextFunction) => void;
     updatePaymentStatus: (req: Request, res: Response, next: import("express").NextFunction) => void;
+    updateShippingAddress: (req: Request, res: Response, next: import("express").NextFunction) => void;
+    updateInternalNotes: (req: Request, res: Response, next: import("express").NextFunction) => void;
     trackOrder: (req: Request, res: Response, next: import("express").NextFunction) => void;
     trackOrderById: (req: Request, res: Response, next: import("express").NextFunction) => void;
     adminTrackOrder: (req: Request, res: Response, next: import("express").NextFunction) => void;

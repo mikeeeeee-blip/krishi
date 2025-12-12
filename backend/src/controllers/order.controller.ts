@@ -4,6 +4,7 @@ import { Order } from '../models/order.model.js';
 import { Product } from '../models/product.model.js';
 import { Cart } from '../models/cart.model.js';
 import { Coupon } from '../models/coupon.model.js';
+import { userModel } from '../models/user.model.js';
 import { ApiError, asyncHandler } from '../middleware/errorHandler.js';
 import { getPagination, generateOrderNumber } from '../utils/helpers.js';
 import { buildDateRange, buildPriceRange, buildPagination } from '../utils/queryBuilder.js';
@@ -338,6 +339,45 @@ export class OrderController {
     res.json({ success: true, data: order });
   });
 
+  // Customer: Update shipping address and phone (only before shipping)
+  updateCustomerOrderAddress = asyncHandler(async (req: Request, res: Response) => {
+    const { shippingAddress } = req.body;
+    const orderId = req.params.id;
+    const userId = req.user!.id;
+
+    if (!shippingAddress) {
+      throw new ApiError(HTTP_STATUS.BAD_REQUEST, 'Shipping address is required');
+    }
+
+    // Validate required fields
+    if (!shippingAddress.fullName || !shippingAddress.phone || !shippingAddress.addressLine1 ||
+        !shippingAddress.city || !shippingAddress.state || !shippingAddress.pincode) {
+      throw new ApiError(HTTP_STATUS.BAD_REQUEST, 'All required address fields must be provided');
+    }
+
+    // Find order and verify ownership
+    const order: any = await Order.findOne({ _id: orderId, user: userId });
+
+    if (!order) {
+      throw new ApiError(HTTP_STATUS.NOT_FOUND, 'Order not found');
+    }
+
+    // Only allow update if order hasn't been shipped
+    if ([ORDER_STATUS.SHIPPED, ORDER_STATUS.DELIVERED].includes(order.status as any)) {
+      throw new ApiError(HTTP_STATUS.BAD_REQUEST, 'Cannot update address after order has been shipped');
+    }
+
+    // Update shipping address
+    order.shippingAddress = shippingAddress;
+    await order.save();
+
+    res.json({ 
+      success: true, 
+      data: order, 
+      message: 'Shipping address updated successfully' 
+    });
+  });
+
   // Admin: Get all orders
   getAllOrders = asyncHandler(async (req: Request, res: Response) => {
     const {
@@ -515,7 +555,7 @@ export class OrderController {
 
   // Admin: Update order status
   updateOrderStatus = asyncHandler(async (req: Request, res: Response) => {
-    const { status, trackingNumber, carrierName } = req.body;
+    const { status, trackingNumber, carrierName, cancellationReason } = req.body;
 
     const updateData: any = { status };
 
@@ -525,6 +565,11 @@ export class OrderController {
       if (carrierName) updateData.carrierName = carrierName;
     } else if (status === 'DELIVERED') {
       updateData.deliveredAt = new Date();
+    } else if (status === 'CANCELLED') {
+      updateData.cancelledAt = new Date();
+      if (cancellationReason) {
+        updateData.cancellationReason = cancellationReason;
+      }
     }
 
     const order: any = await Order.findByIdAndUpdate(req.params.id, updateData, { new: true });
@@ -543,6 +588,44 @@ export class OrderController {
     const order: any = await Order.findByIdAndUpdate(req.params.id, updateData, { new: true });
 
     res.json({ success: true, data: order });
+  });
+
+  // Admin: Update shipping address
+  updateShippingAddress = asyncHandler(async (req: Request, res: Response) => {
+    const { shippingAddress } = req.body;
+
+    if (!shippingAddress) {
+      throw new ApiError(HTTP_STATUS.BAD_REQUEST, 'Shipping address is required');
+    }
+
+    const order: any = await Order.findByIdAndUpdate(
+      req.params.id,
+      { shippingAddress },
+      { new: true }
+    );
+
+    if (!order) {
+      throw new ApiError(HTTP_STATUS.NOT_FOUND, 'Order not found');
+    }
+
+    res.json({ success: true, data: order, message: 'Shipping address updated successfully' });
+  });
+
+  // Admin: Update internal notes
+  updateInternalNotes = asyncHandler(async (req: Request, res: Response) => {
+    const { internalNotes } = req.body;
+
+    const order: any = await Order.findByIdAndUpdate(
+      req.params.id,
+      { internalNotes },
+      { new: true }
+    );
+
+    if (!order) {
+      throw new ApiError(HTTP_STATUS.NOT_FOUND, 'Order not found');
+    }
+
+    res.json({ success: true, data: order, message: 'Internal notes updated successfully' });
   });
 
   // Track order by order number (public endpoint)

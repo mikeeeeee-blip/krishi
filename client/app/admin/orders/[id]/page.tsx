@@ -15,6 +15,8 @@ import {
   getOrderById,
   updateOrderStatus,
   updatePaymentStatus,
+  updateShippingAddress,
+  updateInternalNotes,
 } from '@/lib/api/orders';
 import { format } from 'date-fns';
 import {
@@ -29,6 +31,9 @@ import {
   User,
   Mail,
   Phone,
+  Edit,
+  FileText,
+  X,
 } from 'lucide-react';
 
 const ORDER_STATUSES = [
@@ -63,6 +68,19 @@ export default function AdminOrderDetailPage() {
     paymentStatus: '',
     paymentId: '',
   });
+  const [showEditAddress, setShowEditAddress] = useState(false);
+  const [editAddressForm, setEditAddressForm] = useState({
+    fullName: '',
+    phone: '',
+    addressLine1: '',
+    addressLine2: '',
+    city: '',
+    state: '',
+    pincode: '',
+    country: 'India',
+  });
+  const [internalNotes, setInternalNotes] = useState('');
+  const [showNotesModal, setShowNotesModal] = useState(false);
 
   useEffect(() => {
     const fetchOrder = async () => {
@@ -79,6 +97,22 @@ export default function AdminOrderDetailPage() {
           paymentStatus: response.data.paymentStatus,
           paymentId: response.data.paymentId || '',
         });
+        // Load shipping address for editing
+        if (response.data.shippingAddress) {
+          const addr = response.data.shippingAddress;
+          setEditAddressForm({
+            fullName: addr.fullName || '',
+            phone: addr.phone || '',
+            addressLine1: addr.addressLine1 || '',
+            addressLine2: addr.addressLine2 || '',
+            city: addr.city || '',
+            state: addr.state || '',
+            pincode: addr.pincode || '',
+            country: addr.country || 'India',
+          });
+        }
+        // Load internal notes
+        setInternalNotes(response.data.internalNotes || '');
       } catch (err: any) {
         setError(err.message || 'Failed to load order');
       } finally {
@@ -131,6 +165,37 @@ export default function AdminOrderDetailPage() {
       alert('Payment status updated successfully');
     } catch (err: any) {
       alert(err.message || 'Failed to update payment status');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleAddressUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      setSaving(true);
+      await updateShippingAddress(orderId, editAddressForm);
+      const response = await getOrderById(orderId);
+      setOrder(response.data);
+      setShowEditAddress(false);
+      alert('Shipping address updated successfully');
+    } catch (err: any) {
+      alert(err.message || 'Failed to update shipping address');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleNotesUpdate = async () => {
+    try {
+      setSaving(true);
+      await updateInternalNotes(orderId, internalNotes);
+      const response = await getOrderById(orderId);
+      setOrder(response.data);
+      setShowNotesModal(false);
+      alert('Internal notes updated successfully');
+    } catch (err: any) {
+      alert(err.message || 'Failed to update internal notes');
     } finally {
       setSaving(false);
     }
