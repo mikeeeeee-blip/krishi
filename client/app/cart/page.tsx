@@ -53,6 +53,13 @@ export default function CartPage() {
     }
   }, [isAuthenticated, authLoading, showCheckout, router]);
 
+  // Redirect admins away from cart page
+  useEffect(() => {
+    if (!authLoading && isAuthenticated && user?.role === 'ADMIN') {
+      router.push('/admin/orders');
+    }
+  }, [isAuthenticated, authLoading, user, router]);
+
   // Update email when user is loaded
   useEffect(() => {
     if (user?.email && !shippingAddress.email) {

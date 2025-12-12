@@ -36,8 +36,26 @@ export const getProducts = async (filters: ProductFilters = {}) => {
 
 // Get product by ID
 export const getProductById = async (productId: string) => {
-  const response = await axios.get(`${API_BASE_URL}/products/${productId}`);
-  return response.data;
+  if (!productId) {
+    throw new Error('Product ID is required');
+  }
+
+  try {
+    const response = await axios.get(`${API_BASE_URL}/products/${productId}`);
+    return response.data;
+  } catch (error: any) {
+    if (error.response) {
+      // Server responded with error status
+      const message = error.response.data?.message || error.message;
+      throw new Error(`Failed to fetch product: ${message}`);
+    } else if (error.request) {
+      // Request was made but no response received
+      throw new Error('Network error: Unable to connect to server. Please check if the backend server is running.');
+    } else {
+      // Something else happened
+      throw new Error(`Error: ${error.message}`);
+    }
+  }
 };
 
 // Get product by slug
@@ -90,6 +108,41 @@ export const searchProducts = async (query: string, filters: ProductFilters = {}
   });
 
   const response = await axios.get(`${API_BASE_URL}/products/search?${params.toString()}`);
+  return response.data;
+};
+
+// Create product (admin/seller only)
+export const createProduct = async (productData: any) => {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
+  const response = await axios.post(`${API_BASE_URL}/products`, productData, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+  });
+  return response.data;
+};
+
+// Update product (admin/seller only)
+export const updateProduct = async (productId: string, productData: any) => {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
+  const response = await axios.put(`${API_BASE_URL}/products/${productId}`, productData, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+  });
+  return response.data;
+};
+
+// Delete product (admin/seller only)
+export const deleteProduct = async (productId: string) => {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
+  const response = await axios.delete(`${API_BASE_URL}/products/${productId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
   return response.data;
 };
 

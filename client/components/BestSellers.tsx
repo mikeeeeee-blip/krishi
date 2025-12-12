@@ -1,8 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import ProductCard from './ProductCard';
 import { getBestsellerProducts } from '@/lib/api/products';
+import { useAuth } from '@/contexts/AuthContext';
+import { Plus } from 'lucide-react';
 
 // Fallback products data (used when API is unavailable)
 const fallbackProducts = [
@@ -423,6 +426,8 @@ const fallbackProducts = [
   }]
 
 export default function BestSellers() {
+  const { isAuthenticated, user } = useAuth();
+  const isAdmin = isAuthenticated && user?.role === 'ADMIN';
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -557,9 +562,20 @@ export default function BestSellers() {
       <div className="container mx-auto px-4 md:px-6 max-w-7xl">
         <div className="flex items-center justify-between mb-6 md:mb-8">
           <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900">Best Sellers</h2>
-          <a href="#" className="text-[#16a34a] hover:text-[#15803d] font-semibold text-base md:text-lg transition-colors whitespace-nowrap hover:underline">
-            View All →
-          </a>
+          <div className="flex items-center gap-4">
+            {isAdmin && (
+              <Link
+                href="/admin/products/new?section=bestseller"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:from-green-700 hover:to-emerald-700 transition-all shadow-md hover:shadow-lg font-semibold text-sm"
+              >
+                <Plus size={18} />
+                Add Product
+              </Link>
+            )}
+            <a href="#" className="text-[#16a34a] hover:text-[#15803d] font-semibold text-base md:text-lg transition-colors whitespace-nowrap hover:underline">
+              View All →
+            </a>
+          </div>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-2.5 md:gap-3">
           {products.map((product) => (

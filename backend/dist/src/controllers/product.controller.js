@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import { Product } from '../models/product.model.js';
 import { ApiError, asyncHandler } from '../middleware/errorHandler.js';
 import { getPagination } from '../utils/helpers.js';
@@ -184,7 +185,12 @@ export class ProductController {
     });
     // Get product by ID
     getProductById = asyncHandler(async (req, res) => {
-        const product = await Product.findOne({ _id: req.params.id, deletedAt: null })
+        const { id } = req.params;
+        // Validate productId is a valid MongoDB ObjectId
+        if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+            throw new ApiError(400, 'Invalid product ID format');
+        }
+        const product = await Product.findOne({ _id: id, deletedAt: null })
             .populate('category')
             .populate('brand')
             .populate('seller', 'firstName lastName') // Assuming seller is User
@@ -276,6 +282,10 @@ export class ProductController {
     // Update product
     updateProduct = asyncHandler(async (req, res) => {
         const { id } = req.params;
+        // Validate productId is a valid MongoDB ObjectId
+        if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+            throw new ApiError(400, 'Invalid product ID format');
+        }
         const existing = await Product.findById(id);
         if (!existing) {
             throw new ApiError(404, 'Product not found');
@@ -292,6 +302,10 @@ export class ProductController {
     // Delete product (soft delete)
     deleteProduct = asyncHandler(async (req, res) => {
         const { id } = req.params;
+        // Validate productId is a valid MongoDB ObjectId
+        if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+            throw new ApiError(400, 'Invalid product ID format');
+        }
         await Product.findByIdAndUpdate(id, {
             deletedAt: new Date(),
             status: 'DISCONTINUED'

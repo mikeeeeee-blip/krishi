@@ -65,7 +65,9 @@ export default function Header({ onMenuToggle, isMenuOpen = false }: HeaderProps
 
             {/* Logo - Centered */}
             <Link href="/" className="flex items-center gap-1.5 flex-shrink-0 flex-1 justify-center">
-              <Image src='/logo.png' alt='logo' className='object-cover' height={100} width={200}></Image>
+              <div className="relative h-12 w-24 sm:h-14 sm:w-28">
+                <Image src='/logo.png' alt='logo' className='object-contain' fill unoptimized></Image>
+              </div>
             </Link>
 
             {/* Right Icons: Home, My Orders (if customer), Admin Dashboard (if admin), Shopping Cart, User */}
@@ -83,14 +85,16 @@ export default function Header({ onMenuToggle, isMenuOpen = false }: HeaderProps
                   <LayoutDashboard size={20} className="sm:w-5 sm:h-5" />
                 </Link>
               )}
-              <Link href="/cart" className="relative text-gray-700 hover:text-green-600 hover:bg-gray-50 rounded-lg transition-all duration-200 p-2 active:scale-95">
-                <ShoppingCart size={20} className="sm:w-5 sm:h-5" />
-                {cartCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-gradient-to-br from-red-500 to-red-600 text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center shadow-lg border-2 border-white">
-                    {cartCount > 9 ? '9+' : cartCount}
-                  </span>
-                )}
-              </Link>
+              {(!isAuthenticated || user?.role !== 'ADMIN') && (
+                <Link href="/cart" className="relative text-gray-700 hover:text-green-600 hover:bg-gray-50 rounded-lg transition-all duration-200 p-2 active:scale-95">
+                  <ShoppingCart size={20} className="sm:w-5 sm:h-5" />
+                  {cartCount > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-gradient-to-br from-red-500 to-red-600 text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center shadow-lg border-2 border-white">
+                      {cartCount > 9 ? '9+' : cartCount}
+                    </span>
+                  )}
+                </Link>
+              )}
               {isAuthenticated ? (
                 <Link
                   href={user?.role === 'ADMIN' ? '/admin/orders' : '/my-orders'}
@@ -126,7 +130,9 @@ export default function Header({ onMenuToggle, isMenuOpen = false }: HeaderProps
         <div className="hidden lg:flex items-center justify-between py-3 md:py-4 gap-6 md:gap-8">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 flex-shrink-0 hover:opacity-90 transition-opacity duration-200">
-           <Image src='/logo.png' alt='logo' className='object-cover h-auto' height={100} width={200} priority></Image>
+            <div className="relative h-12 w-24 md:h-14 md:w-28">
+              <Image src='/logo.png' alt='logo' className='object-contain' fill priority unoptimized></Image>
+            </div>
           </Link>
 
           {/* Search Bar */}
@@ -166,15 +172,17 @@ export default function Header({ onMenuToggle, isMenuOpen = false }: HeaderProps
                 <span className="whitespace-nowrap font-medium text-[11px] md:text-xs">Admin</span>
               </Link>
             )}
-            <Link href="/cart" className="relative flex flex-col items-center gap-1 text-gray-700 hover:text-green-600 hover:bg-gray-50 rounded-lg transition-all duration-200 text-xs md:text-sm px-3 py-2 group">
-              <ShoppingCart size={20} className="md:w-5 md:h-5 group-hover:scale-110 transition-transform" />
-              <span className="whitespace-nowrap font-medium text-[11px] md:text-xs">Cart</span>
-              {cartCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-gradient-to-br from-red-500 to-red-600 text-white text-[10px] font-bold rounded-full min-w-[20px] h-5 flex items-center justify-center shadow-lg border-2 border-white px-1">
-                  {cartCount > 9 ? '9+' : cartCount}
-                </span>
-              )}
-            </Link>
+            {(!isAuthenticated || user?.role !== 'ADMIN') && (
+              <Link href="/cart" className="relative flex flex-col items-center gap-1 text-gray-700 hover:text-green-600 hover:bg-gray-50 rounded-lg transition-all duration-200 text-xs md:text-sm px-3 py-2 group">
+                <ShoppingCart size={20} className="md:w-5 md:h-5 group-hover:scale-110 transition-transform" />
+                <span className="whitespace-nowrap font-medium text-[11px] md:text-xs">Cart</span>
+                {cartCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-gradient-to-br from-red-500 to-red-600 text-white text-[10px] font-bold rounded-full min-w-[20px] h-5 flex items-center justify-center shadow-lg border-2 border-white px-1">
+                    {cartCount > 9 ? '9+' : cartCount}
+                  </span>
+                )}
+              </Link>
+            )}
             <div className="relative z-[1002]">
               {isAuthenticated ? (
                 <div className="relative" ref={userMenuRef}>

@@ -77,6 +77,7 @@ export default function AboutUsPage() {
                 width={400}
                 height={200}
                 className="object-contain p-8"
+                unoptimized
               />
             </div>
           </div>

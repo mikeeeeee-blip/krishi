@@ -5,6 +5,10 @@ import { Heart } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useCart } from '@/contexts/CartContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { useRouter } from 'next/navigation';
+import { deleteProduct } from '@/lib/api/products';
+import { Edit, Trash2, Loader2 } from 'lucide-react';
 import Toast from './Toast';
 
 interface ProductVariant {
@@ -38,11 +42,15 @@ interface ProductCardProps {
 
 export default function ProductCard({ product }: ProductCardProps) {
   const { addToCart } = useCart();
+  const { isAuthenticated, user } = useAuth();
+  const router = useRouter();
   const [showToast, setShowToast] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const isAdmin = isAuthenticated && user?.role === 'ADMIN';
   
   // Safe array access with fallbacks
   const selectedVariant = product.variants?.[0];
-  const productImage = product.images?.[0] || '/placeholder-image.png';
+  const productImage = product.images?.[0] || '/logo.png';
 
   // Early return if no variant or image
   const hasImages = product.images && Array.isArray(product.images) && product.images.length > 0;
@@ -78,10 +86,11 @@ export default function ProductCard({ product }: ProductCardProps) {
             fill
             className="object-contain p-1 sm:p-1.5 md:p-2 lg:p-2.5"
             sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
+            unoptimized={productImage.includes('cloudfront.net') || productImage.includes('agribegri.com')}
             onError={(e) => {
-              // Fallback to placeholder if image fails to load
+              // Fallback to logo if image fails to load
               const target = e.target as HTMLImageElement;
-              target.src = '/placeholder-image.png';
+              target.src = '/logo.png';
             }}
           />
 
@@ -155,14 +164,56 @@ export default function ProductCard({ product }: ProductCardProps) {
             {selectedVariant.quantity}
           </p>
 
-          {/* Add to Cart Button - Optimized size */}
-          <button
-            onClick={handleAddToCart}
-            disabled={selectedVariant.price === null}
-            className="w-full bg-[#16a34a] hover:bg-[#15803d] disabled:bg-gray-400 disabled:cursor-not-allowed text-white text-[10px] sm:text-xs font-semibold py-1.5 sm:py-2 md:py-2.5 rounded-md transition-all duration-200 mt-auto flex items-center justify-center shadow-sm hover:shadow-md"
-          >
-            {selectedVariant.price === null ? 'Out of Stock' : 'Add to Cart'}
-          </button>
+          {/* Action Buttons */}
+          {isAdmin ? (
+            <div className="flex gap-2 mt-auto">
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  router.push(`/admin/products/${product.id}/edit`);
+                }}
+                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-[10px] sm:text-xs font-semibold py-1.5 sm:py-2 md:py-2.5 rounded-md transition-all duration-200 flex items-center justify-center gap-1 shadow-sm hover:shadow-md"
+              >
+                <Edit size={12} className="sm:w-3 sm:h-3" />
+                Update
+              </button>
+              <button
+                onClick={async (e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  if (!confirm(`Are you sure you want to delete "${product.name}"?`)) {
+                    return;
+                  }
+                  try {
+                    setDeleting(true);
+                    await deleteProduct(product.id);
+                    router.push('/admin/products');
+                  } catch (err: any) {
+                    alert(err.response?.data?.message || err.message || 'Failed to delete product');
+                    setDeleting(false);
+                  }
+                }}
+                disabled={deleting}
+                className="flex-1 bg-red-600 hover:bg-red-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white text-[10px] sm:text-xs font-semibold py-1.5 sm:py-2 md:py-2.5 rounded-md transition-all duration-200 flex items-center justify-center gap-1 shadow-sm hover:shadow-md"
+              >
+                {deleting ? (
+                  <Loader2 size={12} className="sm:w-3 sm:h-3 animate-spin" />
+                ) : (
+                  <Trash2 size={12} className="sm:w-3 sm:h-3" />
+                )}
+                {deleting ? '...' : 'Delete'}
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={handleAddToCart}
+              disabled={selectedVariant.price === null}
+              className="w-full bg-[#16a34a] hover:bg-[#15803d] disabled:bg-gray-400 disabled:cursor-not-allowed text-white text-[10px] sm:text-xs font-semibold py-1.5 sm:py-2 md:py-2.5 rounded-md transition-all duration-200 mt-auto flex items-center justify-center shadow-sm hover:shadow-md"
+            >
+              {selectedVariant.price === null ? 'Out of Stock' : 'Add to Cart'}
+            </button>
+          )}
         </div>
       </div>
       

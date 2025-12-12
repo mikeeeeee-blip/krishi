@@ -34,7 +34,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { isAuthenticated, loading: authLoading } = useAuth();
+  const { isAuthenticated, loading: authLoading, user } = useAuth();
 
   // Helper function to check if a string is a valid MongoDB ObjectId
   const isValidObjectId = (id: string): boolean => {
@@ -240,6 +240,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
   };
 
   const addToCart = async (item: Omit<CartItem, 'count'>) => {
+    // Prevent admins from adding items to cart
+    if (isAuthenticated && user?.role === 'ADMIN') {
+      throw new Error('Admins cannot add items to cart');
+    }
+    
     // If authenticated and productId is valid, add to backend first
     if (isAuthenticated && isValidObjectId(item.productId)) {
       try {
